@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetConfigFemtoAssetDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigFemtoAssetEntity">
+ INSERT INTO SNET_CONFIG_FEMTO_ASSET
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='fmsid != null '>
+      , fmsid
+   </if>
+   <if test='opcenter != null '>
+      , opcenter
+   </if>
+   <if test='locid != null '>
+      , locid
+   </if>
+   <if test='apid != null '>
+      , apid
+   </if>
+   <if test='eci != null '>
+      , eci
+   </if>
+   <if test='manufacturer != null '>
+      , manufacturer
+   </if>
+   <if test='manufactureroui != null '>
+      , manufactureroui
+   </if>
+   <if test='modelname != null '>
+      , modelname
+   </if>
+   <if test='description != null '>
+      , description
+   </if>
+   <if test='productclass != null '>
+      , productclass
+   </if>
+   <if test='serialnumber != null '>
+      , serialnumber
+   </if>
+   <if test='hardwareversion != null '>
+      , hardwareversion
+   </if>
+   <if test='softwareversion != null '>
+      , softwareversion
+   </if>
+   <if test='modemfirmwareversion != null '>
+      , modemfirmwareversion
+   </if>
+   <if test='enabledoptions != null '>
+      , enabledoptions
+   </if>
+   <if test='additionalsoftwareversion != null '>
+      , additionalsoftwareversion
+   </if>
+   <if test='specversion != null '>
+      , specversion
+   </if>
+   <if test='provisioningcode != null '>
+      , provisioningcode
+   </if>
+   <if test='uptime != null '>
+      , uptime
+   </if>
+   <if test='firstusedate != null '>
+      , firstusedate
+   </if>
+   <if test='equipment != null '>
+      , equipment
+   </if>
+   <if test='useYn != null '>
+      , use_yn
+   </if>
+   <if test='createDate != null '>
+      , create_date
+   </if>
+   <if test='updateDate != null '>
+      , update_date
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='fmsid != null '>
+   	  ,    #{fmsid, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='opcenter != null '>
+   	  ,    #{opcenter, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='locid != null '>
+   	  ,    #{locid, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='apid != null '>
+   	  ,    #{apid, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='eci != null '>
+   	  ,    #{eci, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='manufacturer != null '>
+   	  ,    #{manufacturer, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='manufactureroui != null '>
+   	  ,    #{manufactureroui, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='modelname != null '>
+   	  ,    #{modelname, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='description != null '>
+   	  ,    #{description, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='productclass != null '>
+   	  ,    #{productclass, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='serialnumber != null '>
+   	  ,    #{serialnumber, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='hardwareversion != null '>
+   	  ,    #{hardwareversion, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='softwareversion != null '>
+   	  ,    #{softwareversion, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='modemfirmwareversion != null '>
+   	  ,    #{modemfirmwareversion, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='enabledoptions != null '>
+   	  ,    #{enabledoptions, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='additionalsoftwareversion != null '>
+   	  ,    #{additionalsoftwareversion, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='specversion != null '>
+   	  ,    #{specversion, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='provisioningcode != null '>
+   	  ,    #{provisioningcode, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='uptime != null '>
+   	  ,    #{uptime, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='firstusedate != null '>
+   	  ,    #{firstusedate, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='equipment != null '>
+   	  ,    #{equipment, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='useYn != null '>
+   	  ,    #{useYn, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='createDate != null '>
+   	  ,    #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='updateDate != null '>
+   	  ,    #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+  </trim>
+</insert>
+
+
+
+
+
+
+
+
+
+</mapper>

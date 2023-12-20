@@ -1,0 +1,2525 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.AuditStatisticsMapper">
+
+    <!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+    <select id="getAssetCntByBeforeCreateDay" parameterType="java.util.HashMap" resultType="SnetStatistics">
+        select A.division, branch_id, team_id
+            ,SW_TYPE
+            ,ASSET_NOT_AUDIT_CNT
+            ,ASSET_NOT_COK_CNT
+            ,ASSET_CNT
+            ,ASSET_PLUS_CNT
+            ,ASSET_MINUS_CNT
+        from SNET_AUDIT_STATISTICS A
+        where CREATE_DAY = #{BEFORE_CREATE_DAY}
+        and SW_TYPE = #{SW_TYPE}
+        and DIVISION = #{DIVISION}
+        LIMIT 1
+    </select>
+
+    <select id="getStatisticsTodayMaxDay" parameterType="SnetStatistics" resultType="SnetStatistics">
+        select max(create_day) as create_day
+        from SNET_AUDIT_STATISTICS_TODAY
+        where create_day = #{createDate}
+    </select>
+
+    <select id="getStatisticsTodayMaxTime" parameterType="SnetStatistics" resultType="SnetStatistics">
+        select max(create_time) as create_time
+        from SNET_AUDIT_STATISTICS_TODAY
+        where create_day = #{createDay}
+    </select>
+
+    <delete id="deleteAuditStatisticsDetail" parameterType="SnetStatistics">
+        DELETE FROM SNET_AUDIT_STATISTICS_DETAIL
+        where 1=1
+        and CREATE_DAY = #{createDay}
+    </delete>
+
+    <delete id="deleteAuditStatistics" parameterType="SnetStatistics">
+        DELETE FROM SNET_AUDIT_STATISTICS
+        where 1=1
+        and CREATE_DAY = #{createDay}
+    </delete>
+
+    <delete id="deleteAuditStatisticsDetailToday" parameterType="SnetStatistics">
+        DELETE FROM SNET_AUDIT_STATISTICS_TODAY_DETAIL
+        where 1=1
+        and CREATE_DAY = #{createDay}
+        <if test="createTime != null and !createTime.equals('') ">
+            and CREATE_TIME = #{createTime}
+        </if>
+    </delete>
+
+    <delete id="deleteAuditStatisticsToday" parameterType="SnetStatistics">
+        DELETE FROM SNET_AUDIT_STATISTICS_TODAY
+        where 1=1
+        and CREATE_DAY = #{createDay}
+        <if test="createTime != null and !createTime.equals('') ">
+            and CREATE_TIME = #{createTime}
+        </if>
+    </delete>
+
+    <insert id="insertAuditStatistics" parameterType="SnetStatistics">
+        INSERT INTO SNET_AUDIT_STATISTICS (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , AUDIT_STD_CD
+            , AD_RESULT_REQ
+            , AD_RESULT_OK
+            , AD_RESULT_NOK
+            , AD_RESULT_REQ_D
+            , AD_RESULT_OK_D
+            , AD_RESULT_NOK_D
+            , AD_EXCEPT_REQ
+            , AD_EXCEPT_OK
+            , AD_EXCEPT_NOK
+            , AD_EXCEPT_REQ_D
+            , AD_EXCEPT_OK_D
+            , AD_EXCEPT_NOK_D
+            , EQUIP_CNT
+            , EQUIP_INSTALL_NOK_CNT
+            , EQUIP_PLUS_CNT
+            , EQUIP_MINUS_CNT
+            , EQUIP_CNT_D
+            , EQUIP_INSTALL_NOK_CNT_D
+            , EQUIP_PLUS_CNT_D
+            , EQUIP_MINUS_CNT_D
+            , SW_TYPE
+            , ASSET_NOT_AUDIT_CNT
+            , ASSET_NOT_COK_CNT
+            , ASSET_CNT
+            , ASSET_PLUS_CNT
+            , ASSET_MINUS_CNT
+            , ASSET_NOT_AUDIT_CNT_D
+            , ASSET_NOT_COK_CNT_D
+            , ASSET_CNT_D
+            , ASSET_PLUS_CNT_D
+            , ASSET_MINUS_CNT_D
+            , ITEM_CNT
+            , ALL_ITEM_CNT
+            , SCHK_SEC_VAL
+            , SCHK_SEC_LEV
+            , PCHK_SEC_VAL
+            , PCHK_SEC_LEV
+            , AUDIT_RATE
+            , ALL_AUDIT_RATE
+            , ALL_AUDIT_RATE_AVG
+            , BRANCH_AUDIT_RATE
+            , BRANCH_AUDIT_RATE_AVG
+            , TEAM_AUDIT_RATE
+            , TEAM_AUDIT_RATE_AVG
+            , ITEM_CNT_D
+            , ALL_ITEM_CNT_D
+            , SCHK_SEC_VAL_D
+            , SCHK_SEC_LEV_D
+            , PCHK_SEC_VAL_D
+            , PCHK_SEC_LEV_D
+            , AUDIT_RATE_D
+            , ALL_AUDIT_RATE_D
+            , ALL_AUDIT_RATE_AVG_D
+            , BRANCH_AUDIT_RATE_D
+            , BRANCH_AUDIT_RATE_AVG_D
+            , TEAM_AUDIT_RATE_D
+            , TEAM_AUDIT_RATE_AVG_D
+            , DIVISION
+        ) VALUES (
+              #{seq}
+            , #{statisticsId}
+            , #{branchId}
+            , #{teamId}
+            , #{createDay}
+            , #{auditStdCd}
+            , #{adResultReq}
+            , #{adResultOk}
+            , #{adResultNok}
+            , #{adResultReqD}
+            , #{adResultOkD}
+            , #{adResultNokD}
+            , #{adExceptReq}
+            , #{adExceptOk}
+            , #{adExceptNok}
+            , #{adExceptReqD}
+            , #{adExceptOkD}
+            , #{adExceptNokD}
+            , #{equipCnt}
+            , #{equipInstallNokCnt}
+            , #{equipPlusCnt}
+            , #{equipMinusCnt}
+            , #{equipCntD}
+            , #{equipInstallNokCnt}
+            , #{equipPlusCntD}
+            , #{equipMinusCntD}
+            , #{swType}
+            , #{assetNotAuditCnt}
+            , #{assetNotCokCnt}
+            , #{assetCnt}
+            , #{assetPlusCnt}
+            , #{assetMinusCnt}
+            , #{assetNotAuditCntD}
+            , #{assetNotCokCntD}
+            , #{assetCntD}
+            , #{assetPlusCntD}
+            , #{assetMinusCntD}
+            , #{itemCnt}
+            , #{allItemCnt}
+            , #{schkSecVal}
+            , #{schkSecLev}
+            , #{pchkSecVal}
+            , #{pchkSecLev}
+            , #{auditRate}
+            , #{allAuditRate}
+            , #{allAuditRateAvg}
+            , #{branchAuditRate}
+            , #{branchAuditRateAvg}
+            , #{teamAuditRate}
+            , #{teamAuditRateAvg}
+            , #{itemCntD}
+            , #{allItemCntD}
+            , #{schkSecValD}
+            , #{schkSecLevD}
+            , #{pchkSecValD}
+            , #{pchkSecLevD}
+            , #{auditRateD}
+            , #{allAuditRateD}
+            , #{allAuditRateAvgD}
+            , #{branchAuditRateD}
+            , #{branchAuditRateAvgD}
+            , #{teamAuditRateD}
+            , #{teamAuditRateAvgD}
+            , #{division}
+        )
+    </insert>
+
+    <insert id="insertAuditStatisticsToday" parameterType="SnetStatistics">
+        INSERT INTO SNET_AUDIT_STATISTICS_TODAY (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , CREATE_TIME
+            , AUDIT_STD_CD
+            , AD_RESULT_REQ
+            , AD_RESULT_OK
+            , AD_RESULT_NOK
+            , AD_RESULT_REQ_D
+            , AD_RESULT_OK_D
+            , AD_RESULT_NOK_D
+            , AD_EXCEPT_REQ
+            , AD_EXCEPT_OK
+            , AD_EXCEPT_NOK
+            , AD_EXCEPT_REQ_D
+            , AD_EXCEPT_OK_D
+            , AD_EXCEPT_NOK_D
+            , EQUIP_CNT
+            , EQUIP_INSTALL_NOK_CNT
+            , EQUIP_PLUS_CNT
+            , EQUIP_MINUS_CNT
+            , EQUIP_CNT_D
+            , EQUIP_INSTALL_NOK_CNT_D
+            , EQUIP_PLUS_CNT_D
+            , EQUIP_MINUS_CNT_D
+            , SW_TYPE
+            , ASSET_NOT_AUDIT_CNT
+            , ASSET_NOT_COK_CNT
+            , ASSET_CNT
+            , ASSET_PLUS_CNT
+            , ASSET_MINUS_CNT
+            , ASSET_NOT_AUDIT_CNT_D
+            , ASSET_NOT_COK_CNT_D
+            , ASSET_CNT_D
+            , ASSET_PLUS_CNT_D
+            , ASSET_MINUS_CNT_D
+            , ITEM_CNT
+            , ALL_ITEM_CNT
+            , SCHK_SEC_VAL
+            , SCHK_SEC_LEV
+            , PCHK_SEC_VAL
+            , PCHK_SEC_LEV
+            , AUDIT_RATE
+            , ALL_AUDIT_RATE
+            , ALL_AUDIT_RATE_AVG
+            , BRANCH_AUDIT_RATE
+            , BRANCH_AUDIT_RATE_AVG
+            , TEAM_AUDIT_RATE
+            , TEAM_AUDIT_RATE_AVG
+            , ITEM_CNT_D
+            , ALL_ITEM_CNT_D
+            , SCHK_SEC_VAL_D
+            , SCHK_SEC_LEV_D
+            , PCHK_SEC_VAL_D
+            , PCHK_SEC_LEV_D
+            , AUDIT_RATE_D
+            , ALL_AUDIT_RATE_D
+            , ALL_AUDIT_RATE_AVG_D
+            , BRANCH_AUDIT_RATE_D
+            , BRANCH_AUDIT_RATE_AVG_D
+            , TEAM_AUDIT_RATE_D
+            , TEAM_AUDIT_RATE_AVG_D
+            , DIVISION
+        ) VALUES (
+              #{seq}
+            , #{statisticsId}
+            , #{branchId}
+            , #{teamId}
+            , #{createDay}
+            , #{createTime}
+            , #{auditStdCd}
+            , #{adResultReq}
+            , #{adResultOk}
+            , #{adResultNok}
+            , #{adResultReqD}
+            , #{adResultOkD}
+            , #{adResultNokD}
+            , #{adExceptReq}
+            , #{adExceptOk}
+            , #{adExceptNok}
+            , #{adExceptReqD}
+            , #{adExceptOkD}
+            , #{adExceptNokD}
+            , #{equipCnt}
+            , #{equipInstallNokCnt}
+            , #{equipPlusCnt}
+            , #{equipMinusCnt}
+            , #{equipCntD}
+            , #{equipInstallNokCnt}
+            , #{equipPlusCntD}
+            , #{equipMinusCntD}
+            , #{swType}
+            , #{assetNotAuditCnt}
+            , #{assetNotCokCnt}
+            , #{assetCnt}
+            , #{assetPlusCnt}
+            , #{assetMinusCnt}
+            , #{assetNotAuditCntD}
+            , #{assetNotCokCntD}
+            , #{assetCntD}
+            , #{assetPlusCntD}
+            , #{assetMinusCntD}
+            , #{itemCnt}
+            , #{allItemCnt}
+            , #{schkSecVal}
+            , #{schkSecLev}
+            , #{pchkSecVal}
+            , #{pchkSecLev}
+            , #{auditRate}
+            , #{allAuditRate}
+            , #{allAuditRateAvg}
+            , #{branchAuditRate}
+            , #{branchAuditRateAvg}
+            , #{teamAuditRate}
+            , #{teamAuditRateAvg}
+            , #{itemCntD}
+            , #{allItemCntD}
+            , #{schkSecValD}
+            , #{schkSecLevD}
+            , #{pchkSecValD}
+            , #{pchkSecLevD}
+            , #{auditRateD}
+            , #{allAuditRateD}
+            , #{allAuditRateAvgD}
+            , #{branchAuditRateD}
+            , #{branchAuditRateAvgD}
+            , #{teamAuditRateD}
+            , #{teamAuditRateAvgD}
+            , #{division}
+        )
+    </insert>
+
+    <insert id="insertAuditStatisticsDetail" parameterType="SnetStatisticsDetail">
+        INSERT INTO SNET_AUDIT_STATISTICS_DETAIL (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , ASSET_CD
+            , SW_NM
+            , HOST_NM
+            , AUDIT_RATE
+            , WEAK_CNT
+            , SW_NM_D
+            , HOST_NM_D
+            , AUDIT_RATE_D
+            , WEAK_CNT_D
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+            , ITEM_GRP_CNT
+            , ITEM_GRP_GOOD_CNT
+            , ITEM_GRP_WEAK_CNT
+            , ITEM_GRP_NA_CNT
+            , ITEM_GRP_RISK_CNT
+            , ITEM_GRP_ALL_CNT
+            , ITEM_GRP_NM_D
+            , ITEM_GRP_SEC_VAL_D
+            , ITEM_GRP_CNT_D
+            , ITEM_GRP_GOOD_CNT_D
+            , ITEM_GRP_WEAK_CNT_D
+            , ITEM_GRP_NA_CNT_D
+            , ITEM_GRP_RISK_CNT_D
+            , ITEM_GRP_ALL_CNT_D
+            , WEAK_HIGH_RATE
+            , WEAK_MID_RATE
+            , WEAK_LOW_RATE
+            , WEAK_HIGH_RATE_D
+            , WEAK_MID_RATE_D
+            , WEAK_LOW_RATE_D
+            , WEAK_HIGH_CNT
+            , WEAK_MID_CNT
+            , WEAK_LOW_CNT
+            , WEAK_HIGH_CNT_D
+            , WEAK_MID_CNT_D
+            , WEAK_LOW_CNT_D
+            , AD_RESULT_HIGH_AWEEK_CNT
+            , AD_RESULT_HIGH_BWEEK_CNT
+            , AD_RESULT_HIGH_CWEEK_CNT
+            , AD_RESULT_HIGH_DWEEK_CNT
+            , AD_RESULT_MID_AWEEK_CNT
+            , AD_RESULT_MID_BWEEK_CNT
+            , AD_RESULT_MID_CWEEK_CNT
+            , AD_RESULT_MID_DWEEK_CNT
+            , AD_RESULT_LOW_AWEEK_CNT
+            , AD_RESULT_LOW_BWEEK_CNT
+            , AD_RESULT_LOW_CWEEK_CNT
+            , AD_RESULT_LOW_DWEEK_CNT
+            , AD_RESULT_HIGH_AWEEK_CNT_D
+            , AD_RESULT_HIGH_BWEEK_CNT_D
+            , AD_RESULT_HIGH_CWEEK_CNT_D
+            , AD_RESULT_HIGH_DWEEK_CNT_D
+            , AD_RESULT_MID_AWEEK_CNT_D
+            , AD_RESULT_MID_BWEEK_CNT_D
+            , AD_RESULT_MID_CWEEK_CNT_D
+            , AD_RESULT_MID_DWEEK_CNT_D
+            , AD_RESULT_LOW_AWEEK_CNT_D
+            , AD_RESULT_LOW_BWEEK_CNT_D
+            , AD_RESULT_LOW_CWEEK_CNT_D
+            , AD_RESULT_LOW_DWEEK_CNT_D
+            , AD_EXCEPT_HIGH_AWEEK_CNT
+            , AD_EXCEPT_HIGH_BWEEK_CNT
+            , AD_EXCEPT_HIGH_CWEEK_CNT
+            , AD_EXCEPT_HIGH_DWEEK_CNT
+            , AD_EXCEPT_MID_AWEEK_CNT
+            , AD_EXCEPT_MID_BWEEK_CNT
+            , AD_EXCEPT_MID_CWEEK_CNT
+            , AD_EXCEPT_MID_DWEEK_CNT
+            , AD_EXCEPT_LOW_AWEEK_CNT
+            , AD_EXCEPT_LOW_BWEEK_CNT
+            , AD_EXCEPT_LOW_CWEEK_CNT
+            , AD_EXCEPT_LOW_DWEEK_CNT
+            , AD_EXCEPT_HIGH_AWEEK_CNT_D
+            , AD_EXCEPT_HIGH_BWEEK_CNT_D
+            , AD_EXCEPT_HIGH_CWEEK_CNT_D
+            , AD_EXCEPT_HIGH_DWEEK_CNT_D
+            , AD_EXCEPT_MID_AWEEK_CNT_D
+            , AD_EXCEPT_MID_BWEEK_CNT_D
+            , AD_EXCEPT_MID_CWEEK_CNT_D
+            , AD_EXCEPT_MID_DWEEK_CNT_D
+            , AD_EXCEPT_LOW_AWEEK_CNT_D
+            , AD_EXCEPT_LOW_BWEEK_CNT_D
+            , AD_EXCEPT_LOW_CWEEK_CNT_D
+            , AD_EXCEPT_LOW_DWEEK_CNT_D
+            , DIVISION
+        ) VALUES (
+              #{seq}
+            , #{statisticsId}
+            , #{branchId}
+            , #{teamId}
+            , #{createDay}
+            , #{assetCd}
+            , #{swNm}
+            , #{hostNm}
+            , #{auditRate}
+            , #{weakCnt}
+            , #{swNmD}
+            , #{hostNmD}
+            , #{auditRateD}
+            , #{weakCntD}
+            , #{itemGrpNm}
+            , #{itemGrpSecVal}
+            , #{itemGrpCnt}
+            , #{itemGrpGoodCnt}
+            , #{itemGrpWeakCnt}
+            , #{itemGrpNaCnt}
+            , #{itemGrpRiskCnt}
+            , #{itemGrpAllCnt}
+            , #{itemGrpNmD}
+            , #{itemGrpSecValD}
+            , #{itemGrpCntD}
+            , #{itemGrpGoodCntD}
+            , #{itemGrpWeakCntD}
+            , #{itemGrpNaCntD}
+            , #{itemGrpRiskCntD}
+            , #{itemGrpAllCntD}
+            , #{weakHighRate}
+            , #{weakMidRate}
+            , #{weakLowRate}
+            , #{weakHighRateD}
+            , #{weakMidRateD}
+            , #{weakLowRateD}
+            , #{weakHighCnt}
+            , #{weakMidCnt}
+            , #{weakLowCnt}
+            , #{weakHighCntD}
+            , #{weakMidCntD}
+            , #{weakLowCntD}
+            , #{adResultHighAweekCnt}
+            , #{adResultHighBweekCnt}
+            , #{adResultHighCweekCnt}
+            , #{adResultHighDweekCnt}
+            , #{adResultMidAweekCnt}
+            , #{adResultMidBweekCnt}
+            , #{adResultMidCweekCnt}
+            , #{adResultMidDweekCnt}
+            , #{adResultLowAweekCnt}
+            , #{adResultLowBweekCnt}
+            , #{adResultLowCweekCnt}
+            , #{adResultLowDweekCnt}
+            , #{adResultHighAweekCntD}
+            , #{adResultHighBweekCntD}
+            , #{adResultHighCweekCntD}
+            , #{adResultHighDweekCntD}
+            , #{adResultMidAweekCntD}
+            , #{adResultMidBweekCntD}
+            , #{adResultMidCweekCntD}
+            , #{adResultMidDweekCntD}
+            , #{adResultLowAweekCntD}
+            , #{adResultLowBweekCntD}
+            , #{adResultLowCweekCntD}
+            , #{adResultLowDweekCntD}
+            , #{adExceptHighAweekCnt}
+            , #{adExceptHighBweekCnt}
+            , #{adExceptHighCweekCnt}
+            , #{adExceptHighDweekCnt}
+            , #{adExceptMidAweekCnt}
+            , #{adExceptMidBweekCnt}
+            , #{adExceptMidCweekCnt}
+            , #{adExceptMidDweekCnt}
+            , #{adExceptLowAweekCnt}
+            , #{adExceptLowBweekCnt}
+            , #{adExceptLowCweekCnt}
+            , #{adExceptLowDweekCnt}
+            , #{adExceptHighAweekCntD}
+            , #{adExceptHighBweekCntD}
+            , #{adExceptHighCweekCntD}
+            , #{adExceptHighDweekCntD}
+            , #{adExceptMidAweekCntD}
+            , #{adExceptMidBweekCntD}
+            , #{adExceptMidCweekCntD}
+            , #{adExceptMidDweekCntD}
+            , #{adExceptLowAweekCntD}
+            , #{adExceptLowBweekCntD}
+            , #{adExceptLowCweekCntD}
+            , #{adExceptLowDweekCntD}
+            , #{division}
+        )
+    </insert>
+
+    <insert id="insertAuditStatisticsDetailToday" parameterType="SnetStatisticsDetail">
+        INSERT INTO SNET_AUDIT_STATISTICS_TODAY_DETAIL (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , CREATE_TIME
+            , ASSET_CD
+            , SW_NM
+            , HOST_NM
+            , AUDIT_RATE
+            , WEAK_CNT
+            , SW_NM_D
+            , HOST_NM_D
+            , AUDIT_RATE_D
+            , WEAK_CNT_D
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+            , ITEM_GRP_CNT
+            , ITEM_GRP_GOOD_CNT
+            , ITEM_GRP_WEAK_CNT
+            , ITEM_GRP_NA_CNT
+            , ITEM_GRP_RISK_CNT
+            , ITEM_GRP_ALL_CNT
+            , ITEM_GRP_NM_D
+            , ITEM_GRP_SEC_VAL_D
+            , ITEM_GRP_CNT_D
+            , ITEM_GRP_GOOD_CNT_D
+            , ITEM_GRP_WEAK_CNT_D
+            , ITEM_GRP_NA_CNT_D
+            , ITEM_GRP_RISK_CNT_D
+            , ITEM_GRP_ALL_CNT_D
+            , WEAK_HIGH_RATE
+            , WEAK_MID_RATE
+            , WEAK_LOW_RATE
+            , WEAK_HIGH_RATE_D
+            , WEAK_MID_RATE_D
+            , WEAK_LOW_RATE_D
+            , WEAK_HIGH_CNT
+            , WEAK_MID_CNT
+            , WEAK_LOW_CNT
+            , WEAK_HIGH_CNT_D
+            , WEAK_MID_CNT_D
+            , WEAK_LOW_CNT_D
+            , AD_RESULT_HIGH_AWEEK_CNT
+            , AD_RESULT_HIGH_BWEEK_CNT
+            , AD_RESULT_HIGH_CWEEK_CNT
+            , AD_RESULT_HIGH_DWEEK_CNT
+            , AD_RESULT_MID_AWEEK_CNT
+            , AD_RESULT_MID_BWEEK_CNT
+            , AD_RESULT_MID_CWEEK_CNT
+            , AD_RESULT_MID_DWEEK_CNT
+            , AD_RESULT_LOW_AWEEK_CNT
+            , AD_RESULT_LOW_BWEEK_CNT
+            , AD_RESULT_LOW_CWEEK_CNT
+            , AD_RESULT_LOW_DWEEK_CNT
+            , AD_RESULT_HIGH_AWEEK_CNT_D
+            , AD_RESULT_HIGH_BWEEK_CNT_D
+            , AD_RESULT_HIGH_CWEEK_CNT_D
+            , AD_RESULT_HIGH_DWEEK_CNT_D
+            , AD_RESULT_MID_AWEEK_CNT_D
+            , AD_RESULT_MID_BWEEK_CNT_D
+            , AD_RESULT_MID_CWEEK_CNT_D
+            , AD_RESULT_MID_DWEEK_CNT_D
+            , AD_RESULT_LOW_AWEEK_CNT_D
+            , AD_RESULT_LOW_BWEEK_CNT_D
+            , AD_RESULT_LOW_CWEEK_CNT_D
+            , AD_RESULT_LOW_DWEEK_CNT_D
+            , AD_EXCEPT_HIGH_AWEEK_CNT
+            , AD_EXCEPT_HIGH_BWEEK_CNT
+            , AD_EXCEPT_HIGH_CWEEK_CNT
+            , AD_EXCEPT_HIGH_DWEEK_CNT
+            , AD_EXCEPT_MID_AWEEK_CNT
+            , AD_EXCEPT_MID_BWEEK_CNT
+            , AD_EXCEPT_MID_CWEEK_CNT
+            , AD_EXCEPT_MID_DWEEK_CNT
+            , AD_EXCEPT_LOW_AWEEK_CNT
+            , AD_EXCEPT_LOW_BWEEK_CNT
+            , AD_EXCEPT_LOW_CWEEK_CNT
+            , AD_EXCEPT_LOW_DWEEK_CNT
+            , AD_EXCEPT_HIGH_AWEEK_CNT_D
+            , AD_EXCEPT_HIGH_BWEEK_CNT_D
+            , AD_EXCEPT_HIGH_CWEEK_CNT_D
+            , AD_EXCEPT_HIGH_DWEEK_CNT_D
+            , AD_EXCEPT_MID_AWEEK_CNT_D
+            , AD_EXCEPT_MID_BWEEK_CNT_D
+            , AD_EXCEPT_MID_CWEEK_CNT_D
+            , AD_EXCEPT_MID_DWEEK_CNT_D
+            , AD_EXCEPT_LOW_AWEEK_CNT_D
+            , AD_EXCEPT_LOW_BWEEK_CNT_D
+            , AD_EXCEPT_LOW_CWEEK_CNT_D
+            , AD_EXCEPT_LOW_DWEEK_CNT_D
+            , DIVISION
+        ) VALUES (
+              #{seq}
+            , #{statisticsId}
+            , #{branchId}
+            , #{teamId}
+            , #{createDay}
+            , #{createTime}
+            , #{assetCd}
+            , #{swNm}
+            , #{hostNm}
+            , #{auditRate}
+            , #{weakCnt}
+            , #{swNmD}
+            , #{hostNmD}
+            , #{auditRateD}
+            , #{weakCntD}
+            , #{itemGrpNm}
+            , #{itemGrpSecVal}
+            , #{itemGrpCnt}
+            , #{itemGrpGoodCnt}
+            , #{itemGrpWeakCnt}
+            , #{itemGrpNaCnt}
+            , #{itemGrpRiskCnt}
+            , #{itemGrpAllCnt}
+            , #{itemGrpNmD}
+            , #{itemGrpSecValD}
+            , #{itemGrpCntD}
+            , #{itemGrpGoodCntD}
+            , #{itemGrpWeakCntD}
+            , #{itemGrpNaCntD}
+            , #{itemGrpRiskCntD}
+            , #{itemGrpAllCntD}
+            , #{weakHighRate}
+            , #{weakMidRate}
+            , #{weakLowRate}
+            , #{weakHighRateD}
+            , #{weakMidRateD}
+            , #{weakLowRateD}
+            , #{weakHighCnt}
+            , #{weakMidCnt}
+            , #{weakLowCnt}
+            , #{weakHighCntD}
+            , #{weakMidCntD}
+            , #{weakLowCntD}
+            , #{adResultHighAweekCnt}
+            , #{adResultHighBweekCnt}
+            , #{adResultHighCweekCnt}
+            , #{adResultHighDweekCnt}
+            , #{adResultMidAweekCnt}
+            , #{adResultMidBweekCnt}
+            , #{adResultMidCweekCnt}
+            , #{adResultMidDweekCnt}
+            , #{adResultLowAweekCnt}
+            , #{adResultLowBweekCnt}
+            , #{adResultLowCweekCnt}
+            , #{adResultLowDweekCnt}
+            , #{adResultHighAweekCntD}
+            , #{adResultHighBweekCntD}
+            , #{adResultHighCweekCntD}
+            , #{adResultHighDweekCntD}
+            , #{adResultMidAweekCntD}
+            , #{adResultMidBweekCntD}
+            , #{adResultMidCweekCntD}
+            , #{adResultMidDweekCntD}
+            , #{adResultLowAweekCntD}
+            , #{adResultLowBweekCntD}
+            , #{adResultLowCweekCntD}
+            , #{adResultLowDweekCntD}
+            , #{adExceptHighAweekCnt}
+            , #{adExceptHighBweekCnt}
+            , #{adExceptHighCweekCnt}
+            , #{adExceptHighDweekCnt}
+            , #{adExceptMidAweekCnt}
+            , #{adExceptMidBweekCnt}
+            , #{adExceptMidCweekCnt}
+            , #{adExceptMidDweekCnt}
+            , #{adExceptLowAweekCnt}
+            , #{adExceptLowBweekCnt}
+            , #{adExceptLowCweekCnt}
+            , #{adExceptLowDweekCnt}
+            , #{adExceptHighAweekCntD}
+            , #{adExceptHighBweekCntD}
+            , #{adExceptHighCweekCntD}
+            , #{adExceptHighDweekCntD}
+            , #{adExceptMidAweekCntD}
+            , #{adExceptMidBweekCntD}
+            , #{adExceptMidCweekCntD}
+            , #{adExceptMidDweekCntD}
+            , #{adExceptLowAweekCntD}
+            , #{adExceptLowBweekCntD}
+            , #{adExceptLowCweekCntD}
+            , #{adExceptLowDweekCntD}
+            , #{division}
+        )
+    </insert>
+
+    <insert id="insertAuditStatisticsItemDetail" parameterType="SnetStatisticsDetail">
+        INSERT INTO SNET_AUDIT_STATISTICS_DETAIL (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , ASSET_CD
+            , SW_NM
+            , HOST_NM
+            , AUDIT_RATE
+            , WEAK_CNT
+            , SW_NM_D
+            , HOST_NM_D
+            , AUDIT_RATE_D
+            , WEAK_CNT_D
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+            , ITEM_GRP_CNT
+            , ITEM_GRP_GOOD_CNT
+            , ITEM_GRP_WEAK_CNT
+            , ITEM_GRP_NA_CNT
+            , ITEM_GRP_RISK_CNT
+            , ITEM_GRP_ALL_CNT
+            , ITEM_GRP_NM_D
+            , ITEM_GRP_SEC_VAL_D
+            , ITEM_GRP_CNT_D
+            , ITEM_GRP_GOOD_CNT_D
+            , ITEM_GRP_WEAK_CNT_D
+            , ITEM_GRP_NA_CNT_D
+            , ITEM_GRP_RISK_CNT_D
+            , ITEM_GRP_ALL_CNT_D
+            , WEAK_HIGH_RATE
+            , WEAK_MID_RATE
+            , WEAK_LOW_RATE
+            , WEAK_HIGH_RATE_D
+            , WEAK_MID_RATE_D
+            , WEAK_LOW_RATE_D
+            , WEAK_HIGH_CNT
+            , WEAK_MID_CNT
+            , WEAK_LOW_CNT
+            , WEAK_HIGH_CNT_D
+            , WEAK_MID_CNT_D
+            , WEAK_LOW_CNT_D
+            , AD_RESULT_HIGH_AWEEK_CNT
+            , AD_RESULT_HIGH_BWEEK_CNT
+            , AD_RESULT_HIGH_CWEEK_CNT
+            , AD_RESULT_HIGH_DWEEK_CNT
+            , AD_RESULT_MID_AWEEK_CNT
+            , AD_RESULT_MID_BWEEK_CNT
+            , AD_RESULT_MID_CWEEK_CNT
+            , AD_RESULT_MID_DWEEK_CNT
+            , AD_RESULT_LOW_AWEEK_CNT
+            , AD_RESULT_LOW_BWEEK_CNT
+            , AD_RESULT_LOW_CWEEK_CNT
+            , AD_RESULT_LOW_DWEEK_CNT
+            , AD_RESULT_HIGH_AWEEK_CNT_D
+            , AD_RESULT_HIGH_BWEEK_CNT_D
+            , AD_RESULT_HIGH_CWEEK_CNT_D
+            , AD_RESULT_HIGH_DWEEK_CNT_D
+            , AD_RESULT_MID_AWEEK_CNT_D
+            , AD_RESULT_MID_BWEEK_CNT_D
+            , AD_RESULT_MID_CWEEK_CNT_D
+            , AD_RESULT_MID_DWEEK_CNT_D
+            , AD_RESULT_LOW_AWEEK_CNT_D
+            , AD_RESULT_LOW_BWEEK_CNT_D
+            , AD_RESULT_LOW_CWEEK_CNT_D
+            , AD_RESULT_LOW_DWEEK_CNT_D
+            , AD_EXCEPT_HIGH_AWEEK_CNT
+            , AD_EXCEPT_HIGH_BWEEK_CNT
+            , AD_EXCEPT_HIGH_CWEEK_CNT
+            , AD_EXCEPT_HIGH_DWEEK_CNT
+            , AD_EXCEPT_MID_AWEEK_CNT
+            , AD_EXCEPT_MID_BWEEK_CNT
+            , AD_EXCEPT_MID_CWEEK_CNT
+            , AD_EXCEPT_MID_DWEEK_CNT
+            , AD_EXCEPT_LOW_AWEEK_CNT
+            , AD_EXCEPT_LOW_BWEEK_CNT
+            , AD_EXCEPT_LOW_CWEEK_CNT
+            , AD_EXCEPT_LOW_DWEEK_CNT
+            , AD_EXCEPT_HIGH_AWEEK_CNT_D
+            , AD_EXCEPT_HIGH_BWEEK_CNT_D
+            , AD_EXCEPT_HIGH_CWEEK_CNT_D
+            , AD_EXCEPT_HIGH_DWEEK_CNT_D
+            , AD_EXCEPT_MID_AWEEK_CNT_D
+            , AD_EXCEPT_MID_BWEEK_CNT_D
+            , AD_EXCEPT_MID_CWEEK_CNT_D
+            , AD_EXCEPT_MID_DWEEK_CNT_D
+            , AD_EXCEPT_LOW_AWEEK_CNT_D
+            , AD_EXCEPT_LOW_BWEEK_CNT_D
+            , AD_EXCEPT_LOW_CWEEK_CNT_D
+            , AD_EXCEPT_LOW_DWEEK_CNT_D
+            , DIVISION
+        ) VALUES (
+              #{seq}
+            , #{statisticsId}
+            , #{branchId}
+            , #{teamId}
+            , #{createDay}
+            , #{assetCd}
+            , #{swNm}
+            , #{hostNm}
+            , #{auditRate}
+            , #{weakCnt}
+            , #{swNmD}
+            , #{hostNmD}
+            , #{auditRateD}
+            , #{weakCntD}
+            , #{itemGrpNm}
+            , #{itemGrpSecVal}
+            , #{itemGrpCnt}
+            , #{itemGrpGoodCnt}
+            , #{itemGrpWeakCnt}
+            , #{itemGrpNaCnt}
+            , #{itemGrpRiskCnt}
+            , #{itemGrpAllCnt}
+            , #{itemGrpNmD}
+            , #{itemGrpSecValD}
+            , #{itemGrpCntD}
+            , #{itemGrpGoodCntD}
+            , #{itemGrpWeakCntD}
+            , #{itemGrpNaCntD}
+            , #{itemGrpRiskCntD}
+            , #{itemGrpAllCntD}
+            , #{weakHighRate}
+            , #{weakMidRate}
+            , #{weakLowRate}
+            , #{weakHighRateD}
+            , #{weakMidRateD}
+            , #{weakLowRateD}
+            , #{weakHighCnt}
+            , #{weakMidCnt}
+            , #{weakLowCnt}
+            , #{weakHighCntD}
+            , #{weakMidCntD}
+            , #{weakLowCntD}
+            , #{adResultHighAweekCnt}
+            , #{adResultHighBweekCnt}
+            , #{adResultHighCweekCnt}
+            , #{adResultHighDweekCnt}
+            , #{adResultMidAweekCnt}
+            , #{adResultMidBweekCnt}
+            , #{adResultMidCweekCnt}
+            , #{adResultMidDweekCnt}
+            , #{adResultLowAweekCnt}
+            , #{adResultLowBweekCnt}
+            , #{adResultLowCweekCnt}
+            , #{adResultLowDweekCnt}
+            , #{adResultHighAweekCntD}
+            , #{adResultHighBweekCntD}
+            , #{adResultHighCweekCntD}
+            , #{adResultHighDweekCntD}
+            , #{adResultMidAweekCntD}
+            , #{adResultMidBweekCntD}
+            , #{adResultMidCweekCntD}
+            , #{adResultMidDweekCntD}
+            , #{adResultLowAweekCntD}
+            , #{adResultLowBweekCntD}
+            , #{adResultLowCweekCntD}
+            , #{adResultLowDweekCntD}
+            , #{adExceptHighAweekCnt}
+            , #{adExceptHighBweekCnt}
+            , #{adExceptHighCweekCnt}
+            , #{adExceptHighDweekCnt}
+            , #{adExceptMidAweekCnt}
+            , #{adExceptMidBweekCnt}
+            , #{adExceptMidCweekCnt}
+            , #{adExceptMidDweekCnt}
+            , #{adExceptLowAweekCnt}
+            , #{adExceptLowBweekCnt}
+            , #{adExceptLowCweekCnt}
+            , #{adExceptLowDweekCnt}
+            , #{adExceptHighAweekCntD}
+            , #{adExceptHighBweekCntD}
+            , #{adExceptHighCweekCntD}
+            , #{adExceptHighDweekCntD}
+            , #{adExceptMidAweekCntD}
+            , #{adExceptMidBweekCntD}
+            , #{adExceptMidCweekCntD}
+            , #{adExceptMidDweekCntD}
+            , #{adExceptLowAweekCntD}
+            , #{adExceptLowBweekCntD}
+            , #{adExceptLowCweekCntD}
+            , #{adExceptLowDweekCntD}
+            , #{division}
+        )
+    </insert>
+
+    <insert id="insertAuditStatisticsItemDetailToday" parameterType="SnetStatisticsDetail">
+        INSERT INTO SNET_AUDIT_STATISTICS_TODAY_DETAIL (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , CREATE_TIME
+            , ASSET_CD
+            , SW_NM
+            , HOST_NM
+            , AUDIT_RATE
+            , WEAK_CNT
+            , SW_NM_D
+            , HOST_NM_D
+            , AUDIT_RATE_D
+            , WEAK_CNT_D
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+            , ITEM_GRP_CNT
+            , ITEM_GRP_GOOD_CNT
+            , ITEM_GRP_WEAK_CNT
+            , ITEM_GRP_NA_CNT
+            , ITEM_GRP_RISK_CNT
+            , ITEM_GRP_ALL_CNT
+            , ITEM_GRP_NM_D
+            , ITEM_GRP_SEC_VAL_D
+            , ITEM_GRP_CNT_D
+            , ITEM_GRP_GOOD_CNT_D
+            , ITEM_GRP_WEAK_CNT_D
+            , ITEM_GRP_NA_CNT_D
+            , ITEM_GRP_RISK_CNT_D
+            , ITEM_GRP_ALL_CNT_D
+            , WEAK_HIGH_RATE
+            , WEAK_MID_RATE
+            , WEAK_LOW_RATE
+            , WEAK_HIGH_RATE_D
+            , WEAK_MID_RATE_D
+            , WEAK_LOW_RATE_D
+            , WEAK_HIGH_CNT
+            , WEAK_MID_CNT
+            , WEAK_LOW_CNT
+            , WEAK_HIGH_CNT_D
+            , WEAK_MID_CNT_D
+            , WEAK_LOW_CNT_D
+            , AD_RESULT_HIGH_AWEEK_CNT
+            , AD_RESULT_HIGH_BWEEK_CNT
+            , AD_RESULT_HIGH_CWEEK_CNT
+            , AD_RESULT_HIGH_DWEEK_CNT
+            , AD_RESULT_MID_AWEEK_CNT
+            , AD_RESULT_MID_BWEEK_CNT
+            , AD_RESULT_MID_CWEEK_CNT
+            , AD_RESULT_MID_DWEEK_CNT
+            , AD_RESULT_LOW_AWEEK_CNT
+            , AD_RESULT_LOW_BWEEK_CNT
+            , AD_RESULT_LOW_CWEEK_CNT
+            , AD_RESULT_LOW_DWEEK_CNT
+            , AD_RESULT_HIGH_AWEEK_CNT_D
+            , AD_RESULT_HIGH_BWEEK_CNT_D
+            , AD_RESULT_HIGH_CWEEK_CNT_D
+            , AD_RESULT_HIGH_DWEEK_CNT_D
+            , AD_RESULT_MID_AWEEK_CNT_D
+            , AD_RESULT_MID_BWEEK_CNT_D
+            , AD_RESULT_MID_CWEEK_CNT_D
+            , AD_RESULT_MID_DWEEK_CNT_D
+            , AD_RESULT_LOW_AWEEK_CNT_D
+            , AD_RESULT_LOW_BWEEK_CNT_D
+            , AD_RESULT_LOW_CWEEK_CNT_D
+            , AD_RESULT_LOW_DWEEK_CNT_D
+            , AD_EXCEPT_HIGH_AWEEK_CNT
+            , AD_EXCEPT_HIGH_BWEEK_CNT
+            , AD_EXCEPT_HIGH_CWEEK_CNT
+            , AD_EXCEPT_HIGH_DWEEK_CNT
+            , AD_EXCEPT_MID_AWEEK_CNT
+            , AD_EXCEPT_MID_BWEEK_CNT
+            , AD_EXCEPT_MID_CWEEK_CNT
+            , AD_EXCEPT_MID_DWEEK_CNT
+            , AD_EXCEPT_LOW_AWEEK_CNT
+            , AD_EXCEPT_LOW_BWEEK_CNT
+            , AD_EXCEPT_LOW_CWEEK_CNT
+            , AD_EXCEPT_LOW_DWEEK_CNT
+            , AD_EXCEPT_HIGH_AWEEK_CNT_D
+            , AD_EXCEPT_HIGH_BWEEK_CNT_D
+            , AD_EXCEPT_HIGH_CWEEK_CNT_D
+            , AD_EXCEPT_HIGH_DWEEK_CNT_D
+            , AD_EXCEPT_MID_AWEEK_CNT_D
+            , AD_EXCEPT_MID_BWEEK_CNT_D
+            , AD_EXCEPT_MID_CWEEK_CNT_D
+            , AD_EXCEPT_MID_DWEEK_CNT_D
+            , AD_EXCEPT_LOW_AWEEK_CNT_D
+            , AD_EXCEPT_LOW_BWEEK_CNT_D
+            , AD_EXCEPT_LOW_CWEEK_CNT_D
+            , AD_EXCEPT_LOW_DWEEK_CNT_D
+            , DIVISION
+        ) VALUES (
+              #{seq}
+            , #{statisticsId}
+            , #{branchId}
+            , #{teamId}
+            , #{createDay}
+            , #{createTime}
+            , #{assetCd}
+            , #{swNm}
+            , #{hostNm}
+            , #{auditRate}
+            , #{weakCnt}
+            , #{swNmD}
+            , #{hostNmD}
+            , #{auditRateD}
+            , #{weakCntD}
+            , #{itemGrpNm}
+            , #{itemGrpSecVal}
+            , #{itemGrpCnt}
+            , #{itemGrpGoodCnt}
+            , #{itemGrpWeakCnt}
+            , #{itemGrpNaCnt}
+            , #{itemGrpRiskCnt}
+            , #{itemGrpAllCnt}
+            , #{itemGrpNmD}
+            , #{itemGrpSecValD}
+            , #{itemGrpCntD}
+            , #{itemGrpGoodCntD}
+            , #{itemGrpWeakCntD}
+            , #{itemGrpNaCntD}
+            , #{itemGrpRiskCntD}
+            , #{itemGrpAllCntD}
+            , #{weakHighRate}
+            , #{weakMidRate}
+            , #{weakLowRate}
+            , #{weakHighRateD}
+            , #{weakMidRateD}
+            , #{weakLowRateD}
+            , #{weakHighCnt}
+            , #{weakMidCnt}
+            , #{weakLowCnt}
+            , #{weakHighCntD}
+            , #{weakMidCntD}
+            , #{weakLowCntD}
+            , #{adResultHighAweekCnt}
+            , #{adResultHighBweekCnt}
+            , #{adResultHighCweekCnt}
+            , #{adResultHighDweekCnt}
+            , #{adResultMidAweekCnt}
+            , #{adResultMidBweekCnt}
+            , #{adResultMidCweekCnt}
+            , #{adResultMidDweekCnt}
+            , #{adResultLowAweekCnt}
+            , #{adResultLowBweekCnt}
+            , #{adResultLowCweekCnt}
+            , #{adResultLowDweekCnt}
+            , #{adResultHighAweekCntD}
+            , #{adResultHighBweekCntD}
+            , #{adResultHighCweekCntD}
+            , #{adResultHighDweekCntD}
+            , #{adResultMidAweekCntD}
+            , #{adResultMidBweekCntD}
+            , #{adResultMidCweekCntD}
+            , #{adResultMidDweekCntD}
+            , #{adResultLowAweekCntD}
+            , #{adResultLowBweekCntD}
+            , #{adResultLowCweekCntD}
+            , #{adResultLowDweekCntD}
+            , #{adExceptHighAweekCnt}
+            , #{adExceptHighBweekCnt}
+            , #{adExceptHighCweekCnt}
+            , #{adExceptHighDweekCnt}
+            , #{adExceptMidAweekCnt}
+            , #{adExceptMidBweekCnt}
+            , #{adExceptMidCweekCnt}
+            , #{adExceptMidDweekCnt}
+            , #{adExceptLowAweekCnt}
+            , #{adExceptLowBweekCnt}
+            , #{adExceptLowCweekCnt}
+            , #{adExceptLowDweekCnt}
+            , #{adExceptHighAweekCntD}
+            , #{adExceptHighBweekCntD}
+            , #{adExceptHighCweekCntD}
+            , #{adExceptHighDweekCntD}
+            , #{adExceptMidAweekCntD}
+            , #{adExceptMidBweekCntD}
+            , #{adExceptMidCweekCntD}
+            , #{adExceptMidDweekCntD}
+            , #{adExceptLowAweekCntD}
+            , #{adExceptLowBweekCntD}
+            , #{adExceptLowCweekCntD}
+            , #{adExceptLowDweekCntD}
+            , #{division}
+        )
+    </insert>
+
+    <select id="selectAuditStatisticsSeq" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select seq
+        from SNET_AUDIT_STATISTICS
+        where statistics = #{statisticsId}
+    </select>
+
+    <select id="getEquipPlusCnt" resultType="java.lang.Integer">
+        SELECT
+            COUNT(CASE
+                WHEN
+                    DATEDIFF(CURDATE()-1,
+                        DATE_FORMAT(CREATE_DATE, '%Y-%m-%d')) <![CDATA[ <= ]]> 1
+                THEN
+                    1
+            END) AS '증가'
+        FROM
+            SNET_ASSET_MASTER
+    </select>
+
+    <select id="getEquipMinusCnt" resultType="java.lang.Integer">
+        SELECT
+            COUNT(CASE
+                WHEN
+                    DATEDIFF(CURDATE()-1,
+                            DATE_FORMAT(DEL_DATE, '%Y-%m-%d')) = 1
+                THEN
+                    1
+            END) AS '감소'
+        FROM
+            SNET_ASSET_DEL_HISTORY
+    </select>
+
+    <select id="getEquipPlusCntForDay" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        SELECT
+            COUNT(CASE
+                WHEN
+                    DATEDIFF(DATE_FORMAT(#{CREATE_DAY}, '%Y%m%d')-1,
+                        DATE_FORMAT(CREATE_DATE, '%Y-%m-%d')) <![CDATA[ <= ]]> 1
+                THEN
+                    1
+            END) AS '증가'
+        FROM
+            SNET_ASSET_MASTER
+        where DATE_FORMAT(CREATE_DATE, '%Y%m%d') = #{CREATE_DAY}
+    </select>
+
+    <select id="getEquipMinusCntForDay" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        SELECT
+            COUNT(CASE
+                WHEN
+                    DATEDIFF(DATE_FORMAT(#{CREATE_DAY}, '%Y%m%d')-1,
+                            DATE_FORMAT(DEL_DATE, '%Y-%m-%d')) = 1
+                THEN
+                    1
+            END) AS '감소'
+        FROM
+            SNET_ASSET_DEL_HISTORY
+        where DATE_FORMAT(DEL_DATE, '%Y%m%d') = #{CREATE_DAY}
+    </select>
+
+    <insert id="deleteInsertAuditStatisticsMig" parameterType="SnetStatistics">
+        INSERT INTO SNET_AUDIT_STATISTICS (
+            SEQ, STATISTICS_ID, BRANCH_ID, TEAM_ID, CREATE_DAY, AUDIT_STD_CD, AD_RESULT_REQ, AD_RESULT_OK, AD_RESULT_NOK, AD_RESULT_REQ_D, AD_RESULT_OK_D, AD_RESULT_NOK_D, AD_EXCEPT_REQ, AD_EXCEPT_OK, AD_EXCEPT_NOK, AD_EXCEPT_REQ_D, AD_EXCEPT_OK_D, AD_EXCEPT_NOK_D, EQUIP_CNT, EQUIP_INSTALL_NOK_CNT, EQUIP_PLUS_CNT, EQUIP_MINUS_CNT, EQUIP_CNT_D, EQUIP_INSTALL_NOK_CNT_D, EQUIP_PLUS_CNT_D, EQUIP_MINUS_CNT_D, SW_TYPE, ASSET_NOT_AUDIT_CNT, ASSET_NOT_COK_CNT, ASSET_CNT, ASSET_PLUS_CNT, ASSET_MINUS_CNT, ASSET_NOT_AUDIT_CNT_D, ASSET_NOT_COK_CNT_D, ASSET_CNT_D, ASSET_PLUS_CNT_D, ASSET_MINUS_CNT_D, ITEM_CNT, ALL_ITEM_CNT, SCHK_SEC_VAL, SCHK_SEC_LEV, PCHK_SEC_VAL, PCHK_SEC_LEV, AUDIT_RATE, ALL_AUDIT_RATE, ALL_AUDIT_RATE_AVG, BRANCH_AUDIT_RATE, BRANCH_AUDIT_RATE_AVG, TEAM_AUDIT_RATE, TEAM_AUDIT_RATE_AVG, ITEM_CNT_D, ALL_ITEM_CNT_D, SCHK_SEC_VAL_D, SCHK_SEC_LEV_D, PCHK_SEC_VAL_D, PCHK_SEC_LEV_D, AUDIT_RATE_D, ALL_AUDIT_RATE_D, ALL_AUDIT_RATE_AVG_D, BRANCH_AUDIT_RATE_D, BRANCH_AUDIT_RATE_AVG_D, TEAM_AUDIT_RATE_D, TEAM_AUDIT_RATE_AVG_D, DIVISION)
+        SELECT SEQ, STATISTICS_ID, BRANCH_ID, TEAM_ID, CREATE_DAY, AUDIT_STD_CD, AD_RESULT_REQ, AD_RESULT_OK, AD_RESULT_NOK, AD_RESULT_REQ_D, AD_RESULT_OK_D, AD_RESULT_NOK_D, AD_EXCEPT_REQ, AD_EXCEPT_OK, AD_EXCEPT_NOK, AD_EXCEPT_REQ_D, AD_EXCEPT_OK_D, AD_EXCEPT_NOK_D, EQUIP_CNT, EQUIP_INSTALL_NOK_CNT, EQUIP_PLUS_CNT, EQUIP_MINUS_CNT, EQUIP_CNT_D, EQUIP_INSTALL_NOK_CNT_D, EQUIP_PLUS_CNT_D, EQUIP_MINUS_CNT_D, SW_TYPE, ASSET_NOT_AUDIT_CNT, ASSET_NOT_COK_CNT, ASSET_CNT, ASSET_PLUS_CNT, ASSET_MINUS_CNT, ASSET_NOT_AUDIT_CNT_D, ASSET_NOT_COK_CNT_D, ASSET_CNT_D, ASSET_PLUS_CNT_D, ASSET_MINUS_CNT_D, ITEM_CNT, ALL_ITEM_CNT, SCHK_SEC_VAL, SCHK_SEC_LEV, PCHK_SEC_VAL, PCHK_SEC_LEV, AUDIT_RATE, ALL_AUDIT_RATE, ALL_AUDIT_RATE_AVG, BRANCH_AUDIT_RATE, BRANCH_AUDIT_RATE_AVG, TEAM_AUDIT_RATE, TEAM_AUDIT_RATE_AVG, ITEM_CNT_D, ALL_ITEM_CNT_D, SCHK_SEC_VAL_D, SCHK_SEC_LEV_D, PCHK_SEC_VAL_D, PCHK_SEC_LEV_D, AUDIT_RATE_D, ALL_AUDIT_RATE_D, ALL_AUDIT_RATE_AVG_D, BRANCH_AUDIT_RATE_D, BRANCH_AUDIT_RATE_AVG_D, TEAM_AUDIT_RATE_D, TEAM_AUDIT_RATE_AVG_D, DIVISION
+        FROM SNET_AUDIT_STATISTICS_TODAY
+        where create_day = #{createDay}
+        and create_time = #{createTime}
+    </insert>
+
+    <insert id="deleteInsertAuditStatisticsMigDetail" parameterType="SnetStatisticsDetail">
+        INSERT INTO SNET_AUDIT_STATISTICS_DETAIL (
+              SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , ASSET_CD
+            , SW_NM
+            , HOST_NM
+            , AUDIT_RATE
+            , WEAK_CNT
+            , SW_NM_D
+            , HOST_NM_D
+            , AUDIT_RATE_D
+            , WEAK_CNT_D
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+            , ITEM_GRP_CNT
+            , ITEM_GRP_GOOD_CNT
+            , ITEM_GRP_WEAK_CNT
+            , ITEM_GRP_NA_CNT
+            , ITEM_GRP_RISK_CNT
+            , ITEM_GRP_ALL_CNT
+            , ITEM_GRP_NM_D
+            , ITEM_GRP_SEC_VAL_D
+            , ITEM_GRP_CNT_D
+            , ITEM_GRP_GOOD_CNT_D
+            , ITEM_GRP_WEAK_CNT_D
+            , ITEM_GRP_NA_CNT_D
+            , ITEM_GRP_RISK_CNT_D
+            , ITEM_GRP_ALL_CNT_D
+            , WEAK_HIGH_RATE
+            , WEAK_MID_RATE
+            , WEAK_LOW_RATE
+            , WEAK_HIGH_RATE_D
+            , WEAK_MID_RATE_D
+            , WEAK_LOW_RATE_D
+            , WEAK_HIGH_CNT
+            , WEAK_MID_CNT
+            , WEAK_LOW_CNT
+            , WEAK_HIGH_CNT_D
+            , WEAK_MID_CNT_D
+            , WEAK_LOW_CNT_D
+            , AD_RESULT_HIGH_AWEEK_CNT
+            , AD_RESULT_HIGH_BWEEK_CNT
+            , AD_RESULT_HIGH_CWEEK_CNT
+            , AD_RESULT_HIGH_DWEEK_CNT
+            , AD_RESULT_MID_AWEEK_CNT
+            , AD_RESULT_MID_BWEEK_CNT
+            , AD_RESULT_MID_CWEEK_CNT
+            , AD_RESULT_MID_DWEEK_CNT
+            , AD_RESULT_LOW_AWEEK_CNT
+            , AD_RESULT_LOW_BWEEK_CNT
+            , AD_RESULT_LOW_CWEEK_CNT
+            , AD_RESULT_LOW_DWEEK_CNT
+            , AD_RESULT_HIGH_AWEEK_CNT_D
+            , AD_RESULT_HIGH_BWEEK_CNT_D
+            , AD_RESULT_HIGH_CWEEK_CNT_D
+            , AD_RESULT_HIGH_DWEEK_CNT_D
+            , AD_RESULT_MID_AWEEK_CNT_D
+            , AD_RESULT_MID_BWEEK_CNT_D
+            , AD_RESULT_MID_CWEEK_CNT_D
+            , AD_RESULT_MID_DWEEK_CNT_D
+            , AD_RESULT_LOW_AWEEK_CNT_D
+            , AD_RESULT_LOW_BWEEK_CNT_D
+            , AD_RESULT_LOW_CWEEK_CNT_D
+            , AD_RESULT_LOW_DWEEK_CNT_D
+            , AD_EXCEPT_HIGH_AWEEK_CNT
+            , AD_EXCEPT_HIGH_BWEEK_CNT
+            , AD_EXCEPT_HIGH_CWEEK_CNT
+            , AD_EXCEPT_HIGH_DWEEK_CNT
+            , AD_EXCEPT_MID_AWEEK_CNT
+            , AD_EXCEPT_MID_BWEEK_CNT
+            , AD_EXCEPT_MID_CWEEK_CNT
+            , AD_EXCEPT_MID_DWEEK_CNT
+            , AD_EXCEPT_LOW_AWEEK_CNT
+            , AD_EXCEPT_LOW_BWEEK_CNT
+            , AD_EXCEPT_LOW_CWEEK_CNT
+            , AD_EXCEPT_LOW_DWEEK_CNT
+            , AD_EXCEPT_HIGH_AWEEK_CNT_D
+            , AD_EXCEPT_HIGH_BWEEK_CNT_D
+            , AD_EXCEPT_HIGH_CWEEK_CNT_D
+            , AD_EXCEPT_HIGH_DWEEK_CNT_D
+            , AD_EXCEPT_MID_AWEEK_CNT_D
+            , AD_EXCEPT_MID_BWEEK_CNT_D
+            , AD_EXCEPT_MID_CWEEK_CNT_D
+            , AD_EXCEPT_MID_DWEEK_CNT_D
+            , AD_EXCEPT_LOW_AWEEK_CNT_D
+            , AD_EXCEPT_LOW_BWEEK_CNT_D
+            , AD_EXCEPT_LOW_CWEEK_CNT_D
+            , AD_EXCEPT_LOW_DWEEK_CNT_D
+            , DIVISION)
+        SELECT SEQ
+            , STATISTICS_ID
+            , BRANCH_ID
+            , TEAM_ID
+            , CREATE_DAY
+            , ASSET_CD
+            , SW_NM
+            , HOST_NM
+            , AUDIT_RATE
+            , WEAK_CNT
+            , SW_NM_D
+            , HOST_NM_D
+            , AUDIT_RATE_D
+            , WEAK_CNT_D
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+            , ITEM_GRP_CNT
+            , ITEM_GRP_GOOD_CNT
+            , ITEM_GRP_WEAK_CNT
+            , ITEM_GRP_NA_CNT
+            , ITEM_GRP_RISK_CNT
+            , ITEM_GRP_ALL_CNT
+            , ITEM_GRP_NM_D
+            , ITEM_GRP_SEC_VAL_D
+            , ITEM_GRP_CNT_D
+            , ITEM_GRP_GOOD_CNT_D
+            , ITEM_GRP_WEAK_CNT_D
+            , ITEM_GRP_NA_CNT_D
+            , ITEM_GRP_RISK_CNT_D
+            , ITEM_GRP_ALL_CNT_D
+            , WEAK_HIGH_RATE
+            , WEAK_MID_RATE
+            , WEAK_LOW_RATE
+            , WEAK_HIGH_RATE_D
+            , WEAK_MID_RATE_D
+            , WEAK_LOW_RATE_D
+            , WEAK_HIGH_CNT
+            , WEAK_MID_CNT
+            , WEAK_LOW_CNT
+            , WEAK_HIGH_CNT_D
+            , WEAK_MID_CNT_D
+            , WEAK_LOW_CNT_D
+            , AD_RESULT_HIGH_AWEEK_CNT
+            , AD_RESULT_HIGH_BWEEK_CNT
+            , AD_RESULT_HIGH_CWEEK_CNT
+            , AD_RESULT_HIGH_DWEEK_CNT
+            , AD_RESULT_MID_AWEEK_CNT
+            , AD_RESULT_MID_BWEEK_CNT
+            , AD_RESULT_MID_CWEEK_CNT
+            , AD_RESULT_MID_DWEEK_CNT
+            , AD_RESULT_LOW_AWEEK_CNT
+            , AD_RESULT_LOW_BWEEK_CNT
+            , AD_RESULT_LOW_CWEEK_CNT
+            , AD_RESULT_LOW_DWEEK_CNT
+            , AD_RESULT_HIGH_AWEEK_CNT_D
+            , AD_RESULT_HIGH_BWEEK_CNT_D
+            , AD_RESULT_HIGH_CWEEK_CNT_D
+            , AD_RESULT_HIGH_DWEEK_CNT_D
+            , AD_RESULT_MID_AWEEK_CNT_D
+            , AD_RESULT_MID_BWEEK_CNT_D
+            , AD_RESULT_MID_CWEEK_CNT_D
+            , AD_RESULT_MID_DWEEK_CNT_D
+            , AD_RESULT_LOW_AWEEK_CNT_D
+            , AD_RESULT_LOW_BWEEK_CNT_D
+            , AD_RESULT_LOW_CWEEK_CNT_D
+            , AD_RESULT_LOW_DWEEK_CNT_D
+            , AD_EXCEPT_HIGH_AWEEK_CNT
+            , AD_EXCEPT_HIGH_BWEEK_CNT
+            , AD_EXCEPT_HIGH_CWEEK_CNT
+            , AD_EXCEPT_HIGH_DWEEK_CNT
+            , AD_EXCEPT_MID_AWEEK_CNT
+            , AD_EXCEPT_MID_BWEEK_CNT
+            , AD_EXCEPT_MID_CWEEK_CNT
+            , AD_EXCEPT_MID_DWEEK_CNT
+            , AD_EXCEPT_LOW_AWEEK_CNT
+            , AD_EXCEPT_LOW_BWEEK_CNT
+            , AD_EXCEPT_LOW_CWEEK_CNT
+            , AD_EXCEPT_LOW_DWEEK_CNT
+            , AD_EXCEPT_HIGH_AWEEK_CNT_D
+            , AD_EXCEPT_HIGH_BWEEK_CNT_D
+            , AD_EXCEPT_HIGH_CWEEK_CNT_D
+            , AD_EXCEPT_HIGH_DWEEK_CNT_D
+            , AD_EXCEPT_MID_AWEEK_CNT_D
+            , AD_EXCEPT_MID_BWEEK_CNT_D
+            , AD_EXCEPT_MID_CWEEK_CNT_D
+            , AD_EXCEPT_MID_DWEEK_CNT_D
+            , AD_EXCEPT_LOW_AWEEK_CNT_D
+            , AD_EXCEPT_LOW_BWEEK_CNT_D
+            , AD_EXCEPT_LOW_CWEEK_CNT_D
+            , AD_EXCEPT_LOW_DWEEK_CNT_D
+            , DIVISION
+        FROM SNET_AUDIT_STATISTICS_TODAY_DETAIL
+        where create_day = #{createDay}
+        and create_time = #{createTime}
+    </insert>
+
+    <insert id="insertIntroSecCategory" parameterType="SnetAssetSecCategory">
+        INSERT INTO SNET_INTRO_SWTYPE_SEC (
+              GOV_FLAG
+            , SW_TYPE
+            , SW_NM
+            , ITEM_GRP_NM
+            , ITEM_GRP_SEC_VAL
+        )
+          SELECT
+                DIAGNOSIS_TYPE,
+                SW_TYPE,
+                SW_NM,
+                ITEM_GRP_NM,
+                CASE WHEN ITEM_GRADE_F IS NULL THEN 100.00
+                     WHEN ITEM_GRADE_F = ITEM_GRADE_TOTAL THEN 100.00
+                ELSE
+                    ROUND( (SUM(ITEM_GRADE_F)) / SUM(ITEM_GRADE_TOTAL) * 100, 2 )
+                END AS ITEM_GRP_SEC_VAL
+          FROM(
+                SELECT
+                     A.DIAGNOSIS_TYPE,
+                     A.SW_TYPE,
+                     A.SW_NM,
+                     A.ITEM_GRP_NM,
+                     A.ITEM_GRADE,
+                     A.ITEM_GRADE_TOTAL,
+                     B.ITEM_GRADE_F
+                FROM(
+                      SELECT
+                          <if test="auditStdCd != null and !auditStdCd.equals('') and auditStdCd != 0">
+                            C.DIAGNOSIS_TYPE,
+                          </if>
+                          <if test="auditStdCd != null and !auditStdCd.equals('') and auditStdCd == 0">
+                            0 AS DIAGNOSIS_TYPE,
+                          </if>
+                            C.SW_TYPE,
+                            C.SW_NM,
+                            LTRIM(SUBSTRING_INDEX(IFNULL(I.ITEM_GRP_NM, C.ITEM_GRP_NM), '.', -1)) AS ITEM_GRP_NM,
+                            C.ITEM_GRADE,
+                            COUNT(1) AS TOTAL_CNT,
+                            COUNT(1) * CASE
+                                WHEN C.ITEM_GRADE = 'H' THEN 3
+                                WHEN C.ITEM_GRADE = 'M' THEN 2
+                                ELSE 1
+                            END AS ITEM_GRADE_TOTAL
+                      FROM
+                        SNET_ASSET_MASTER M
+                            INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                            INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+                            AND A.SW_TYPE = B.SW_TYPE
+                            AND A.SW_NM = B.SW_NM
+                            AND A.SW_INFO = B.SW_INFO
+                            AND A.SW_DIR = B.SW_DIR
+                            AND A.SW_ETC = B.SW_ETC
+                            AND A.SW_USER = B.SW_USER
+                            AND A.AUDIT_DAY = B.AUDIT_DAY)
+                            INNER JOIN
+                        SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+                            AND C.SW_TYPE = B.SW_TYPE
+                            AND C.SW_NM = B.SW_NM
+                            AND C.SW_INFO = B.SW_INFO
+                            AND C.SW_DIR = B.SW_DIR
+                            AND C.SW_ETC = B.SW_ETC
+                            AND C.SW_USER = B.SW_USER
+                            AND C.AUDIT_DAY = B.AUDIT_DAY)
+                        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (C.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+                      WHERE 1=1
+                            AND C.ITEM_RESULT != 'NA'
+                            <if test="lnotflag != null and !lnotflag.equals('') ">
+                                AND C.sw_type = 'OS'
+                                AND C.sw_nm != 'Windows'
+                            </if>
+                            <if test="swType != null and !swType.equals('') ">
+                                AND C.sw_type = #{swType}
+                            </if>
+                            <if test="swNm != null and !swNm.equals('') ">
+                                AND C.sw_nm = #{swNm}
+                            </if>
+                            <if test="notflag != null and !notflag.equals('') ">
+                                AND C.sw_type not in ('OS','DB','WEB','WAS','NW','URL')
+                            </if>
+                            <if test="auditStdCd != null and !auditStdCd.equals('') and auditStdCd != 0">
+                                AND C.DIAGNOSIS_TYPE = #{auditStdCd}
+                            </if>
+                            <if test="createDay != null and !createDay.equals('') ">
+                                AND A.AUDIT_DAY <![CDATA[ <= ]]> #{createDay}
+                            </if>
+                      GROUP BY ITEM_GRP_NM , ITEM_GRADE
+                ) A
+                  LEFT OUTER JOIN
+                    (
+                        SELECT
+                            C.sw_type, C.sw_nm,
+                            LTRIM(SUBSTRING_INDEX(IFNULL(I.ITEM_GRP_NM, C.ITEM_GRP_NM), '.', -1)) AS ITEM_GRP_NM,
+                            C.ITEM_GRADE,
+                            COUNT(1) AS F_CNT,
+                            COUNT(1) * CASE
+                                WHEN C.ITEM_GRADE = 'H' THEN 3
+                                WHEN C.ITEM_GRADE = 'M' THEN 2
+                                ELSE 1
+                            END AS ITEM_GRADE_F
+                        FROM
+                            SNET_ASSET_MASTER M
+                                INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                                INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+                                AND A.SW_TYPE = B.SW_TYPE
+                                AND A.SW_NM = B.SW_NM
+                                AND A.SW_INFO = B.SW_INFO
+                                AND A.SW_DIR = B.SW_DIR
+                                AND A.SW_ETC = B.SW_ETC
+                                AND A.SW_USER = B.SW_USER
+                                AND A.AUDIT_DAY = B.AUDIT_DAY)
+                                INNER JOIN
+                            SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+                                AND C.SW_TYPE = B.SW_TYPE
+                                AND C.SW_NM = B.SW_NM
+                                AND C.SW_INFO = B.SW_INFO
+                                AND C.SW_DIR = B.SW_DIR
+                                AND C.SW_ETC = B.SW_ETC
+                                AND C.SW_USER = B.SW_USER
+                                AND C.AUDIT_DAY = B.AUDIT_DAY)
+                            LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (C.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+                        WHERE 1=1
+                                AND C.ITEM_RESULT = 'T'
+                                <if test="lnotflag != null and !lnotflag.equals('') ">
+                                    AND C.sw_type = 'OS'
+                                    AND C.sw_nm != 'Windows'
+                                </if>
+                                <if test="swType != null and !swType.equals('') ">
+                                    AND C.sw_type = #{swType}
+                                </if>
+                                <if test="swNm != null and !swNm.equals('') ">
+                                    AND C.sw_nm = #{swNm}
+                                </if>
+                                <if test="notflag != null and !notflag.equals('') ">
+                                    AND C.sw_type not in ('OS','DB','WEB','WAS','NW','URL')
+                                </if>
+                                <if test="auditStdCd != null and !auditStdCd.equals('') and auditStdCd != 0">
+                                    AND C.DIAGNOSIS_TYPE = #{auditStdCd}
+                                </if>
+                                <if test="createDay != null and !createDay.equals('') ">
+                                    AND A.AUDIT_DAY <![CDATA[ <= ]]> #{createDay}
+                                </if>
+                        GROUP BY ITEM_GRP_NM, ITEM_GRADE
+                    ) B ON (A.ITEM_GRP_NM = B.ITEM_GRP_NM and A.ITEM_GRADE = B.ITEM_GRADE)
+                ) AA
+          GROUP BY ITEM_GRP_NM
+          ORDER BY ITEM_GRADE_TOTAL
+    </insert>
+
+    <select id="selectIntroSecCategoryCnt" resultType="int">
+        SELECT COUNT(1) AS CNT
+        FROM SNET_INTRO_SWTYPE_SEC
+    </select>
+
+    <delete id="deleteIntroSecCategory" parameterType="SnetAssetSecCategory">
+        DELETE FROM SNET_INTRO_SWTYPE_SEC
+    </delete>
+
+    <!-- Intro 진단결과 변경 신청 현황 -->
+    <insert id="insertIntroCokStatus">
+        INSERT INTO SNET_INTRO_COK_STATUS
+            (BRANCH_ID, TEAM_ID, CREATE_DAY, AD_RESULT_REQ, AD_RESULT_NOK, AD_RESULT_OK, AD_EXCEPT_OK)
+        SELECT
+            BRANCH_ID,
+            TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY),
+                    '%Y%m%d') AS CREATE_DAY,
+            COUNT(ITEM_RESULT) AS AD_RESULT_REQ,
+            SUM(CASE
+                WHEN ADMIN_OK_FLAG = 0 THEN 1
+                ELSE 0
+            END) AD_RESULT_NOK,
+            SUM(CASE
+                WHEN ADMIN_OK_FLAG = 1 THEN 1
+                ELSE 0
+            END) AD_RESULT_OK,
+            SUM(CASE
+                WHEN ADMIN_OK_FLAG = 2 THEN 1
+                ELSE 0
+            END) AD_EXCEPT_OK
+        FROM
+            (SELECT
+                A.branch_id, A.team_id, AA.*, BBB.ADMIN_OK_FLAG
+            FROM
+                SNET_ASSET_MASTER A
+            INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+            INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY CC ON (B.ASSET_CD = CC.ASSET_CD
+                AND B.SW_TYPE = CC.SW_TYPE
+                AND B.SW_NM = CC.SW_NM
+                AND B.SW_INFO = CC.SW_INFO
+                AND B.SW_DIR = CC.SW_DIR
+                AND B.SW_USER = CC.SW_USER
+                AND B.SW_ETC = CC.SW_ETC
+                AND B.AUDIT_DAY = CC.AUDIT_DAY)
+            INNER JOIN SNET_ASSET_SW_AUDIT_REPORT AA ON (AA.ASSET_CD = B.ASSET_CD
+                AND AA.SW_TYPE = B.SW_TYPE
+                AND AA.SW_NM = B.SW_NM
+                AND AA.SW_INFO = B.SW_INFO
+                AND AA.SW_DIR = B.SW_DIR
+                AND AA.SW_USER = B.SW_USER
+                AND AA.SW_ETC = B.SW_ETC
+                AND AA.AUDIT_DAY = B.AUDIT_DAY
+        		  AND IFNULL(AA.EXCEPT_YN, 'N') = 'N')
+        	LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK BBB ON (AA.ASSET_CD = BBB.ASSET_CD
+        	 	  AND AA.DIAGNOSIS_CD = BBB.DIAGNOSIS_CD
+                AND AA.SW_TYPE = BBB.SW_TYPE
+                AND AA.SW_NM = BBB.SW_NM
+                AND AA.SW_INFO = BBB.SW_INFO
+                AND AA.SW_DIR = BBB.SW_DIR
+                AND AA.SW_USER = BBB.SW_USER
+                AND AA.SW_ETC = BBB.SW_ETC)
+           WHERE
+                (AA.ITEM_RESULT != 'T' OR BBB.ADMIN_OK_FLAG = '0')
+           AND AA.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')) AAA
+
+        WHERE
+            1 = 1
+        GROUP BY BRANCH_ID , TEAM_ID
+    </insert>
+
+    <delete id="deleteIntroCokStatus">
+      DELETE FROM SNET_INTRO_COK_STATUS
+      WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 장비현황 -->
+    <insert id="insertIntroEquipStatus">
+        INSERT INTO SNET_INTRO_EQUIP_STATUS
+        (BRANCH_ID, TEAM_ID, CREATE_DAY, EQUIP_CNT, AGENT_CNT, AGENT_NOT_INSTALL_CNT, EQUIP_PLUS_CNT, EQUIP_MINUS_CNT)
+        SELECT
+            BRANCH_ID,
+            TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')  AS CREATE_DAY,
+            COUNT(1) AS EQUIP_CNT,
+            SUM(CASE WHEN B.AGENT_TYPE IS NOT NULL THEN 1 ELSE 0 END) AS AGENT_CNT,
+            SUM(CASE WHEN B.AGENT_TYPE IS NULL THEN 1 ELSE 0 END) AS AGENT_NOT_INSTALL_CNT,
+            SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS EQUIP_PLUS_CNT,
+            (
+                SELECT COUNT(1)
+                FROM SNET_ASSET_DEL_HISTORY
+                WHERE DATE_FORMAT(DEL_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+            ) AS EQUIP_MINUS_CNT
+        FROM SNET_ASSET_MASTER A
+        LEFT OUTER JOIN SNET_AGENT_MASTER B ON (A.AGENT_CD = B.AGENT_CD)
+        WHERE DATE_FORMAT(A.CREATE_DATE, '%Y%m%d') <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+        GROUP BY A.BRANCH_ID, A.TEAM_ID
+    </insert>
+
+    <delete id="deleteIntroEquipStatus">
+      DELETE FROM SNET_INTRO_EQUIP_STATUS
+      WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 자산현황 -->
+    <insert id="insertIntroAssetStatus">
+        INSERT INTO SNET_INTRO_ASSET_STATUS
+        (
+            USER_TYPE, BRANCH_ID, TEAM_ID, CREATE_DAY, ASSET_CNT, ASSET_AUDIT_RATE, ASSET_PLUS_CNT, ASSET_MINUS_CNT, ASSET_NOT_AUDIT_CNT, ASSET_NOT_ACTION_CNT
+        )
+        SELECT USER_TYPE, BRANCH_ID, TEAM_ID, CREATE_DAY, ASSET_CNT, ASSET_AUDIT_RATE, ASSET_PLUS_CNT, ASSET_MINUS_CNT, ASSET_NOT_AUDIT_CNT, ASSET_NOT_ACTION_CNT
+        FROM
+        (
+            (
+                SELECT 'SU' AS USER_TYPE,
+                         '' AS BRANCH_ID,
+                         '' AS TEAM_ID,
+                         DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+                         SUM(ASSET_CNT) AS ASSET_CNT,
+                         ROUND(CASE (SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 WHEN 0 THEN 0 WHEN null THEN 0
+                            ELSE SUM(AD_WEIGHT_OK)/(SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 END, 2) AS ASSET_AUDIT_RATE,
+                         SUM(ASSET_PLUS_CNT) AS ASSET_PLUS_CNT,
+                         SUM(ASSET_MINUS_CNT) AS ASSET_MINUS_CNT,
+                         SUM(ASSET_NOT_AUDIT_CNT) AS ASSET_NOT_AUDIT_CNT,
+                         SUM(ASSET_NOT_ACTION_CNT) AS ASSET_NOT_ACTION_CNT
+                FROM (
+                    SELECT
+                         'SU' AS USER_TYPE,
+                         SW_TYPE,
+                         '' AS BRANCH_ID,
+                         '' AS TEAM_ID,
+                         COUNT(1) AS ASSET_CNT,
+                         IFNULL(ROUND(AVG(AUDIT_RATE), 2), 0) AS ASSET_AUDIT_RATE,
+                         SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS ASSET_PLUS_CNT,
+                         0 AS ASSET_MINUS_CNT,
+                         SUM(CASE WHEN UNACTED_DAY_ACTION >= 0 THEN 1 ELSE 0 END) AS ASSET_NOT_ACTION_CNT,
+                         SUM(CASE WHEN UNACTED_DAY_AUDIT >= 0 THEN 1 ELSE 0 END) AS ASSET_NOT_AUDIT_CNT,
+                         SUM(AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL,
+                         SUM(AD_WEIGHT_PASS) AS AD_WEIGHT_PASS,
+                         SUM(AD_WEIGHT_NA) AS AD_WEIGHT_NA,
+                         SUM(AD_WEIGHT_OK) AS AD_WEIGHT_OK
+                    FROM  (
+                        SELECT
+                             CASE WHEN A.SW_TYPE = 'OS' AND A.SW_NM = 'Windows' THEN 'Windows'
+                                  WHEN A.SW_TYPE = 'OS' AND A.SW_NM != 'Windows' THEN 'Linux'
+                                  WHEN A.SW_TYPE = 'DB' THEN 'DB'
+                                  WHEN A.SW_TYPE = 'WEB' THEN 'WEB'
+                                  WHEN A.SW_TYPE = 'WAS' THEN 'WAS'
+                                  WHEN A.SW_TYPE = 'NW' THEN 'NW'
+                                  WHEN A.SW_TYPE = 'URL' THEN 'URL'
+                                  ELSE 'ETC' END AS SW_TYPE,
+                             M.BRANCH_ID,
+                             M.TEAM_ID,
+                             A.CREATE_DATE,
+                             K.AUDIT_RATE,
+                             A.AUDIT_DAY,
+                             CASE WHEN K.AUDIT_DAY != '19990101' AND K.AUDIT_RATE <![CDATA[ < ]]> 100
+                                  THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                                  ELSE -1
+                             END AS UNACTED_DAY_ACTION,
+                             CASE WHEN K.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                                  ELSE DATEDIFF(NOW(), CAST(A.CREATE_DATE AS DATETIME))
+                             END AS UNACTED_DAY_AUDIT,
+                             K.AD_WEIGHT_TOTAL,
+                             K.AD_WEIGHT_PASS,
+                             K.AD_WEIGHT_NA,
+                             K.AD_WEIGHT_OK
+                        FROM SNET_ASSET_MASTER M
+                        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON (A.ASSET_CD = K.ASSET_CD
+                          AND A.SW_TYPE = K.SW_TYPE
+                          AND A.SW_INFO = K.SW_INFO
+                          AND A.SW_NM = K.SW_NM
+                          AND A.SW_DIR = K.SW_DIR
+                          AND A.SW_USER = K.SW_USER
+                          AND A.SW_ETC = K.SW_ETC
+                          AND A.AUDIT_DAY = K.AUDIT_DAY)
+                        WHERE 1=1
+                        AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV', 'LOG4J')
+                        AND ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+                        AND DATE_FORMAT(M.CREATE_DATE, '%Y%m%d') <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                    ) A
+                    GROUP BY SW_TYPE
+                ) A
+            )
+            UNION ALL
+            (
+                SELECT 'SE' AS USER_TYPE,
+                         BRANCH_ID,
+                         '' AS TEAM_ID,
+                         DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+                         SUM(ASSET_CNT) AS ASSET_CNT,
+                         ROUND(CASE (SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 WHEN 0 THEN 0 WHEN null THEN 0
+                            ELSE SUM(AD_WEIGHT_OK)/(SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 END, 2) AS ASSET_AUDIT_RATE,
+                         SUM(ASSET_PLUS_CNT) AS ASSET_PLUS_CNT,
+                         SUM(ASSET_MINUS_CNT) AS ASSET_MINUS_CNT,
+                         SUM(UNACTED_DAY_AUDIT_CNT) AS ASSET_NOT_AUDIT_CNT,
+                         SUM(UNACTED_DAY_ACTION_CNT) AS ASSET_NOT_ACTION_CNT
+                FROM (
+                    SELECT
+                         'SE' AS USER_TYPE,
+                         SW_TYPE,
+                         BRANCH_ID AS BRANCH_ID,
+                         '' AS TEAM_ID,
+                         COUNT(1) AS ASSET_CNT,
+                         IFNULL(ROUND(AVG(AUDIT_RATE), 2), 0) AS ASSET_AUDIT_RATE,
+                         SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS ASSET_PLUS_CNT,
+                         0 AS ASSET_MINUS_CNT,
+                         SUM(CASE WHEN UNACTED_DAY_ACTION > 0 THEN 1 ELSE 0 END) AS UNACTED_DAY_ACTION_CNT,
+                         SUM(CASE WHEN UNACTED_DAY_AUDIT > 0 THEN 1 ELSE 0 END) AS UNACTED_DAY_AUDIT_CNT,
+                         DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+                         SUM(AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL,
+                         SUM(AD_WEIGHT_PASS) AS AD_WEIGHT_PASS,
+                         SUM(AD_WEIGHT_NA) AS AD_WEIGHT_NA,
+                         SUM(AD_WEIGHT_OK) AS AD_WEIGHT_OK
+                    FROM (
+                        SELECT
+                             CASE WHEN A.SW_TYPE = 'OS' AND A.SW_NM = 'Windows' THEN 'Windows'
+                                  WHEN A.SW_TYPE = 'OS' AND A.SW_NM != 'Windows' THEN 'Linux'
+                                  WHEN A.SW_TYPE = 'DB' THEN 'DB'
+                                  WHEN A.SW_TYPE = 'WEB' THEN 'WEB'
+                                  WHEN A.SW_TYPE = 'WAS' THEN 'WAS'
+                                  WHEN A.SW_TYPE = 'NW' THEN 'NW'
+                                  WHEN A.SW_TYPE = 'URL' THEN 'URL'
+                                  ELSE 'ETC' END AS SW_TYPE,
+                             M.BRANCH_ID,
+                             M.TEAM_ID,
+                             A.CREATE_DATE,
+                             K.AUDIT_RATE,
+                             A.AUDIT_DAY,
+                             CASE WHEN K.AUDIT_DAY != '19990101' AND K.AUDIT_RATE <![CDATA[ < ]]> 100
+                                  THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                                  ELSE DATEDIFF(NOW(), CAST(A.CREATE_DATE AS DATETIME))
+                             END AS UNACTED_DAY_AUDIT,
+                             CASE WHEN K.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                                  ELSE 0
+                             END AS UNACTED_DAY_ACTION,
+                             K.AD_WEIGHT_TOTAL,
+                             K.AD_WEIGHT_PASS,
+                             K.AD_WEIGHT_NA,
+                             K.AD_WEIGHT_OK
+                        FROM SNET_ASSET_MASTER M
+                        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON (A.ASSET_CD = K.ASSET_CD
+                          AND A.SW_TYPE = K.SW_TYPE
+                          AND A.SW_INFO = K.SW_INFO
+                          AND A.SW_NM = K.SW_NM
+                          AND A.SW_DIR = K.SW_DIR
+                          AND A.SW_USER = K.SW_USER
+                          AND A.SW_ETC = K.SW_ETC
+                          AND A.AUDIT_DAY = K.AUDIT_DAY)
+                        WHERE 1=1
+                        AND  A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV', 'LOG4J')
+                        AND ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+                        AND DATE_FORMAT(M.CREATE_DATE, '%Y%m%d') <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                    ) A
+                    GROUP BY BRANCH_ID, SW_TYPE
+                ) A
+                GROUP BY BRANCH_ID
+            )
+            UNION ALL
+            (
+                SELECT 'SV' AS USER_TYPE,
+                         BRANCH_ID,
+                         TEAM_ID,
+                         DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+                         SUM(ASSET_CNT) AS ASSET_CNT,
+                         ROUND(CASE (SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 WHEN 0 THEN 0 WHEN null THEN 0
+                                ELSE SUM(AD_WEIGHT_OK)/(SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 END, 2) AS ASSET_AUDIT_RATE,
+                         SUM(ASSET_PLUS_CNT) AS ASSET_PLUS_CNT,
+                         SUM(ASSET_MINUS_CNT) AS ASSET_MINUS_CNT,
+                         SUM(UNACTED_DAY_AUDIT_CNT) AS ASSET_NOT_AUDIT_CNT,
+                         SUM(UNACTED_DAY_ACTION_CNT) AS ASSET_NOT_ACTION_CNT
+                FROM (
+                    SELECT
+                         'SV' AS USER_TYPE,
+                         SW_TYPE,
+                         BRANCH_ID,
+                         TEAM_ID,
+                         COUNT(1) AS ASSET_CNT,
+                         IFNULL(ROUND(AVG(AUDIT_RATE), 2), 0) AS ASSET_AUDIT_RATE,
+                         SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS ASSET_PLUS_CNT,
+                         0 AS ASSET_MINUS_CNT,
+                         SUM(CASE WHEN UNACTED_DAY_ACTION > 0 THEN 1 ELSE 0 END) AS UNACTED_DAY_ACTION_CNT,
+                         SUM(CASE WHEN UNACTED_DAY_AUDIT > 0 THEN 1 ELSE 0 END) AS UNACTED_DAY_AUDIT_CNT,
+                         DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+                         SUM(AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL,
+                         SUM(AD_WEIGHT_PASS) AS AD_WEIGHT_PASS,
+                         SUM(AD_WEIGHT_NA) AS AD_WEIGHT_NA,
+                         SUM(AD_WEIGHT_OK) AS AD_WEIGHT_OK
+                    FROM (
+                        SELECT
+                             CASE WHEN A.SW_TYPE = 'OS' AND A.SW_NM = 'Windows' THEN 'Windows'
+                                  WHEN A.SW_TYPE = 'OS' AND A.SW_NM != 'Windows' THEN 'Linux'
+                                  WHEN A.SW_TYPE = 'DB' THEN 'DB'
+                                  WHEN A.SW_TYPE = 'WEB' THEN 'WEB'
+                                  WHEN A.SW_TYPE = 'WAS' THEN 'WAS'
+                                  WHEN A.SW_TYPE = 'NW' THEN 'NW'
+                                  WHEN A.SW_TYPE = 'URL' THEN 'URL'
+                                  ELSE 'ETC' END AS SW_TYPE,
+                             M.BRANCH_ID,
+                             M.TEAM_ID,
+                             A.CREATE_DATE,
+                             K.AUDIT_RATE,
+                             A.AUDIT_DAY,
+                             CASE WHEN K.AUDIT_DAY != '19990101' AND K.AUDIT_RATE <![CDATA[ < ]]> 100
+                                  THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                                  ELSE DATEDIFF(NOW(), CAST(A.CREATE_DATE AS DATETIME))
+                             END AS UNACTED_DAY_AUDIT,
+                             CASE WHEN K.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                                  ELSE 0
+                             END AS UNACTED_DAY_ACTION,
+                             K.AD_WEIGHT_TOTAL,
+                             K.AD_WEIGHT_PASS,
+                             K.AD_WEIGHT_NA,
+                             K.AD_WEIGHT_OK
+                        FROM SNET_ASSET_MASTER M
+                        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON (A.ASSET_CD = K.ASSET_CD
+                          AND A.SW_TYPE = K.SW_TYPE
+                          AND A.SW_INFO = K.SW_INFO
+                          AND A.SW_NM = K.SW_NM
+                          AND A.SW_DIR = K.SW_DIR
+                          AND A.SW_USER = K.SW_USER
+                          AND A.SW_ETC = K.SW_ETC
+                          AND A.AUDIT_DAY = K.AUDIT_DAY)
+                        WHERE 1=1
+                        AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV', 'LOG4J')
+                        AND ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+                        AND DATE_FORMAT(M.CREATE_DATE, '%Y%m%d') <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                    ) A
+                    GROUP BY BRANCH_ID, TEAM_ID, SW_TYPE
+                ) A
+                GROUP BY BRANCH_ID, TEAM_ID
+            )
+        ) A
+    </insert>
+
+    <delete id="deleteIntroAssetStatus">
+      DELETE FROM SNET_INTRO_ASSET_STATUS
+      WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 자산현황 Detail -->
+    <insert id="insertIntroAssetStatusDetail">
+        INSERT INTO SNET_INTRO_ASSET_STATUS_DETAIL
+            (USER_TYPE, SW_TYPE, BRANCH_ID, TEAM_ID, CREATE_dAY, ASSET_CNT, ASSET_AUDIT_RATE, ASSET_PLUS_CNT, ASSET_MINUS_CNT, ASSET_NOT_AUDIT_CNT, ASSET_NOT_ACTION_CNT)
+        SELECT
+             'SU' AS USER_TYPE,
+             SW_TYPE,
+             '' AS BRANCH_ID,
+             '' AS TEAM_ID,
+             DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+             COUNT(1) AS ASSET_CNT,
+             ROUND(CASE (SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 WHEN 0 THEN 0 WHEN null THEN 0
+                    ELSE SUM(AD_WEIGHT_OK)/(SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 END, 2) AS ASSET_AUDIT_RATE,
+             SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS ASSET_PLUS_CNT,
+             0 AS ASSET_MINUS_CNT,
+             SUM(CASE WHEN UNACTED_DAY_ACTION > 0 THEN 1 ELSE 0 END) AS ASSET_NOT_AUDIT_CNT,
+             SUM(CASE WHEN UNACTED_DAY_AUDIT > 0 THEN 1 ELSE 0 END) AS ASSET_NOT_ACTION_CNT
+        FROM (SELECT
+                 CASE WHEN A.SW_TYPE = 'OS' AND A.SW_NM = 'Windows' THEN 'Windows'
+                      WHEN A.SW_TYPE = 'OS' AND A.SW_NM != 'Windows' THEN 'Linux'
+                      WHEN A.SW_TYPE = 'DB' THEN 'DB'
+                      WHEN A.SW_TYPE = 'WEB' THEN 'WEB'
+                      WHEN A.SW_TYPE = 'WAS' THEN 'WAS'
+                      WHEN A.SW_TYPE = 'NW' THEN 'NW'
+                      WHEN A.SW_TYPE = 'URL' THEN 'URL'
+                      ELSE 'ETC' END AS SW_TYPE,
+                 M.BRANCH_ID,
+                 M.TEAM_ID,
+                 A.CREATE_DATE,
+                 K.AUDIT_RATE,
+                 A.AUDIT_DAY,
+                 CASE WHEN A.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                      ELSE 0
+                 END AS UNACTED_DAY_ACTION,
+                 CASE WHEN A.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                      ELSE DATEDIFF(NOW(), CAST(A.CREATE_DATE AS DATETIME))
+                 END AS UNACTED_DAY_AUDIT,
+                 K.AD_WEIGHT_TOTAL,
+                  K.AD_WEIGHT_PASS,
+                  K.AD_WEIGHT_NA,
+                  K.AD_WEIGHT_OK
+             FROM SNET_ASSET_MASTER M
+             INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+             LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON (A.ASSET_CD = K.ASSET_CD
+                  AND A.SW_TYPE = K.SW_TYPE
+                  AND A.SW_INFO = K.SW_INFO
+                  AND A.SW_NM = K.SW_NM
+                  AND A.SW_DIR = K.SW_DIR
+                  AND A.SW_USER = K.SW_USER
+                  AND A.SW_ETC = K.SW_ETC
+                  AND A.AUDIT_DAY = K.AUDIT_DAY)
+            WHERE 1=1
+            AND  A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV', 'LOG4J')
+            AND ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+            AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+        ) A
+        GROUP BY SW_TYPE
+        UNION ALL
+        SELECT
+             'SE' AS USER_TYPE,
+             SW_TYPE,
+             BRANCH_ID AS BRANCH_ID,
+             '' AS TEAM_ID,
+             DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+             COUNT(1) AS ASSET_CNT,
+             ROUND(CASE (SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 WHEN 0 THEN 0 WHEN null THEN 0
+                ELSE SUM(AD_WEIGHT_OK)/(SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 END, 2) AS ASSET_AUDIT_RATE,
+             SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS ASSET_PLUS_CNT,
+             0 AS ASSET_MINUS_CNT,
+             SUM(CASE WHEN UNACTED_DAY_ACTION > 0 THEN 1 ELSE 0 END) AS ASSET_NOT_AUDIT_CNT,
+             SUM(CASE WHEN UNACTED_DAY_AUDIT > 0 THEN 1 ELSE 0 END) AS ASSET_NOT_ACTION_CNT
+        FROM ( SELECT
+                 CASE WHEN A.SW_TYPE = 'OS' AND A.SW_NM = 'Windows' THEN 'Windows'
+                      WHEN A.SW_TYPE = 'OS' AND A.SW_NM != 'Windows' THEN 'Linux'
+                      WHEN A.SW_TYPE = 'DB' THEN 'DB'
+                      WHEN A.SW_TYPE = 'WEB' THEN 'WEB'
+                      WHEN A.SW_TYPE = 'WAS' THEN 'WAS'
+                      WHEN A.SW_TYPE = 'NW' THEN 'NW'
+                      WHEN A.SW_TYPE = 'URL' THEN 'URL'
+                      ELSE 'ETC' END AS SW_TYPE,
+                 M.BRANCH_ID,
+                 M.TEAM_ID,
+                 A.CREATE_DATE,
+                 K.AUDIT_RATE,
+                 A.AUDIT_DAY,
+                 CASE WHEN A.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                      ELSE 0
+                 END AS UNACTED_DAY_ACTION,
+                 CASE WHEN A.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                      ELSE DATEDIFF(NOW(), CAST(A.CREATE_DATE AS DATETIME))
+                 END AS UNACTED_DAY_AUDIT,
+                 K.AD_WEIGHT_TOTAL,
+                  K.AD_WEIGHT_PASS,
+                  K.AD_WEIGHT_NA,
+                  K.AD_WEIGHT_OK
+             FROM SNET_ASSET_MASTER M
+             INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+             LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON ( A.ASSET_CD = K.ASSET_CD
+                  AND A.SW_TYPE = K.SW_TYPE
+                  AND A.SW_INFO = K.SW_INFO
+                  AND A.SW_NM = K.SW_NM
+                  AND A.SW_DIR = K.SW_DIR
+                  AND A.SW_USER = K.SW_USER
+                  AND A.SW_ETC = K.SW_ETC
+                  AND A.AUDIT_DAY = K.AUDIT_DAY)
+            WHERE 1=1
+            AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV', 'LOG4J')
+            AND ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE  <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+            AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+        ) A
+        GROUP BY BRANCH_ID, SW_TYPE
+        UNION ALL
+        SELECT
+             'SV' AS USER_TYPE,
+             SW_TYPE,
+             BRANCH_ID AS BRANCH_ID,
+             TEAM_ID AS TEAM_ID,
+             DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+             COUNT(1) AS ASSET_CNT,
+             ROUND(CASE (SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 WHEN 0 THEN 0 WHEN null THEN 0
+                ELSE SUM(AD_WEIGHT_OK)/(SUM(AD_WEIGHT_TOTAL)-SUM(AD_WEIGHT_PASS)-SUM(AD_WEIGHT_NA))*100 END, 2) AS ASSET_AUDIT_RATE,
+             SUM(CASE WHEN DATE_FORMAT(CREATE_DATE, '%Y%m%d') = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') THEN 1 ELSE 0 END) AS ASSET_PLUS_CNT,
+             0 AS ASSET_MINUS_CNT,
+             SUM(CASE WHEN UNACTED_DAY_ACTION > 0 THEN 1 ELSE 0 END) AS ASSET_NOT_AUDIT_CNT,
+             SUM(CASE WHEN UNACTED_DAY_AUDIT > 0 THEN 1 ELSE 0 END) AS ASSET_NOT_ACTION_CNT
+        FROM (SELECT
+                 CASE WHEN A.SW_TYPE = 'OS' AND A.SW_NM = 'Windows' THEN 'Windows'
+                      WHEN A.SW_TYPE = 'OS' AND A.SW_NM != 'Windows' THEN 'Linux'
+                      WHEN A.SW_TYPE = 'DB' THEN 'DB'
+                      WHEN A.SW_TYPE = 'WEB' THEN 'WEB'
+                      WHEN A.SW_TYPE = 'WAS' THEN 'WAS'
+                      WHEN A.SW_TYPE = 'NW' THEN 'NW'
+                      WHEN A.SW_TYPE = 'URL' THEN 'URL'
+                      ELSE 'ETC' END AS SW_TYPE,
+                 M.BRANCH_ID,
+                 M.TEAM_ID,
+                 A.CREATE_DATE,
+                 K.AUDIT_RATE,
+                 A.AUDIT_DAY,
+                 CASE WHEN A.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                      ELSE 0
+                 END AS UNACTED_DAY_ACTION,
+                 CASE WHEN A.AUDIT_DAY != '19990101' THEN DATEDIFF(DATE_SUB(NOW(), INTERVAL 1 DAY), CAST(K.AUDIT_DAY AS DATETIME))
+                      ELSE DATEDIFF(NOW(), CAST(A.CREATE_DATE AS DATETIME))
+                 END AS UNACTED_DAY_AUDIT,
+                 K.AD_WEIGHT_TOTAL,
+                  K.AD_WEIGHT_PASS,
+                  K.AD_WEIGHT_NA,
+                  K.AD_WEIGHT_OK
+             FROM SNET_ASSET_MASTER M
+             INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+             LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON ( A.ASSET_CD = K.ASSET_CD
+                  AND A.SW_TYPE = K.SW_TYPE
+                  AND A.SW_INFO = K.SW_INFO
+                  AND A.SW_NM = K.SW_NM
+                  AND A.SW_DIR = K.SW_DIR
+                  AND A.SW_USER = K.SW_USER
+                  AND A.SW_ETC = K.SW_ETC
+                  AND A.AUDIT_DAY = K.AUDIT_DAY)
+            WHERE 1=1
+            AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV', 'LOG4J')
+            AND ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+            AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+        ) A
+        GROUP BY BRANCH_ID, TEAM_ID, SW_TYPE
+    </insert>
+
+    <delete id="deleteIntroAssetStatusDetail">
+      DELETE FROM SNET_INTRO_ASSET_STATUS_DETAIL
+      WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 자산별 보안준수율 하위 TOP10 -->
+    <insert id="insertIntroAssetAuditRateTop10">
+        INSERT INTO SNET_INTRO_ASSET_AUDIT_RATE_TOP10
+        (
+            USER_TYPE, BRANCH_ID, TEAM_ID, CREATE_DAY, SW_TYPE, SW_NM, HOST_NM, AUDIT_RATE
+        )
+        (
+        SELECT
+            'SU' AS USER_TYPE,
+            '' AS BRANCH_ID,
+            '' AS TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+            A.SW_TYPE,
+            A.SW_NM,
+            B.HOST_NM,
+            B.AUDIT_RATE AS AUDIT_RATE
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+            AND A.SW_TYPE = B.SW_TYPE
+            AND A.SW_NM = B.SW_NM
+            AND A.SW_INFO = B.SW_INFO
+            AND A.SW_DIR = B.SW_DIR
+            AND A.SW_ETC = B.SW_ETC
+            AND A.SW_USER = B.SW_USER
+            AND A.AUDIT_DAY = B.AUDIT_DAY)
+        WHERE A.AUDIT_DAY != '19990101'
+        AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV')
+        AND B.AUDIT_RATE BETWEEN 0 AND 99
+        AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+        ORDER BY B.AUDIT_RATE
+        LIMIT 10
+        )
+        UNION ALL
+        (
+        SELECT
+            'SE' AS USER_TYPE,
+            BRANCH_ID,
+            '' AS TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+            SW_TYPE,
+            SW_NM,
+            HOST_NM,
+            AUDIT_RATE
+        FROM (SELECT A.*,
+                     (CASE @c_branch_id
+                         WHEN A.BRANCH_ID THEN @rownum:=@rownum + 1
+                         ELSE @rownum:=1
+                     END) RNUM,
+                    (@c_branch_id:=A.BRANCH_ID) AS c_branch_id
+              FROM (SELECT
+                        M.BRANCH_ID,
+                        '' AS TEAM_ID,
+                        A.SW_TYPE,
+                        A.SW_NM,
+                        B.HOST_NM,
+                        B.AUDIT_RATE
+                    FROM SNET_ASSET_MASTER M
+                    INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                    INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+                        AND A.SW_TYPE = B.SW_TYPE
+                        AND A.SW_NM = B.SW_NM
+                        AND A.SW_INFO = B.SW_INFO
+                        AND A.SW_DIR = B.SW_DIR
+                        AND A.SW_ETC = B.SW_ETC
+                        AND A.SW_USER = B.SW_USER
+                        AND A.AUDIT_DAY = B.AUDIT_DAY)
+                    WHERE A.AUDIT_DAY != '19990101'
+                    AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV')
+                    AND B.AUDIT_RATE BETWEEN 0 AND 99
+                    AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                    GROUP BY M.BRANCH_ID, A.SW_TYPE, A.SW_NM, B.HOST_NM, B.AUDIT_RATE) A,
+                    (SELECT @c_branch_id:='', @rownum:=0 FROM DUAL) B
+              ORDER BY A.BRANCH_ID , AUDIT_RATE ) C
+        WHERE RNUM <![CDATA[ <= ]]> 10
+        )
+        UNION ALL
+        (
+        SELECT
+            'SV' AS USER_TYPE,
+             BRANCH_ID,
+             TEAM_ID ,
+             DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY,
+             SW_TYPE,
+             SW_NM,
+             HOST_NM,
+             AUDIT_RATE
+        FROM (SELECT A.*,
+                     (CASE @c_team_id
+                         WHEN A.TEAM_ID THEN @rownum:=@rownum + 1
+                         ELSE @rownum:=1
+                     END) RNUM,
+                     (@c_team_id:=A.TEAM_ID) AS c_team_id
+              FROM (SELECT
+                        M.BRANCH_ID,
+                        M.TEAM_ID,
+                        A.SW_TYPE,
+                        A.SW_NM,
+                        B.HOST_NM,
+                        B.AUDIT_RATE
+                    FROM SNET_ASSET_MASTER M
+                    INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                    INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+                        AND A.SW_TYPE = B.SW_TYPE
+                        AND A.SW_NM = B.SW_NM
+                        AND A.SW_INFO = B.SW_INFO
+                        AND A.SW_DIR = B.SW_DIR
+                        AND A.SW_ETC = B.SW_ETC
+                        AND A.SW_USER = B.SW_USER
+                        AND A.AUDIT_DAY = B.AUDIT_DAY)
+                    WHERE A.AUDIT_DAY != '19990101'
+                    AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV')
+                    AND B.AUDIT_RATE BETWEEN 0 AND 99
+                    AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                    GROUP BY M.BRANCH_ID, M.TEAM_ID, A.SW_TYPE, A.SW_NM, B.HOST_NM, B.AUDIT_RATE) A,
+                    (SELECT @c_team_id:='', @rownum:=0 FROM DUAL) B
+              ORDER BY A.BRANCH_ID , A.TEAM_ID, AUDIT_RATE ) C
+        WHERE RNUM <![CDATA[ <= ]]> 10
+        )
+    </insert>
+
+    <delete id="deleteIntroAssetAuditRateTop10">
+      DELETE FROM SNET_INTRO_ASSET_AUDIT_RATE_TOP10
+      WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 진단항목별 취약점 TOP10 -->
+    <insert id="insertIntroValnerabilityTop10">
+        INSERT INTO SNET_INTRO_VALNERABILITY_TOP10
+        (
+            USER_TYPE,
+            BRANCH_ID,
+            TEAM_ID,
+            DIAGNOSIS_CD,
+            ITEM_NM,
+            ITEM_WEAK_COUNT,
+            ITEM_GRADE,
+            CREATE_DAY
+        )
+        SELECT
+            USER_TYPE, BRANCH_ID, TEAM_ID, DIAGNOSIS_CD, ITEM_NM, ITEM_WEAK_COUNT, ITEM_GRADE, CREATE_DAY
+        FROM
+            (
+                (SELECT 'SU' AS USER_TYPE,
+                        '' AS BRANCH_ID,
+                        '' AS TEAM_ID,
+                        B.DIAGNOSIS_CD,
+                        B.ITEM_NM,
+                        COUNT(1) AS ITEM_WEAK_COUNT,
+                        ITEM_GRADE,
+                        DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY
+                FROM SNET_ASSET_MASTER M
+                INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                INNER JOIN SNET_ASSET_SW_AUDIT_REPORT B ON (A.ASSET_CD = B.ASSET_CD
+                    AND A.SW_TYPE = B.SW_TYPE
+                    AND A.SW_NM = B.SW_NM
+                    AND A.SW_INFO = B.SW_INFO
+                    AND A.SW_DIR = B.SW_DIR
+                    AND A.SW_ETC = B.SW_ETC
+                    AND A.SW_USER = B.SW_USER
+                    AND A.AUDIT_DAY = B.AUDIT_DAY)
+                WHERE B.ITEM_RESULT = 'F'
+                      AND B.DIAGNOSIS_CD IS NOT NULL
+                      AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                GROUP BY B.DIAGNOSIS_CD
+                ORDER BY COUNT(1) DESC
+                LIMIT 10
+            )
+            UNION ALL
+            (SELECT 'SE' AS USER_TYPE,
+                    BRANCH_ID,
+                    TEAM_ID,
+                    DIAGNOSIS_CD,
+                    ITEM_NM,
+                    ITEM_WEAK_COUNT,
+                    ITEM_GRADE,
+                    DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY
+            FROM (SELECT A.*,
+                    (CASE @c_branch_id
+                        WHEN A.BRANCH_ID THEN @rownum:=@rownum + 1
+                        ELSE @rownum:=1
+                    END) RNUM,
+                    (@c_branch_id:=A.BRANCH_ID) AS c_branch_id
+                 FROM (SELECT M.BRANCH_ID,
+                              '' AS TEAM_ID,
+                              B.DIAGNOSIS_CD,
+                              B.ITEM_NM,
+                              COUNT(1) AS ITEM_WEAK_COUNT,
+                              B.ITEM_GRADE
+                       FROM SNET_ASSET_MASTER M
+                       INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                       INNER JOIN SNET_ASSET_SW_AUDIT_REPORT B ON (A.ASSET_CD = B.ASSET_CD
+                            AND A.SW_TYPE = B.SW_TYPE
+                            AND A.SW_NM = B.SW_NM
+                            AND A.SW_INFO = B.SW_INFO
+                            AND A.SW_DIR = B.SW_DIR
+                            AND A.SW_ETC = B.SW_ETC
+                            AND A.SW_USER = B.SW_USER
+                            AND A.AUDIT_DAY = B.AUDIT_DAY)
+                       WHERE B.ITEM_RESULT = 'F'
+                            AND B.DIAGNOSIS_CD IS NOT NULL
+                            AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                            AND M.BRANCH_ID IS NOT NULL
+                            AND M.TEAM_ID IS NOT NULL
+                       GROUP BY BRANCH_ID , DIAGNOSIS_CD , ITEM_NM) A,
+                       (SELECT @c_branch_id:='', @rownum:=0 FROM DUAL) B
+                 ORDER BY A.BRANCH_ID , ITEM_WEAK_COUNT DESC) C
+            WHERE RNUM <![CDATA[ <= ]]> 10
+            )
+            UNION ALL
+            (SELECT 'SV' AS USER_TYPE,
+                    BRANCH_ID,
+                    TEAM_ID,
+                    DIAGNOSIS_CD,
+                    ITEM_NM,
+                    ITEM_WEAK_COUNT,
+                    ITEM_GRADE,
+                    DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY
+            FROM (SELECT A.*,
+                        (CASE @c_team_id
+                            WHEN A.TEAM_ID THEN @rownum:=@rownum + 1
+                            ELSE @rownum:=1
+                        END) RNUM,
+                        (@c_team_id:=A.TEAM_ID) AS c_team_id
+                 FROM (SELECT M.BRANCH_ID,
+                              M.TEAM_ID,
+                              B.DIAGNOSIS_CD,
+                              B.ITEM_NM,
+                              COUNT(1) AS ITEM_WEAK_COUNT,
+                              B.ITEM_GRADE
+                       FROM SNET_ASSET_MASTER M
+                       INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+                       INNER JOIN SNET_ASSET_SW_AUDIT_REPORT B ON (A.ASSET_CD = B.ASSET_CD
+                            AND A.SW_TYPE = B.SW_TYPE
+                            AND A.SW_NM = B.SW_NM
+                            AND A.SW_INFO = B.SW_INFO
+                            AND A.SW_DIR = B.SW_DIR
+                            AND A.SW_ETC = B.SW_ETC
+                            AND A.SW_USER = B.SW_USER
+                            AND A.AUDIT_DAY = B.AUDIT_DAY)
+                       WHERE B.ITEM_RESULT = 'F'
+                            AND B.DIAGNOSIS_CD IS NOT NULL
+                            AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+                            AND M.BRANCH_ID IS NOT NULL
+                            AND M.TEAM_ID IS NOT NULL
+                       GROUP BY BRANCH_ID , TEAM_ID , DIAGNOSIS_CD , ITEM_NM) A,
+                       (SELECT @c_team_id:='', @rownum:=0 FROM DUAL) B
+                 ORDER BY A.BRANCH_ID , A.TEAM_ID , ITEM_WEAK_COUNT DESC) C
+             WHERE RNUM <![CDATA[ <= ]]> 10)
+            ) A
+    </insert>
+
+    <delete id="deleteIntroValnerabilityTop10">
+       DELETE FROM SNET_INTRO_VALNERABILITY_TOP10
+       WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 중요도별 취약점 현황 -->
+    <insert id="insertIntroValnerabilityStatus">
+        INSERT INTO SNET_INTRO_VALNERABILITY_STATUS
+        (
+            BRANCH_ID,
+            TEAM_ID,
+            ITEM_GRADE,
+            ITEM_WEAK_COUNT,
+            CREATE_DAY
+        )
+        SELECT
+           M.BRANCH_ID,
+           M.TEAM_ID,
+           C.ITEM_GRADE,
+           COUNT(1) AS WEAK_CNT,
+           DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d') AS CREATE_DAY
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+            AND A.SW_TYPE = B.SW_TYPE
+            AND A.SW_NM = B.SW_NM
+            AND A.SW_INFO = B.SW_INFO
+            AND A.SW_DIR = B.SW_DIR
+            AND A.SW_ETC = B.SW_ETC
+            AND A.SW_USER = B.SW_USER
+            AND A.AUDIT_DAY = B.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+            AND C.SW_TYPE   = B.SW_TYPE
+            AND C.SW_NM     = B.SW_NM
+            AND C.SW_INFO   = B.SW_INFO
+            AND C.SW_DIR    = B.SW_DIR
+            AND C.SW_ETC    = B.SW_ETC
+            AND C.SW_USER   = B.SW_USER
+            AND C.AUDIT_DAY = B.AUDIT_DAY)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK E ON (C.ASSET_CD = E.ASSET_CD
+            AND C.SW_TYPE = E.SW_TYPE
+            AND C.SW_NM = E.SW_NM
+            AND C.SW_INFO = E.SW_INFO
+            AND C.SW_DIR = E.SW_DIR
+            AND C.SW_USER = E.SW_USER
+            AND C.SW_ETC = E.SW_ETC
+            AND IFNULL(C.DIAGNOSIS_CD, '') = IFNULL(E.DIAGNOSIS_CD, '')
+            AND E.ADMIN_OK_FLAG = 1
+            AND ITEM_COK_REQ_VALID_DATE > NOW())
+        WHERE 1=1
+            AND A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+            AND C.ITEM_RESULT = 'F'
+            AND A.AUDIT_DAY <![CDATA[ <= ]]> DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+            AND IFNULL(E.ACTION_ITEM_RESULT, C.ITEM_RESULT) = 'F'
+        GROUP BY M.BRANCH_ID, M.TEAM_ID, C.ITEM_GRADE
+    </insert>
+
+    <delete id="deleteIntroValnerabilityStatus">
+       DELETE FROM SNET_INTRO_VALNERABILITY_STATUS
+    </delete>
+
+    <!-- Intro 중요도별 진단 결과 승인/반려 현황 -->
+    <insert id="insertIntroResultStatus">
+        INSERT INTO SNET_INTRO_RESULT_STATUS
+        (
+            BRANCH_ID,
+            TEAM_ID,
+            ITEM_GRADE,
+            AD_RESULT_HIGH_AWEEK_CNT,
+            AD_RESULT_HIGH_BWEEK_CNT,
+            AD_RESULT_HIGH_CWEEK_CNT,
+            AD_RESULT_HIGH_DWEEK_CNT,
+
+            AD_RESULT_MID_AWEEK_CNT,
+            AD_RESULT_MID_BWEEK_CNT,
+            AD_RESULT_MID_CWEEK_CNT,
+            AD_RESULT_MID_DWEEK_CNT,
+
+            AD_RESULT_LOW_AWEEK_CNT,
+            AD_RESULT_LOW_BWEEK_CNT,
+            AD_RESULT_LOW_CWEEK_CNT,
+            AD_RESULT_LOW_DWEEK_CNT,
+
+            AD_EXCEPT_HIGH_AWEEK_CNT,
+            AD_EXCEPT_HIGH_BWEEK_CNT,
+            AD_EXCEPT_HIGH_CWEEK_CNT,
+            AD_EXCEPT_HIGH_DWEEK_CNT,
+
+            AD_EXCEPT_MID_AWEEK_CNT,
+            AD_EXCEPT_MID_BWEEK_CNT,
+            AD_EXCEPT_MID_CWEEK_CNT,
+            AD_EXCEPT_MID_DWEEK_CNT,
+
+            AD_EXCEPT_LOW_AWEEK_CNT,
+            AD_EXCEPT_LOW_BWEEK_CNT,
+            AD_EXCEPT_LOW_CWEEK_CNT,
+            AD_EXCEPT_LOW_DWEEK_CNT,
+
+            CREATE_DAY
+        )
+        SELECT
+            M.BRANCH_ID,
+            M.TEAM_ID,
+            B.ITEM_GRADE,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ <= ]]> 7 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_RESULT_A_HIGH_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 8 AND 14 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_RESULT_B_HIGH_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 15 AND 21 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_RESULT_C_HIGH_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ >= ]]> 22 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_RESULT_D_HIGH_CNT,
+
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ <= ]]> 7 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_RESULT_A_MID_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 8 AND 14 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_RESULT_B_MID_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 15 AND 21 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_RESULT_C_MID_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ >= ]]> 22 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_RESULT_D_MID_CNT,
+
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ <= ]]> 7 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_RESULT_A_LOW_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 8 AND 14 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_RESULT_B_LOW_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 15 AND 21 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_RESULT_C_LOW_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '승인' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ >= ]]> 22 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_RESULT_D_LOW_CNT,
+
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ <= ]]> 7 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_EXCEPT_A_HIGH_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 8 AND 14 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_EXCEPT_B_HIGH_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 15 AND 21 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_EXCEPT_C_HIGH_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ >= ]]> 22 AND B.ITEM_GRADE = 'H' THEN 1 ELSE 0 END) AS AD_EXCEPT_D_HIGH_CNT,
+
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ <= ]]> 7 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_EXCEPT_A_MID_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 8 AND 14 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_EXCEPT_B_MID_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 15 AND 21 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_EXCEPT_C_MID_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ >= ]]> 22 AND B.ITEM_GRADE = 'M' THEN 1 ELSE 0 END) AS AD_EXCEPT_D_MID_CNT,
+
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ <= ]]> 7 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_EXCEPT_A_LOW_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 8 AND 14 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_EXCEPT_B_LOW_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) BETWEEN 15 AND 21 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_EXCEPT_C_LOW_CNT,
+            SUM(CASE WHEN ADMIN_OK_FLAG_NM = '반려' AND DATEDIFF(DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d'), C.AUDIT_DAY) <![CDATA[ >= ]]> 22 AND B.ITEM_GRADE = 'L' THEN 1 ELSE 0 END) AS AD_EXCEPT_D_LOW_CNT,
+
+            DATE_FORMAT( DATE_SUB( NOW() , INTERVAL 1 DAY) , '%Y%m%d') AS CREATE_DAY
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT B ON (A.ASSET_CD = B.ASSET_CD
+            AND A.SW_TYPE = B.SW_TYPE
+            AND A.SW_NM = B.SW_NM
+            AND A.SW_INFO = B.SW_INFO
+            AND A.SW_DIR = B.SW_DIR
+            AND A.SW_ETC = B.SW_ETC
+            AND A.SW_USER = B.SW_USER
+            AND A.AUDIT_DAY = B.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_COK_HIS C ON (C.ASSET_CD = B.ASSET_CD
+            AND C.SW_TYPE = B.SW_TYPE
+            AND C.SW_NM = B.SW_NM
+            AND C.SW_INFO = B.SW_INFO
+            AND C.SW_DIR = B.SW_DIR
+            AND C.SW_ETC = B.SW_ETC
+            AND C.SW_USER = B.SW_USER
+            AND C.DIAGNOSIS_CD = B.DIAGNOSIS_CD)
+        WHERE 1=1
+        and C.AUDIT_DAY is not null
+        and C.ADMIN_OK_FLAG_NM IN ('승인', '반려')
+        AND A.AUDIT_DAY  <![CDATA[ <= ]]> DATE_FORMAT( DATE_SUB( NOW() , INTERVAL 1 DAY) , '%Y%m%d')
+        GROUP BY M.BRANCH_ID, M.TEAM_ID, ITEM_GRADE
+    </insert>
+
+    <delete id="deleteIntroResultStatus">
+       DELETE FROM SNET_INTRO_RESULT_STATUS
+       WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+    <!-- Intro 에이전트 상태 -->
+    <insert id="insertIntroAgentStatus">
+        INSERT INTO SNET_INTRO_AGENT_STATUS
+                (
+                    USER_TYPE,
+                    BRANCH_ID,
+                    TEAM_ID,
+                    CREATE_DAY,
+                    AGENT_INSTALL_CNT,
+                    AGENT_STATUS1_CNT,
+                    AGENT_STATUS2_CNT,
+                    AGENT_STATUS3_CNT
+                )
+        SELECT
+        	USER_TYPE,
+        	BRANCH_ID,
+        	TEAM_ID,
+        	CREATE_DAY,
+        	AGENT_INSTALL_CNT,
+        	AGENT_STATUS1_CNT,
+        	TOTAL_CNT - (AGENT_STATUS1_CNT + AGENT_STATUS3_CNT) AS AGENT_STATUS2_CNT,
+        	AGENT_STATUS3_CNT
+        FROM	(
+        SELECT
+             'SU' AS USER_TYPE,
+            '' BRANCH_ID,
+            '' AS TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')  AS CREATE_DAY,
+            COUNT(A.ASSET_CD) AS TOTAL_CNT,
+            SUM(CASE WHEN C.AGENT_TYPE != '3' THEN 1 ELSE 0 END) AS AGENT_INSTALL_CNT,
+            SUM(CASE WHEN D.AGENT_STATUS = '1' THEN 1 ELSE 0 END) AS AGENT_STATUS1_CNT,
+            SUM(CASE WHEN D.AGENT_STATUS = '3' THEN 1 ELSE 0 END) AS AGENT_STATUS3_CNT
+        FROM SNET_ASSET_MASTER A
+        LEFT OUTER JOIN SNET_CONNECT_MASTER B ON (A.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER JOIN SNET_AGENT_MASTER C ON (A.AGENT_CD = C.AGENT_CD)
+        LEFT OUTER JOIN SNET_AGENT_STATUS_HISTORY D ON (C.AGENT_CD = D.AGENT_CD)
+        ) A
+        UNION ALL
+
+        SELECT
+        	USER_TYPE,
+        	BRANCH_ID,
+        	TEAM_ID,
+        	CREATE_DAY,
+        	AGENT_INSTALL_CNT,
+        	AGENT_STATUS1_CNT,
+        	TOTAL_CNT - (AGENT_STATUS1_CNT + AGENT_STATUS3_CNT) AS AGENT_STATUS2_CNT,
+        	AGENT_STATUS3_CNT
+        FROM	(
+        SELECT
+            'SE' AS USER_TYPE,
+            BRANCH_ID,
+            '' AS TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')  AS CREATE_DAY,
+            COUNT(A.ASSET_CD) AS TOTAL_CNT,
+            SUM(CASE WHEN C.AGENT_TYPE != '3' THEN 1 ELSE 0 END) AS AGENT_INSTALL_CNT,
+            SUM(CASE WHEN D.AGENT_STATUS = '1' THEN 1 ELSE 0 END) AS AGENT_STATUS1_CNT,
+            SUM(CASE WHEN D.AGENT_STATUS = '3' THEN 1 ELSE 0 END) AS AGENT_STATUS3_CNT
+        FROM SNET_ASSET_MASTER A
+        LEFT OUTER JOIN SNET_CONNECT_MASTER B ON (A.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER JOIN SNET_AGENT_MASTER C ON (A.AGENT_CD = C.AGENT_CD)
+        LEFT OUTER JOIN SNET_AGENT_STATUS_HISTORY D ON (A.AGENT_CD = D.AGENT_CD)
+        GROUP BY A.BRANCH_ID
+        ) A
+        UNION ALL
+        SELECT
+        	USER_TYPE,
+        	BRANCH_ID,
+        	TEAM_ID,
+        	CREATE_DAY,
+        	AGENT_INSTALL_CNT,
+        	AGENT_STATUS1_CNT,
+        	TOTAL_CNT - (AGENT_STATUS1_CNT + AGENT_STATUS3_CNT) AS AGENT_STATUS2_CNT,
+        	AGENT_STATUS3_CNT
+        FROM	(
+        SELECT
+            'SV' AS USER_TYPE,
+            BRANCH_ID,
+            TEAM_ID,
+            DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')  AS CREATE_DAY,
+            COUNT(A.ASSET_CD) AS TOTAL_CNT,
+            SUM(CASE WHEN C.AGENT_TYPE != '3' THEN 1 ELSE 0 END) AS AGENT_INSTALL_CNT,
+            SUM(CASE WHEN D.AGENT_STATUS = '1' THEN 1 ELSE 0 END) AS AGENT_STATUS1_CNT,
+            SUM(CASE WHEN D.AGENT_STATUS = '3' THEN 1 ELSE 0 END) AS AGENT_STATUS3_CNT
+        FROM SNET_ASSET_MASTER A
+        LEFT OUTER JOIN SNET_CONNECT_MASTER B ON (A.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER JOIN SNET_AGENT_MASTER C ON (A.AGENT_CD = C.AGENT_CD)
+        LEFT OUTER JOIN SNET_AGENT_STATUS_HISTORY D ON (A.AGENT_CD = D.AGENT_CD)
+        GROUP BY A.BRANCH_ID, A.TEAM_ID
+        ) A
+    </insert>
+
+    <delete id="deleteIntroAgentStatus">
+       DELETE FROM SNET_INTRO_AGENT_STATUS
+       WHERE CREATE_DAY = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d')
+    </delete>
+
+</mapper>

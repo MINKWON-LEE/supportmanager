@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetAssetIpDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetIpEntity">
+ INSERT INTO SNET_ASSET_IP
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='assetCd != null '>
+      , asset_cd
+   </if>
+   <if test='ipAddress != null '>
+      , ip_address
+   </if>
+   <if test='ipRepresent != null '>
+      , ip_represent
+   </if>
+   <if test='ipVersion != null '>
+      , ip_version
+   </if>
+   <if test='sgwRegi != null '>
+      , sgw_regi
+   </if>
+   <if test='userRegi != null '>
+      , user_regi
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='assetCd != null '>
+   	  ,    #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='ipAddress != null '>
+   	  ,    #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='ipRepresent != null '>
+   	  ,    #{ipRepresent, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='ipVersion != null '>
+   	  ,    #{ipVersion, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='sgwRegi != null '>
+   	  ,    #{sgwRegi, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='userRegi != null '>
+   	  ,    #{userRegi, javaType=String, jdbcType=INTEGER} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetIpEntity">
+   UPDATE 
+         SNET_ASSET_IP
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='ipRepresent != null '>
+      , ip_represent =   #{ipRepresent, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='ipVersion != null '>
+      , ip_version =   #{ipVersion, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='sgwRegi != null '>
+      , sgw_regi =   #{sgwRegi, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='userRegi != null '>
+      , user_regi =   #{userRegi, javaType=String, jdbcType=INTEGER} 
+    </if>  
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetIpEntity">
+   UPDATE 
+         SNET_ASSET_IP
+      SET 
+ <trim  prefixOverrides="," >
+      , ip_represent =   #{ipRepresent, javaType=String, jdbcType=INTEGER} 
+      , ip_version =   #{ipVersion, javaType=String, jdbcType=INTEGER} 
+      , sgw_regi =   #{sgwRegi, javaType=String, jdbcType=INTEGER} 
+      , user_regi =   #{userRegi, javaType=String, jdbcType=INTEGER} 
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_ASSET_IP
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetIpEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , asset_cd AS assetCd
+      , ip_address AS ipAddress
+      , ip_represent AS ipRepresent
+      , ip_version AS ipVersion
+      , sgw_regi AS sgwRegi
+      , user_regi AS userRegi
+  </trim>
+ FROM 
+      SNET_ASSET_IP
+WHERE
+      asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+  AND ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+</select>
+
+</mapper>

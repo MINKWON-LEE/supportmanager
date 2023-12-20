@@ -1,0 +1,48 @@
+<included>
+    <!-- 'sg_supprotmanager 프로젝트 - 로컬 실행을 위해서 주석 처리 한 부분' -->
+	<property name="LOG_HOME" value="/usr/local/snetManager/logs" />
+    <!--<property name="LOG_HOME" value="D:/SupportAgentTest/logs" />-->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%class{0}.%M-%line] [%thread] - %msg%n%throwable"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>
+                ${LOG_PATTERN}
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/supportAgent.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_HOME}/supportAgent.%d{yyyy.MM.dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="FILE_2" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/supportAgent_makereport.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_HOME}/supportAgent_makereport.%d{yyyy.MM.dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- turn OFF all logging (children can override) -->
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="FILE_2" />
+    </root>
+</included>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.ExternalInterWorkingMapper">
+	<!-- FirmWare -->
+	<insert id="TMSFirmwareInsert" parameterType="com.mobigen.snet.supportagent.entity.FirmWare">
+		INSERT INTO SNET_CONFIG_WIFI_FIRMWARE
+		(
+			COMPANY_ID,
+			COMPANY_NM,
+			FIRMWARE_VER
+		)
+		VALUES
+		(
+			#{companyId},
+			#{companyNm},
+			#{firmwareVer}
+		)
+		ON DUPLICATE KEY UPDATE USE_YN='Y', COMPANY_NM = #{companyNm}, UPDATE_DATE=now()
+	</insert>
+	
+	<update id="TMSFirmwareUpdate" parameterType="com.mobigen.snet.supportagent.entity.TMSInterworkingEntity">
+		UPDATE SNET_CONFIG_WIFI_FIRMWARE A 
+		LEFT JOIN 
+		(
+			SELECT A.COMPANY_ID,  A.FIRMWARE_VER, 'N' AS USE_YN
+			FROM SNET_CONFIG_WIFI_FIRMWARE A
+			LEFT OUTER JOIN
+		    (
+		    	<foreach collection="firmwareList" item="firmware" separator="UNION ALL">
+				SELECT COMPANY_ID,  FIRMWARE_VER FROM SNET_CONFIG_WIFI_FIRMWARE
+		        WHERE 
+		        COMPANY_ID = #{firmware.companyId} AND FIRMWARE_VER = #{firmware.firmwareVer}		    	
+		    	</foreach>
+			) B
+			ON (A.COMPANY_ID=B.COMPANY_ID AND A.FIRMWARE_VER=B.FIRMWARE_VER)
+			WHERE B.COMPANY_ID IS NULL
+		)B
+		ON (A.COMPANY_ID = B.COMPANY_ID  AND A.FIRMWARE_VER = B.FIRMWARE_VER)
+		
+		SET
+			A.USE_YN = B.USE_YN
+			, UPDATE_DATE =NOW()
+		WHERE 
+		A.COMPANY_ID = B.COMPANY_ID  AND A.FIRMWARE_VER = B.FIRMWARE_VER
+	</update>
+	
+	<delete id="TMSFirmwareDelete">
+		DELETE FROM SNET_CONFIG_WIFI_FIRMWARE
+	</delete>
+	<!-- FirmWare -->
+	
+	<!-- Company -->
+	<insert id="TMSCompanyInsert" parameterType="com.mobigen.snet.supportagent.entity.Company">
+		INSERT INTO SNET_CONFIG_WIFI_COMPANY
+		(
+			COMPANY_ID,
+			COMPANY_NM
+		)
+		VALUES
+		(
+			#{companyId},
+			#{companyNm}
+		)
+		ON DUPLICATE KEY UPDATE USE_YN='Y', COMPANY_NM = #{companyNm}, UPDATE_DATE=now()
+	</insert>
+	
+	<update id="TMSCompanyUpdate" parameterType="com.mobigen.snet.supportagent.entity.TMSInterworkingEntity">
+		UPDATE SNET_CONFIG_WIFI_COMPANY A 
+		LEFT JOIN 
+		(
+			SELECT A.COMPANY_ID, 'N' AS USE_YN
+			FROM SNET_CONFIG_WIFI_COMPANY A
+			LEFT OUTER JOIN
+		    (
+		    	<foreach collection="companyList" item="company" separator="UNION ALL">
+				SELECT COMPANY_ID FROM SNET_CONFIG_WIFI_COMPANY
+		        WHERE 
+		        COMPANY_ID = #{company.companyId}		    	
+		    	</foreach>
+			) B
+			ON (A.COMPANY_ID=B.COMPANY_ID)
+			WHERE B.COMPANY_ID IS NULL
+		)B
+		ON (A.COMPANY_ID = B.COMPANY_ID)
+		
+		SET
+			A.USE_YN = B.USE_YN
+			, UPDATE_DATE =NOW()
+		WHERE 
+		A.COMPANY_ID = B.COMPANY_ID	
+	</update>
+	
+	<delete id="TMSCompanyDelete">
+		DELETE FROM SNET_CONFIG_WIFI_COMPANY
+	</delete>	
+	<!-- Company -->
+	
+	<!-- Group -->
+	<insert id="TMSGroupInsert" parameterType="com.mobigen.snet.supportagent.entity.Group">
+		INSERT INTO SNET_CONFIG_WIFI_GROUP
+		(
+			BRANCH_ID,
+			BRANCH_NM,
+			TEAM_ID,
+			TEAM_NM
+		)
+		VALUES
+		(
+			#{branchId},
+			#{branchNm},
+			#{teamId},
+			#{teamNm}
+		)
+		ON DUPLICATE KEY UPDATE USE_YN='Y', BRANCH_NM=#{branchNm}, TEAM_NM=#{teamNm}, UPDATE_DATE=now()
+	</insert>
+	
+	<update id="TMSGroupUpdate" parameterType="com.mobigen.snet.supportagent.entity.TMSInterworkingEntity">
+		UPDATE SNET_CONFIG_WIFI_GROUP A 
+		LEFT JOIN 
+		(
+			SELECT A.BRANCH_ID, A.TEAM_ID, 'N' AS USE_YN
+			FROM SNET_CONFIG_WIFI_GROUP A
+			LEFT OUTER JOIN
+		    (
+		    	<foreach collection="groupList" item="group" separator="UNION ALL">
+				SELECT BRANCH_ID, TEAM_ID  FROM SNET_CONFIG_WIFI_GROUP
+		        WHERE 
+		        BRANCH_ID = #{group.branchId}
+		        AND TEAM_ID= #{group.teamId}		    	
+		    	</foreach>
+			) B
+			ON (A.BRANCH_ID=B.BRANCH_ID AND A.TEAM_ID = B.TEAM_ID)
+			WHERE B.BRANCH_ID IS NULL AND B.TEAM_ID IS NULL
+		)B
+		ON (A.BRANCH_ID=B.BRANCH_ID AND A.TEAM_ID = B.TEAM_ID)
+		
+		SET
+			A.USE_YN = B.USE_YN
+			, UPDATE_DATE =NOW()
+		WHERE 
+		A.BRANCH_ID=B.BRANCH_ID AND A.TEAM_ID = B.TEAM_ID
+	</update>
+	
+	<delete id="TMSGroupDelete">
+		DELETE FROM SNET_CONFIG_WIFI_GROUP
+	</delete>	
+	<!-- Group -->
+	
+	<!-- Asset -->
+	<insert id="TMSAssetInsert" parameterType="com.mobigen.snet.supportagent.entity.Asset">
+		INSERT INTO SNET_CONFIG_WIFI_ASSET
+		(
+			MAC_ADDRESS,
+			COMPANY_ID,
+			ASSET_LOCATION,
+			IP_ADDRESS,
+			TEAM_ID,
+			FIRMWARE_VER
+		)
+		VALUES
+		(
+			#{macAddress},
+			#{companyId},
+			#{assetLocation},
+			#{ipAddress},
+			#{teamId},
+			#{firmwareVer}
+		)
+		ON DUPLICATE KEY UPDATE 
+		COMPANY_ID = #{companyId}
+		, ASSET_LOCATION = #{assetLocation}
+		, IP_ADDRESS = #{ipAddress}
+		, TEAM_ID = #{teamId}
+		, FIRMWARE_VER = #{firmwareVer}
+		, USE_YN='Y'
+		, UPDATE_DATE=now()
+	</insert>
+	<update id="TMSAssetUpdate" parameterType="com.mobigen.snet.supportagent.entity.TMSInterworkingEntity">
+		UPDATE SNET_CONFIG_WIFI_ASSET A 
+		LEFT JOIN 
+		(
+			SELECT A.MAC_ADDRESS, 'N' AS USE_YN
+			FROM SNET_CONFIG_WIFI_ASSET A
+			LEFT OUTER JOIN
+		    (
+		    	<foreach collection="assetList" item="asset" separator="UNION ALL">
+				SELECT MAC_ADDRESS  FROM SNET_CONFIG_WIFI_ASSET
+		        WHERE 
+		        MAC_ADDRESS = #{asset.macAddress}
+		    	</foreach>
+			) B
+			ON (A.MAC_ADDRESS=B.MAC_ADDRESS)
+			WHERE B.MAC_ADDRESS IS NULL
+		)B
+		ON (A.MAC_ADDRESS=B.MAC_ADDRESS)
+		SET
+			A.USE_YN = B.USE_YN
+			, UPDATE_DATE =now()
+		WHERE 
+		A.MAC_ADDRESS=B.MAC_ADDRESS
+	
+	</update>
+	<delete id="TMSAssetDelete">
+		DELETE FROM SNET_CONFIG_WIFI_ASSET
+	</delete>		
+	<!-- Asset -->
+</mapper>

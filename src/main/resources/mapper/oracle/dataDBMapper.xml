@@ -1,0 +1,1267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.DaoMapper">
+
+	<select id="getSwAuditReport" parameterType="com.mobigen.snet.supportagent.entity.ExcelListEntity" resultType="com.mobigen.snet.supportagent.entity.ReportEntity">
+		SELECT * 
+		FROM SNET_ASSET_SW_AUDIT_REPORT
+		<where>
+			<if test="assetCd != null">
+				ASSET_CD = #{assetCd}		
+			</if>
+			<if test="auditDay != null">
+				AND AUDIT_DAY = #{auditDay}		
+			</if>
+			<if test="swInfo != null">
+				AND SW_INFO = #{swInfo}		
+			</if>
+			<if test="swNm != null">
+				AND SW_NM = #{swNm}		
+			</if>
+			<if test="swType != null">
+				AND SW_TYPE = #{swType}		
+			</if>
+			<if test="swDir != null">
+				AND SW_DIR = #{swDir}		
+			</if>
+			<if test="swUser != null">
+				AND SW_USER = #{swUser}		
+			</if>
+			<if test="swEtc != null">
+				AND SW_ETC = #{swEtc}		
+			</if>
+		</where>
+		ORDER BY ITEM_GRP_NM, DIAGNOSIS_CD, ITEM_NM ASC
+	</select>
+
+	<select id="getSwTypeAuditReport" parameterType="com.mobigen.snet.supportagent.entity.ExcelEntity" resultType="com.mobigen.snet.supportagent.entity.ReportEntity">
+		<foreach collection="entityList" item="entity" index="index" separator="UNION ALL">
+			SELECT 
+				ASSET_CD
+				, IP_ADDRESS
+				, HOST_NM
+				, SW_TYPE
+				, SW_NM
+				, SW_INFO
+				, AUDIT_DAY
+				, ITEM_COK_REASON
+				, DIAGNOSIS_CD
+				, ITEM_GRP_NM
+				, ITEM_NM
+				, ITEM_GRADE
+				, ITEM_STANDARD
+				, ITEM_STATUS
+				, ITEM_RESULT
+				, ITEM_COUNTERMEASURE
+				, ITEM_COUNTERMEASURE_DETAIL
+			FROM SNET_ASSET_SW_AUDIT_REPORT
+			<where>
+				<if test="entity.assetCd != null">
+					ASSET_CD = #{entity.assetCd}		
+				</if>
+				<if test="entity.auditDay != null">
+					AND AUDIT_DAY = #{entity.auditDay}		
+				</if>
+				<if test="entity.swInfo != null">
+					AND SW_INFO = #{entity.swInfo}		
+				</if>
+				<if test="entity.swNm != null">
+					AND SW_NM = #{entity.swNm}		
+				</if>
+				<if test="entity.swType != null">
+					AND SW_TYPE = #{entity.swType}		
+				</if>
+			</where>
+		</foreach>
+		ORDER BY ITEM_GRP_NM, DIAGNOSIS_CD, ITEM_NM ASC
+	</select>
+
+	<select id="selectAssetInfo" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.AssetEntity">
+		SELECT
+		*
+		FROM SNET_ASSET_MASTER
+		WHERE ASSET_CD = #{assetCd}
+	</select>
+
+	<select id="selectAssetInfoExcel" parameterType="com.mobigen.snet.supportagent.entity.ExcelListEntity" resultType="com.mobigen.snet.supportagent.entity.AssetEntity">
+		SELECT
+		*
+		FROM SNET_ASSET_SW_AUDIT_HISTORY
+		<where>
+			<if test="assetCd != null">
+				ASSET_CD = #{assetCd}
+			</if>		
+			<if test="swType != null">
+				AND SW_TYPE = #{swType}
+			</if>		
+			<if test="swNm != null">
+				AND SW_NM = #{swNm}
+			</if>		
+			<if test="swInfo != null">
+				AND SW_INFO = #{swInfo}
+			</if>		
+			<if test="auditDay != null">
+				AND AUDIT_DAY = #{auditDay}
+			</if>		
+		</where>
+	</select>
+		
+	<select id="getColumnName" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.ColumnEntity">
+		SELECT COLUMN_NAME, DATA_TYPE
+		FROM COLS
+		<where>
+			TABLE_NAME = #{tableName}		
+		</where>
+	</select>
+
+	<select id="selectAvailableConfig" resultType="com.mobigen.snet.supportagent.entity.ConfigAuditAvailableEntity">
+		SELECT *
+		FROM SNET_CONFIG_AUDIT_AVAILABLE
+	</select>
+	
+	<update id="updateConfigAvailable" parameterType="com.mobigen.snet.supportagent.entity.ConfigAuditAvailableEntity">
+		UPDATE SNET_CONFIG_AUDIT_AVAILABLE
+		<set>
+			<if test="unixYn != null">
+			UNIX_YN =#{unixYn},
+			</if>
+			<if test="winYn != null">
+			WIN_YN =#{winYn},
+			</if>
+		</set>
+		WHERE 
+		SW_TYPE = #{swType}
+		AND SW_NM = #{swNm}		
+	</update>
+	
+	<select id="getExcelJob" parameterType="com.mobigen.snet.supportagent.entity.ExcelJobEntity" resultType="com.mobigen.snet.supportagent.entity.ExcelJobEntity">
+		SELECT *
+		FROM SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		WHERE REQ_CD =#{reqCd}
+	</select>
+
+	<select id="selectExcelJob" parameterType="com.mobigen.snet.supportagent.entity.ExcelJobEntity" resultType="com.mobigen.snet.supportagent.entity.ExcelJobEntity">
+		SELECT *
+		FROM SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		<where>
+			<if test="reqCd != null">
+			 REQ_CD =#{reqCd}
+			</if>
+			<if test="jobFlag != null">
+			 AND JOB_FLAG =#{jobFlag}
+			</if>
+			<if test="reqUser != null">
+			 AND REQ_USER =#{reqUser}
+			</if>
+		</where>
+	</select>
+
+	<select id="getExcelAsset" parameterType="com.mobigen.snet.supportagent.entity.ExcelListEntity" resultType="com.mobigen.snet.supportagent.entity.ExcelListEntity">
+		SELECT *
+		FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST
+		WHERE REQ_CD =#{reqCd}
+	</select>
+	
+	<update id="updateExcelJob" parameterType="com.mobigen.snet.supportagent.entity.ExcelJobEntity">
+		UPDATE SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		<set>
+			<if test="jobFlag != null">
+			JOB_FLAG = #{jobFlag},
+			</if>
+			<if test="jobFileNm != null">
+			JOB_FILE_NM = #{jobFileNm},
+			</if>
+			JOB_DATE = SYSDATE
+		</set>
+		WHERE REQ_CD = #{reqCd}
+	</update>
+	
+	<select id="getConfigPkms" resultType="com.mobigen.snet.supportagent.entity.ConfigPkmsEntity">
+		SELECT 
+		   SEQ_NUM,
+	       PKG_NM,
+	       A.USER_ID,
+	       A.USER_NM,
+		   B.TEAM_ID,
+	       B.TEAM_NM,
+	       B.USER_MS,
+	       B.USER_MAIL
+	  FROM SNET_CONFIG_PKMS A
+      LEFT OUTER JOIN SNET_CONFIG_USER_VIEW B ON A.USER_ID = B.USER_ID
+	</select>
+	
+	<select id="selectServiceMaster" parameterType="Integer" resultType="Integer">
+		SELECT COUNT(*) AS CNT
+		FROM SNET_SERVICE_MASTER
+		WHERE SVC_PKMS_SEQ = #{svcPkmsSeq}
+	</select>
+	
+	<insert id="insertServiceMaster" parameterType="com.mobigen.snet.supportagent.entity.ServiceMaster">
+		INSERT INTO SNET_SERVICE_MASTER 
+		(
+			SVC_CD,
+	        SVC_MENU,
+	        SVC_TYPE,
+	        SVC_NM,
+	        SVC_CREATE_DAY,
+	        SVC_PKMS_SEQ
+	    )
+	    VALUES 
+	    (
+	     	#{svcCd}
+	     	,'2'
+	     	,'1'
+	     	,#{svcNm}
+	        ,#{svcCreateDay}    
+	        ,#{svcPkmsSeq}
+	    )
+	</insert>
+	
+	<insert id="insertServiceUser" parameterType="com.mobigen.snet.supportagent.entity.ServiceUser">
+		INSERT INTO SNET_SERVICE_USER 
+		(
+			SVC_CD
+			, TEAM_ID
+			, TEAM_NM
+			, USER_ID
+			, USER_NM
+			, USER_TYPE
+			, USER_MS
+			, USER_MAIL
+		)
+		VALUES 
+		(
+			#{svcCd}
+			, #{teamId}
+			, #{teamNm}
+			, #{userId}
+			, #{userNm}
+			, 'SV'
+			, #{userMs}
+			, #{userMail}
+		)
+	</insert>
+	
+	<update id="updateLoginStatus">
+	<![CDATA[ 
+		UPDATE SNET_CONFIG_USER_AUTH SET  
+		USER_STATUS = 3
+		WHERE USER_ID IN
+		(
+			SELECT USER_ID FROM SNET_CONFIG_USER_AUTH
+			WHERE 
+			USER_ID NOT IN
+			( 
+				SELECT distinct PERSON_ID
+				FROM AUDIT_HISTORY_PERSON
+				WHERE LOGIN_DATE > (SYSDATE -60)
+			)
+			AND CREATE_DATE < (SYSDATE -60)
+			AND USER_ID NOT LIKE '1%'
+		)
+	]]>
+	</update>
+
+	<update id="updatePwStatus">
+	<![CDATA[ 
+		UPDATE SNET_CONFIG_USER_AUTH SET  
+		USER_STATUS = 2
+		WHERE USER_ID IN
+		(
+			SELECT USER_ID 
+			FROM SNET_CONFIG_USER_AUTH
+			WHERE PW_CREATE_DATE < (SYSDATE-90)
+			AND USER_ID NOT LIKE '1%'
+			AND USER_STATUS != 3
+		)
+	]]>
+	</update>
+	
+	<delete id="deleteConfigUserAuth">
+	<![CDATA[ 
+		DELETE FROM SNET_CONFIG_USER_AUTH
+		WHERE 
+		USER_ID NOT IN
+		( 
+			SELECT distinct PERSON_ID
+			FROM AUDIT_HISTORY_PERSON
+			WHERE LOGIN_DATE > (SYSDATE -90)
+		)
+		AND CREATE_DATE < (SYSDATE -60)
+		AND USER_ID NOT LIKE '1%'			
+	]]>
+	</delete>
+	
+	<insert id="insertConfigUserAuthHistory">
+	<![CDATA[ 
+		INSERT INTO SNET_CONFIG_USER_AUTH_HISTORY 
+		(
+		   USER_ID
+		   ,USER_NM
+		   ,USER_AUTH
+		   ,TEAM_NM
+		   ,USER_MS
+		   ,USER_MAIL
+		   ,TEAM_ID
+		   ,SVC_CD
+		   ,CREATE_USER_ID
+		   ,CREATE_DATE
+		   ,PW_FAIL_CNT
+		   ,PW_CREATE_DATE
+		   ,USER_STATUS
+		   ,CREATE_REASON
+		   ,DELETE_REASON
+		   ,DELETE_DATE
+		   ,JOB_FLAG
+		   ,DELETE_USER_ID
+		)
+		SELECT 
+		   USER_ID
+		   ,USER_NM
+		   ,USER_AUTH
+		   ,TEAM_NM
+		   ,USER_MS
+		   ,USER_MAIL
+		   ,TEAM_ID
+		   ,SVC_CD
+		   ,CREATE_USER_ID
+		   ,CREATE_DATE
+		   ,PW_FAIL_CNT
+		   ,PW_CREATE_DATE
+		   ,USER_STATUS
+		   ,CREATE_REASON
+		   ,'90일 이상 로그인 하지 않아 자동으로 계정 삭제'
+		   ,sysdate
+		   ,3
+		   ,'SYSTEM'
+		FROM SNET_CONFIG_USER_AUTH
+		WHERE 
+		USER_ID NOT IN
+		( 
+			SELECT distinct PERSON_ID
+			FROM AUDIT_HISTORY_PERSON
+			WHERE LOGIN_DATE > (SYSDATE -90)
+		)
+		AND CREATE_DATE < (SYSDATE -60)
+		AND USER_ID NOT LIKE '1%'			
+	]]>
+	</insert>
+	
+	<select id="monitoringNmapJob" resultType="com.mobigen.snet.supportagent.entity.NmapJob">
+		SELECT *
+		FROM SNET_NMAP_JOB_HISTORY
+		WHERE JOB_STATUS = 1
+	</select>
+
+	<select id="selectNmapJob" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.NmapJob">
+		SELECT *
+		FROM SNET_NMAP_JOB_HISTORY
+		WHERE JOB_KEY = #{jobKey}
+	</select>
+	
+	<!-- Update  SNET_NMAP_JOB_HISTORY-->
+	<update id="updateNmapJob" parameterType="com.mobigen.snet.supportagent.entity.NmapJob">
+		UPDATE SNET_NMAP_JOB_HISTORY
+		<set>
+			JOB_STATUS = #{jobStatus}
+			<if test="jobFileNm != null">
+			, JOB_FILE_NM  = #{jobFileNm}
+			</if>
+			, JOB_END_DATE = sysdate
+		</set>
+		WHERE JOB_KEY = #{jobKey}
+	</update>
+
+	<!-- INSERT SNET_NMAP_JOB_RAWDATA -->
+	<insert id="insertNmapRawData" parameterType="com.mobigen.snet.supportagent.entity.NmapData">
+		INSERT INTO SNET_NMAP_JOB_RAWDATA
+		(
+		   JOB_KEY,          
+		   IP_ADDRESS,         
+		   PROTOCOL,           
+		   PORTID,             
+		   STATE_REASON_TTL,   
+		   STATE_REASON,       
+		   STATE_STATE,        
+		   STATE_REASON_IP,    
+		   SERVICE_NM,         
+		   SERVICE_CONF,       
+		   SERVICE_METHOD,     
+		   CREATE_USER,
+		   CREATE_DATE 
+		)
+		VALUES
+		(
+			#{jobKey,jdbcType=VARCHAR}
+			, #{ipAddress,jdbcType=VARCHAR}
+			, #{protocol,jdbcType=VARCHAR}
+			, #{portid,jdbcType=VARCHAR}
+			, #{stateReasonTtl,jdbcType=VARCHAR}
+			, #{stateReason,jdbcType=VARCHAR}
+			, #{stateState,jdbcType=VARCHAR}
+			, #{stateReasonIp,jdbcType=VARCHAR}
+			, #{serviceNm,jdbcType=VARCHAR}
+			, #{serviceConf,jdbcType=VARCHAR}
+			, #{serviceMethod,jdbcType=VARCHAR}
+			, #{createUser,jdbcType=VARCHAR}
+			, SYSDATE
+		)
+	</insert>
+
+	<!-- INSERT SNET_NMAP_PORT_RESULT -->
+	<insert id="insertNmapResult" parameterType="com.mobigen.snet.supportagent.entity.NmapData">
+		INSERT INTO SNET_NMAP_PORT_RESULT
+		(
+		   CDATE,          
+		   IP_ADDRESS,         
+		   PROTOCOL,           
+		   PORTID,             
+		   STATE_REASON_TTL,   
+		   STATE_REASON,       
+		   STATE_STATE,        
+		   STATE_REASON_IP,    
+		   SERVICE_NM,         
+		   SERVICE_CONF,       
+		   SERVICE_METHOD 
+		)
+		VALUES
+		(
+			#{cdate ,jdbcType=VARCHAR}
+			, #{ipAddress ,jdbcType=VARCHAR}
+			, #{protocol ,jdbcType=VARCHAR}
+			, #{portid ,jdbcType=VARCHAR}
+			, #{stateReasonTtl ,jdbcType=VARCHAR}
+			, #{stateReason ,jdbcType=VARCHAR}
+			, #{stateState ,jdbcType=VARCHAR}
+			, #{stateReasonIp ,jdbcType=VARCHAR}
+			, #{serviceNm ,jdbcType=VARCHAR}
+			, #{serviceConf ,jdbcType=VARCHAR}
+			, #{serviceMethod ,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- DELETE SNET_NMAP_PORT_RESULT -->
+	<delete id="deleteNmapResult" parameterType="com.mobigen.snet.supportagent.entity.NmapData">
+		DELETE FROM SNET_NMAP_PORT_RESULT
+		WHERE CDATE		= #{cdate,jdbcType=VARCHAR}
+		AND IP_ADDRESS	= #{ipAddress,jdbcType=VARCHAR}
+		AND PORTID		= #{portid,jdbcType=VARCHAR}	
+	</delete>
+	
+	<select id="selectOneJobId" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.NpsNmapJob">
+		SELECT * 
+		FROM SNET_NPS_NMAP_JOB_LIST
+		WHERE JOB_RESULT=1
+		AND JOB_ID = #{jobId}
+	</select>
+
+	<select id="selectTempletJob" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.NpsNmapJob">
+		SELECT B.* 
+		FROM SNET_NPS_NMAP_JOB_LIST A
+		, SNET_NPS_NMAP_JOB_INFO B
+		WHERE A.JOB_ID = B.JOB_ID
+		AND A.JOB_RESULT = 1
+		AND B.JOB_ID = #{jobId}
+	</select>
+	
+	<update id="updateJobStart" parameterType="com.mobigen.snet.supportagent.entity.NpsNmapJob">
+		UPDATE SNET_NPS_NMAP_JOB_LIST 
+		<set>
+			<if test="jobResult != null">
+				JOB_RESULT = #{jobResult,jdbcType=VARCHAR},
+			</if>
+			<if test="jobDesc != null">
+				JOB_DESC = #{jobDesc,jdbcType=VARCHAR},
+			</if>
+			JOB_STIME = SYSDATE
+		</set>
+		WHERE JOB_ID = #{jobId}
+	</update>
+
+	<update id="updateJobResult" parameterType="com.mobigen.snet.supportagent.entity.NpsNmapJob">
+		UPDATE SNET_NPS_NMAP_JOB_LIST 
+		<set>
+			<if test="jobResult != null">
+				JOB_RESULT = #{jobResult,jdbcType=VARCHAR},
+			</if>
+			<if test="jobDesc != null">
+				JOB_DESC = #{jobDesc,jdbcType=VARCHAR},
+			</if>
+			JOB_ETIME = SYSDATE
+		</set>
+		WHERE JOB_ID = #{jobId}
+	</update>
+	
+	<select id="selectAssetMasterByIpAddress" parameterType="String" resultType="Integer">
+		SELECT COUNT(A.ASSET_CD) AS CNT
+		FROM SNET_ASSET_MASTER A
+		LEFT OUTER JOIN SNET_ASSET_IP B
+		ON (A.ASSET_CD=B.ASSET_CD)
+		WHERE B.IP_ADDRESS = #{ipAddress,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectOpenPortByIpAddress" resultType="com.mobigen.snet.supportagent.entity.OpenPortInfo">
+		SELECT 
+			C.HOST_NM
+			, C.AUDIT_DAY
+			, C.IP_ADDRESS
+			,
+			CASE 
+				WHEN D.OPEN_TYPE='1' THEN 'TCP'
+				WHEN D.OPEN_TYPE='2' THEN 'UDP'
+				ELSE NULL
+			END AS OPEN_TYPE	
+			, D.OPEN_PORT
+			, D.PROCESS_NM
+		FROM 
+		(
+			SELECT 	
+			A.ASSET_CD
+			, A.HOST_NM
+			, A.GET_DAY AS AUDIT_DAY
+			, B.IP_ADDRESS
+			FROM SNET_ASSET_MASTER A
+			LEFT OUTER JOIN SNET_ASSET_IP B
+			ON (A.ASSET_CD=B.ASSET_CD)
+			WHERE B.IP_ADDRESS = #{ipAddress,jdbcType=VARCHAR}
+		) C
+		LEFT OUTER JOIN SNET_ASSET_OPEN_PORT D
+		ON (C.ASSET_CD = D.ASSET_CD AND D.CDATE = C.AUDIT_DAY)	
+	</select>
+	
+	
+		<!-- INSERT SNET_NPS_NMAP_RESULT -->
+	<insert id="insertComparedOpenPort" parameterType="com.mobigen.snet.supportagent.entity.NmapData">
+		INSERT INTO SNET_NPS_NMAP_RESULT
+		(
+			DATA_KEY,
+			JOB_ID,
+			HOST_NM,
+			IP_ADDRESS,
+			AUDIT_DAY,
+			OPEN_TYPE,
+			OPEN_PORT,
+			PROCESS_NM,		
+
+			PROTOCOL,           
+			PORTID,             
+			STATE_REASON_TTL,   
+			STATE_REASON,       
+			STATE_STATE,        
+			STATE_REASON_IP,    
+			SERVICE_NM,         
+			SERVICE_CONF,       
+			SERVICE_METHOD 
+		)
+		VALUES
+		(
+			#{dataKey ,jdbcType=VARCHAR}
+			, #{jobKey ,jdbcType=VARCHAR}
+			, #{hostNm ,jdbcType=VARCHAR}
+			, #{ipAddress ,jdbcType=VARCHAR}
+			, #{auditDay ,jdbcType=VARCHAR}
+			, #{openType ,jdbcType=VARCHAR}
+			, #{openPort ,jdbcType=VARCHAR}
+			, #{processNm ,jdbcType=VARCHAR}
+			
+			, #{protocol ,jdbcType=VARCHAR}
+			, #{portid ,jdbcType=VARCHAR}
+			, #{stateReasonTtl ,jdbcType=VARCHAR}
+			, #{stateReason ,jdbcType=VARCHAR}
+			, #{stateState ,jdbcType=VARCHAR}
+			, #{stateReasonIp ,jdbcType=VARCHAR}
+			, #{serviceNm ,jdbcType=VARCHAR}
+			, #{serviceConf ,jdbcType=VARCHAR}
+			, #{serviceMethod ,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<select id="monitoringTempletJob" resultType="com.mobigen.snet.supportagent.entity.NpsNmapJob">
+		SELECT * 
+		FROM SNET_NPS_NMAP_JOB_LIST
+		WHERE JOB_RESULT=1
+	</select>
+    
+    <select id="selectSms" resultType="com.mobigen.snet.supportagent.entity.SMSEntity">
+		SELECT 
+			SEND_KEY AS sendKey
+			, USER_MS AS userMs
+			, SEND_MSG AS sendMsg
+		FROM SNET_CONFIG_SMS
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			SEND_FLAG = 0
+			<if test="sendKey != ''  and sendKey != null ">
+				AND SEND_KEY = #{sendKey}
+			</if>
+		</trim>		
+    </select>
+
+    <update id="updateSmsStatus">
+    	UPDATE SNET_CONFIG_SMS
+    	SET 
+    		SEND_FLAG =1
+    		, SEND_DATE = SYSDATE
+    	WHERE SEND_KEY = #{sendKey}
+    </update>
+
+	<select id="selectSendMailUser" parameterType="String" resultType="String">
+		SELECT 
+			USER_MAIL
+		FROM SNET_SERVICE_MAIL_USER
+		WHERE MAIL_CD = #{mailCd}
+	</select>
+    
+    <select id="selectMailInfo" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.MailEntity">
+		SELECT 
+			MAIL_TITLE as mailTitle
+			, SEND_MSG as sendMsg
+		FROM SNET_SERVICE_MAIL
+		WHERE 
+			SEND_FLAG=0 
+			AND MAIL_CD = #{mailCd}
+    </select>
+    
+    <update id="updateMailInfo" parameterType="String">
+		UPDATE SNET_SERVICE_MAIL
+			SET SEND_FLAG = 1  
+		WHERE 
+			MAIL_CD = #{mailCd}
+    </update>
+    
+    <select id="selectBatchDiagnosis" resultType="com.mobigen.snet.supportagent.entity.BatchDiagnosis">
+			SELECT 
+				A.ASSET_CD,
+				B.AGENT_CD,
+		        A.SW_TYPE,
+		        A.SW_NM,
+		        A.SW_INFO,
+		        A.SW_DIR,
+		        A.SW_USER,
+		        A.SW_ETC,
+		        A.AUDIT_TIME,
+		        A.AUDIT_TYPE,
+		        A.AUDIT_DAY_LIST,
+		        A.CREATE_USER_ID
+		    FROM SNET_ASSET_SW_AUDIT_SCHEDULE A
+		    LEFT OUTER JOIN SNET_ASSET_MASTER B
+		    ON A.ASSET_CD  = B.ASSET_CD
+		  WHERE AUDIT_TIME = TO_CHAR (SYSDATE, 'HH24Mi')
+    </select>
+    
+    <delete id="deleteSnetAgentJobRdate" parameterType="com.mobigen.snet.supportagent.entity.BatchDiagnosis">
+		DELETE FROM SNET_AGENT_JOB_RDATE 
+		WHERE AGENT_CD = #{agentCd,jdbcType=VARCHAR} 
+		  AND ASSET_CD = #{assetCd,jdbcType=VARCHAR}
+		  AND SW_TYPE = #{swType,jdbcType=VARCHAR}
+		  AND SW_NM = #{swNm,jdbcType=VARCHAR}
+		  AND SW_INFO = #{swInfo,jdbcType=VARCHAR} 
+	</delete>
+	
+	<insert id="insertSnetAgentJobRdate" parameterType="com.mobigen.snet.supportagent.entity.BatchDiagnosis">
+		INSERT INTO SNET_AGENT_JOB_RDATE ( AGENT_CD , ASSET_CD , SW_TYPE , SW_NM , SW_INFO , AGENT_JOB_RDATE )
+        VALUES ( #{agentCd,jdbcType=VARCHAR} , #{assetCd,jdbcType=VARCHAR} , #{swType,jdbcType=VARCHAR} , #{swNm,jdbcType=VARCHAR} , #{swInfo,jdbcType=VARCHAR}, 
+        		 ( SELECT MAX ( AGENT_JOB_RDATE ) FROM SNET_AGENT_JOB_HISTORY 
+                   WHERE AGENT_CD = #{agentCd,jdbcType=VARCHAR}
+					 AND ASSET_CD = #{assetCd,jdbcType=VARCHAR}
+					 AND SW_TYPE = #{swType,jdbcType=VARCHAR}
+					 AND SW_NM = #{swNm,jdbcType=VARCHAR}
+					 AND SW_INFO = #{swInfo,jdbcType=VARCHAR} 
+				 ) 
+		)
+	</insert>
+    
+    <insert id="insertSnetAgentJobHistory" parameterType="com.mobigen.snet.supportagent.entity.BatchDiagnosis">
+		INSERT INTO SNET_AGENT_JOB_HISTORY
+		( AGENT_CD , ASSET_CD , SW_TYPE , SW_NM , SW_INFO , AGENT_JOB_RDATE , USER_ID , AGENT_JOB_FLAG , AUDIT_FILE_CD )
+		VALUES 
+		( #{agentCd,jdbcType=VARCHAR} , #{assetCd,jdbcType=VARCHAR} , #{swType,jdbcType=VARCHAR} , #{swNm,jdbcType=VARCHAR} , #{swInfo,jdbcType=VARCHAR} , SYSDATE , #{createUserId,jdbcType=VARCHAR} , 1 , 
+			(
+				SELECT AUDIT_FILE_CD
+				FROM SNET_ASSET_SW_AUDIT_DAY
+				WHERE ASSET_CD = #{assetCd,jdbcType=VARCHAR}
+				AND SW_TYPE = #{swType,jdbcType=VARCHAR}
+				AND SW_NM = #{swNm,jdbcType=VARCHAR}
+				AND SW_INFO = #{swInfo,jdbcType=VARCHAR}
+				AND AUDIT_DAY = 
+				(
+					SELECT AUDIT_DAY
+					FROM SNET_ASSET_MASTER
+					WHERE ASSET_CD = #{assetCd,jdbcType=VARCHAR}
+				)
+			)
+		)
+	</insert>
+	<delete id="deleteAgentHealthChkHistory">
+		<![CDATA[
+			DELETE FROM SNET_AGENT_STATUS_HISTORY
+			WHERE AGENT_STATUS_DATE < (SYSDATE - 1/24)
+		 ]]>
+	</delete>     
+	<delete id="deleteRelayHealthChkHistory">
+		<![CDATA[
+			DELETE FROM SNET_RELAY_STATUS_HISTORY
+			WHERE RELAY_STATUS_DATE < (SYSDATE - 1/24)
+		 ]]>
+	</delete>
+	
+	
+	<select id="branchServerActualizingRate" resultType="java.util.HashMap">
+		SELECT 
+			ORG.BRANCH_ID
+			, ORG.BRANCH_NM
+			, ORG.ASSET_CNT
+			, ORG.AR_RATE ||'%' AS AR_RATE
+			, ORG.SETUP_RATE ||'%'  AS SETUP_RATE
+			, TOTAL.TOTAL_AR_CNT
+			, TOTAL.TOTAL_ASSET_CNT
+			, TOTAL.TOTAL_AR_RATE ||'%' AS TOTAL_AR_RATE
+			, TOTAL.TOTAL_SETUP_RATE ||'%' AS TOTAL_SETUP_RATE
+		FROM
+		(
+			SELECT 
+				BRANCH_ASSET.BRANCH_NM
+				, BRANCH_ASSET.BRANCH_ID
+				, NVL(BRANCH_ASSET.ASSET_CNT, 0) AS ASSET_CNT
+				, NVL(BRANCH_AR.AR_CNT, 0) AS AR_CNT
+				, NVL(ROUND(BRANCH_AR.AR_CNT/BRANCH_ASSET.ASSET_CNT , 2) *100, 0) AS AR_RATE
+				, NVL(BRANCH_SETUP.SETUP_CNT, 0) AS SETUP_CNT
+				, NVL(ROUND(BRANCH_SETUP.SETUP_CNT/BRANCH_ASSET.ASSET_CNT, 2)*100, 0) AS SETUP_RATE
+			FROM 
+			(
+				SELECT 
+				BRANCH_ID
+				,
+				(
+					 SELECT BRANCH_NM 
+					 FROM SNET_CONFIG_TEAM_VIEW
+					 WHERE BRANCH_ID = SAM.BRANCH_ID
+					 GROUP BY BRANCH_ID, BRANCH_NM
+				) AS BRANCH_NM
+				, COUNT(*) AS ASSET_CNT
+				FROM SNET_ASSET_MASTER SAM
+				WHERE BRANCH_ID IS NOT NULL
+				GROUP BY BRANCH_ID
+			)  BRANCH_ASSET	
+			LEFT OUTER JOIN 
+			(
+				SELECT 
+				BRANCH_ID
+				, COUNT(*) AS AR_CNT
+				FROM SNET_ASSET_MASTER SAM
+				WHERE BRANCH_ID IS NOT NULL
+				AND GET_DAY >TO_CHAR(SYSDATE-30, 'yyyymmdd')
+				GROUP BY BRANCH_ID
+			) BRANCH_AR
+			ON (BRANCH_ASSET.BRANCH_ID=BRANCH_AR.BRANCH_ID)
+			LEFT OUTER JOIN 
+			(
+				SELECT 
+				BRANCH_ID
+				, COUNT(*) AS SETUP_CNT
+				  FROM SNET_ASSET_MASTER A,
+				 SNET_AGENT_MASTER B
+				WHERE A.AGENT_CD=B.AGENT_CD
+				AND B.AGENT_REGI_FLAG = 2
+				GROUP BY BRANCH_ID
+			) BRANCH_SETUP
+			ON (BRANCH_ASSET.BRANCH_ID=BRANCH_SETUP.BRANCH_ID)
+		) ORG ,
+		(
+			SELECT 
+				 SUM(ASSET_CNT) AS TOTAL_ASSET_CNT
+				 , SUM(AR_CNT) AS TOTAL_AR_CNT
+				 , NVL(ROUND(SUM(AR_CNT)/SUM(ASSET_CNT) , 2) *100, 0) AS TOTAL_AR_RATE
+				 , NVL(ROUND(SUM(SETUP_CNT) /SUM(ASSET_CNT), 2)*100, 0) AS TOTAL_SETUP_RATE
+			FROM 
+			(
+				SELECT 
+				BRANCH_ID
+				,
+				(
+					 SELECT BRANCH_NM 
+					 FROM SNET_CONFIG_TEAM_VIEW
+					 WHERE BRANCH_ID = SAM.BRANCH_ID
+					 GROUP BY BRANCH_ID, BRANCH_NM
+				) AS BRANCH_NM
+				, COUNT(*) AS ASSET_CNT
+				FROM SNET_ASSET_MASTER SAM
+				WHERE BRANCH_ID IS NOT NULL
+				GROUP BY BRANCH_ID
+			)  BRANCH_ASSET	
+			LEFT OUTER JOIN 
+			(
+				SELECT 
+				BRANCH_ID
+				, COUNT(*) AS AR_CNT
+				FROM SNET_ASSET_MASTER SAM
+				WHERE BRANCH_ID IS NOT NULL
+				AND GET_DAY >TO_CHAR(SYSDATE-30, 'yyyymmdd')
+				GROUP BY BRANCH_ID
+			) BRANCH_AR
+			ON (BRANCH_ASSET.BRANCH_ID=BRANCH_AR.BRANCH_ID)
+			LEFT OUTER JOIN 
+			(
+				SELECT 
+				BRANCH_ID
+				, COUNT(*) AS SETUP_CNT
+				  FROM SNET_ASSET_MASTER A,
+				 SNET_AGENT_MASTER B
+				WHERE A.AGENT_CD=B.AGENT_CD
+				AND B.AGENT_REGI_FLAG = 2
+				GROUP BY BRANCH_ID
+			) BRANCH_SETUP
+			ON (BRANCH_ASSET.BRANCH_ID=BRANCH_SETUP.BRANCH_ID)
+		) TOTAL	
+	</select>
+	<select id="branchSwAuditRateBranchList" resultType="java.util.HashMap">
+		SELECT
+		   SAM.BRANCH_ID
+		   , 
+		   (
+		     SELECT BRANCH_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE BRANCH_ID = SAM.BRANCH_ID
+			 GROUP BY BRANCH_ID, BRANCH_NM
+		   ) AS BRANCH_NM		   
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+			, SNET_ASSET_SW_AUDIT_DAY B
+			, SNET_ASSET_MASTER SAM
+		WHERE SAM.BRANCH_ID IS NOT NULL
+			AND A.ASSET_CD 	= B.ASSET_CD
+			AND A.AUDIT_DAY = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 	= B.SW_NM
+			AND A.SW_DIR 	= B.SW_DIR
+            AND A.SW_USER 	= B.SW_USER
+            AND A.SW_ETC 	= B.SW_ETC
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE')
+			AND SAM.ASSET_CD = A.ASSET_CD
+		GROUP BY SAM.BRANCH_ID
+	</select>
+	<select id="branchSwAuditRate" resultType="java.util.HashMap">
+		SELECT 
+			BRANCH_AR.BRANCH_ID
+			, BRANCH_AR.BRANCH_NM
+			, BRANCH_AR.SW_TYPE
+			, BRANCH_AR.AUDIT_RATE AS AUDIT_RATE
+			, TOTAL_RATE.AUDIT_RATE AS TOTAL_RATE
+			, TOTAL_AUDIT_RATE.AUDIT_RATE AS TOTAL_AUDIT_RATE
+		from 
+		(
+				SELECT
+				   A.SW_TYPE
+				   , SAM.BRANCH_ID
+				   , 
+				   (
+				     SELECT BRANCH_NM 
+					 FROM SNET_CONFIG_TEAM_VIEW
+					 WHERE BRANCH_ID = SAM.BRANCH_ID
+					 GROUP BY BRANCH_ID, BRANCH_NM
+				   ) AS BRANCH_NM		   
+				   , ROUND(decode((SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100, 0, 0, null, 0,SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100),2) AS AUDIT_RATE
+				FROM SNET_ASSET_SW_AUDIT_HISTORY A
+					, SNET_ASSET_SW_AUDIT_DAY B
+					, SNET_ASSET_MASTER SAM
+				WHERE SAM.BRANCH_ID IS NOT NULL
+					AND A.ASSET_CD 	= B.ASSET_CD
+					AND A.AUDIT_DAY = B.AUDIT_DAY
+					AND A.SW_TYPE 	= B.SW_TYPE
+					AND A.SW_NM 	= B.SW_NM
+					AND A.SW_DIR 	= B.SW_DIR
+		            AND A.SW_USER 	= B.SW_USER
+		            AND A.SW_ETC 	= B.SW_ETC
+					AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE')
+					AND SAM.ASSET_CD = A.ASSET_CD
+				GROUP BY SAM.BRANCH_ID, A.SW_TYPE
+		) BRANCH_AR
+		,
+		(
+				SELECT
+				   A.SW_TYPE
+				   , ROUND(decode((SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100, 0, 0, null, 0,SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100),2) AS AUDIT_RATE
+				FROM SNET_ASSET_SW_AUDIT_HISTORY A
+					, SNET_ASSET_SW_AUDIT_DAY B
+					, SNET_ASSET_MASTER SAM
+				WHERE SAM.BRANCH_ID IS NOT NULL
+					AND A.ASSET_CD 	= B.ASSET_CD
+					AND A.AUDIT_DAY = B.AUDIT_DAY
+					AND A.SW_TYPE 	= B.SW_TYPE
+					AND A.SW_NM 	= B.SW_NM
+					AND A.SW_DIR 	= B.SW_DIR
+		            AND A.SW_USER 	= B.SW_USER
+		            AND A.SW_ETC 	= B.SW_ETC
+					AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE')
+					AND SAM.ASSET_CD = A.ASSET_CD
+				GROUP BY A.SW_TYPE
+		) TOTAL_RATE
+		,
+		(
+			SELECT
+			   ROUND(decode((SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100, 0, 0, null, 0,SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100),2) AS AUDIT_RATE
+			FROM SNET_ASSET_SW_AUDIT_HISTORY A
+				, SNET_ASSET_SW_AUDIT_DAY B
+				, SNET_ASSET_MASTER SAM
+			WHERE SAM.BRANCH_ID IS NOT NULL
+				AND A.ASSET_CD 	= B.ASSET_CD
+				AND A.AUDIT_DAY = B.AUDIT_DAY
+				AND A.SW_TYPE 	= B.SW_TYPE
+				AND A.SW_NM 	= B.SW_NM
+				AND A.SW_DIR 	= B.SW_DIR
+	            AND A.SW_USER 	= B.SW_USER
+	            AND A.SW_ETC 	= B.SW_ETC
+				AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE')
+				AND SAM.ASSET_CD = A.ASSET_CD		
+		) TOTAL_AUDIT_RATE
+	WHERE 1=1
+	AND BRANCH_AR.SW_TYPE = TOTAL_RATE.SW_TYPE			
+	</select>     
+	<select id="branchActualizingRate" parameterType="String" resultType="java.util.HashMap">
+		SELECT 
+			(
+				SELECT TEAM_NM
+				FROM SNET_CONFIG_TEAM_VIEW
+				WHERE TEAM_NM IS NOT NULL 
+				AND TEAM_ID = TEAM.TEAM_ID
+			)TEAM_NM
+			, TEAM.TEAM_ID
+			, TEAM.USER_ID
+			, TEAM.USER_NM
+			, TEAM_ASSET.ASSET_CNT
+			, TEAM_AR.AR_CNT
+			, TEAM_SETUP.AGENT_CNT
+			, NVL(ROUND(TEAM_AR.AR_CNT/TEAM_ASSET.ASSET_CNT , 2) *100, 0) AS AR_RATE
+			, NVL(ROUND(TEAM_SETUP.AGENT_CNT/TEAM_ASSET.ASSET_CNT, 2)*100, 0) AS SETUP_RATE
+			, TEAM_AUDIT.AUDIT_RATE
+			, NVL(TEAM_COK.COK_CNT, 0) AS COK_CNT
+			, NVL(TEAM_AUDIT_RATE.AUDIT_RATE, 0) AS TEAM_AUDIT_RATE
+		FROM
+			(
+				SELECT
+					TEAM_ID
+					, USER_ID
+					, USER_NM
+				FROM 
+					SNET_CONFIG_USER_VIEW
+			) TEAM
+			LEFT OUTER JOIN 
+			(
+				SELECT
+					 SAU.TEAM_ID
+					, SAU.USER_ID
+					, COUNT(*) AS COK_CNT
+				FROM
+					SNET_ASSET_SW_AUDIT_DAY A
+					, SNET_ASSET_SW_AUDIT_HISTORY B
+					, SNET_ASSET_SW_AUDIT_COK C
+					, SNET_ASSET_MASTER SAM
+					, SNET_ASSET_USER SAU		
+				WHERE 1=1
+				AND A.ASSET_CD = B.ASSET_CD
+				AND A.SW_TYPE = B.SW_TYPE
+				AND A.SW_NM = B.SW_NM
+				AND A.SW_DIR = B.SW_DIR
+				AND A.SW_USER = B.SW_USER
+				AND A.SW_ETC = B.SW_ETC		
+				AND A.ASSET_CD =C.ASSET_CD
+				AND C.ITEM_COK_REQ_VALID_DATE >= SYSDATE
+				AND	C.ADMIN_OK_FLAG = 1
+				AND C.ACTION_ITEM_RESULT ='C'
+				AND A.ASSET_CD 	= SAM.ASSET_CD
+				AND SAM.ASSET_CD = SAU.ASSET_CD
+				AND SAM.TEAM_ID = SAU.TEAM_ID
+				AND SAU.USER_TYPE='OP'
+				GROUP BY SAU.TEAM_ID, SAU.USER_ID
+			) TEAM_COK
+			ON (TEAM.TEAM_ID = TEAM_COK.TEAM_ID AND TEAM.USER_ID= TEAM_COK.USER_ID)
+			,
+			(
+				SELECT 
+					B.TEAM_ID
+					, B.USER_ID
+					, COUNT(*) AS ASSET_CNT
+				FROM 
+					SNET_ASSET_MASTER A
+					, SNET_ASSET_USER B
+				WHERE 1=1
+					AND A.TEAM_ID IS NOT NULL 
+					AND A.ASSET_CD = B.ASSET_CD 
+					AND A.TEAM_ID = B.TEAM_ID
+					AND B.USER_TYPE='OP'					
+				GROUP BY B.TEAM_ID, B.USER_ID
+			)  TEAM_ASSET	
+			,
+			(
+			
+				SELECT 
+					B.TEAM_ID
+					, B.USER_ID
+					, COUNT(*) AS AR_CNT
+				FROM 
+					SNET_ASSET_MASTER A
+					, SNET_ASSET_USER B
+				WHERE 1=1
+					AND A.TEAM_ID IS NOT NULL 
+					AND A.ASSET_CD = B.ASSET_CD 
+					AND A.TEAM_ID = B.TEAM_ID
+					AND B.USER_TYPE='OP'						
+					AND GET_DAY >TO_CHAR(SYSDATE-30, 'yyyymmdd')
+				GROUP BY B.TEAM_ID, B.USER_ID	
+			) TEAM_AR
+			,
+			(
+				SELECT 
+					B.TEAM_ID
+					, B.USER_ID
+					, COUNT(*) AS AGENT_CNT
+				FROM 
+					SNET_ASSET_MASTER A
+					, SNET_ASSET_USER B
+					, SNET_AGENT_MASTER C
+				WHERE 1=1
+					AND A.TEAM_ID IS NOT NULL 
+					AND A.ASSET_CD = B.ASSET_CD 
+					AND A.TEAM_ID = B.TEAM_ID
+					AND B.USER_TYPE='OP'						
+					AND A.AGENT_CD = C.AGENT_CD
+				GROUP BY B.TEAM_ID, B.USER_ID
+			) TEAM_SETUP	
+			,
+			(
+				SELECT 
+					SAU.TEAM_ID
+					, SAU.USER_ID
+					, ROUND(decode((SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100, 0, 0, null, 0,SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100),2) AS AUDIT_RATE 
+				FROM SNET_ASSET_SW_AUDIT_HISTORY A
+					, SNET_ASSET_SW_AUDIT_DAY B
+					, SNET_ASSET_MASTER SAM
+					, SNET_ASSET_USER SAU
+				WHERE 1=1
+					AND A.ASSET_CD 	= B.ASSET_CD
+					AND A.AUDIT_DAY = B.AUDIT_DAY
+					AND A.SW_TYPE 	= B.SW_TYPE
+					AND A.SW_NM 		= B.SW_NM
+					AND A.SW_DIR 	= B.SW_DIR
+					AND A.SW_USER 	= B.SW_USER
+					AND A.SW_ETC 	= B.SW_ETC
+					AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE')
+					AND A.ASSET_CD 	= SAM.ASSET_CD
+					AND SAM.ASSET_CD = SAU.ASSET_CD
+					AND SAM.TEAM_ID = SAU.TEAM_ID
+					AND SAU.USER_TYPE='OP'					
+				GROUP BY SAU.TEAM_ID, SAU.USER_ID	
+			) TEAM_AUDIT
+			LEFT OUTER JOIN 
+			(
+				SELECT 
+					SAU.TEAM_ID
+					, ROUND(decode((SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100, 0, 0, null, 0,SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100),2) AS AUDIT_RATE 
+				FROM SNET_ASSET_SW_AUDIT_HISTORY A
+					, SNET_ASSET_SW_AUDIT_DAY B
+					, SNET_ASSET_MASTER SAM
+					, SNET_ASSET_USER SAU
+				WHERE 1=1
+					AND A.ASSET_CD 	= B.ASSET_CD
+					AND A.AUDIT_DAY = B.AUDIT_DAY
+					AND A.SW_TYPE 	= B.SW_TYPE
+					AND A.SW_NM 		= B.SW_NM
+					AND A.SW_DIR 	= B.SW_DIR
+					AND A.SW_USER 	= B.SW_USER
+					AND A.SW_ETC 	= B.SW_ETC
+					AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE')
+					AND A.ASSET_CD 	= SAM.ASSET_CD
+					AND SAM.ASSET_CD = SAU.ASSET_CD
+					AND SAM.TEAM_ID = SAU.TEAM_ID
+					AND SAU.USER_TYPE='OP'					
+				GROUP BY SAU.TEAM_ID
+			) TEAM_AUDIT_RATE
+			ON(TEAM_AUDIT.TEAM_ID = TEAM_AUDIT_RATE.TEAM_ID)
+		WHERE 1=1 
+		AND TEAM.TEAM_ID = TEAM_ASSET.TEAM_ID
+		AND TEAM.TEAM_ID = TEAM_AR.TEAM_ID
+		AND TEAM.TEAM_ID = TEAM_SETUP.TEAM_ID
+		AND TEAM.TEAM_ID = TEAM_AUDIT.TEAM_ID
+		AND TEAM.USER_ID = TEAM_ASSET.USER_ID
+		AND TEAM.USER_ID = TEAM_AR.USER_ID
+		AND TEAM.USER_ID = TEAM_SETUP.USER_ID
+		AND TEAM.USER_ID = TEAM_AUDIT.USER_ID
+		AND TEAM.TEAM_ID = 
+		(
+			SELECT 
+				TEAM_ID
+			FROM SNET_CONFIG_USER_VIEW 
+			WHERE USER_ID= #{userId}
+		)
+	</select>
+	
+	<select id="sendMailReportImmediately" resultType="com.mobigen.snet.supportagent.entity.SendMailReport">
+		SELECT
+			A.MAIL_CD 
+			, A.MAIL_TITLE
+			, A.MAIL_TYPE 
+			, A.MAIL_SEND 
+			, A.MAIL_NOW 
+			, B.USER_ID 
+			, 
+			(
+				SELECT USER_MAIL
+				FROM SNET_CONFIG_USER_VIEW
+				WHERE USER_ID = B.USER_ID
+			) AS userMail
+			, B.USER_NM 
+			, C.MAIL_DATA
+		FROM 
+		SNET_REPORT_MAIL A
+		, SNET_REPORT_MAIL_RECEIVER B
+		, SNET_REPORT_MAIL_TEMPLATE C
+		WHERE 1=1
+		AND A.MAIL_CD = B.MAIL_CD
+		AND A.MAIL_CD = C.MAIL_CD
+		AND A.MAIL_SEND ='Y'
+		AND A.MAIL_NOW = 'Y'
+	</select>
+	
+	<select id="dailySendMailReport" resultType="com.mobigen.snet.supportagent.entity.SendMailReport">
+		SELECT
+			A.MAIL_CD 
+			, A.MAIL_TITLE
+			, A.MAIL_TYPE 
+			, A.MAIL_SEND 
+			, A.MAIL_NOW 
+			, B.USER_ID 
+			, 
+			(
+				SELECT USER_MAIL
+				FROM SNET_CONFIG_USER_VIEW
+				WHERE USER_ID = B.USER_ID
+			) AS userMail
+			, B.USER_NM 
+			, C.MAIL_DATA
+		FROM 
+		SNET_REPORT_MAIL A
+		, SNET_REPORT_MAIL_RECEIVER B
+		, SNET_REPORT_MAIL_TEMPLATE C
+		WHERE 1=1
+		AND A.MAIL_CD = B.MAIL_CD
+		AND A.MAIL_CD = C.MAIL_CD
+		AND A.MAIL_TYPE = 1
+		AND A.MAIL_SEND ='Y'
+	</select>
+	<select id="weeklySendMailReport" resultType="com.mobigen.snet.supportagent.entity.SendMailReport">
+		SELECT
+			A.MAIL_CD 
+			, A.MAIL_TITLE
+			, A.MAIL_TYPE 
+			, A.MAIL_SEND 
+			, A.MAIL_NOW 
+			, B.USER_ID 
+			, 
+			(
+				SELECT USER_MAIL
+				FROM SNET_CONFIG_USER_VIEW
+				WHERE USER_ID = B.USER_ID
+			) AS userMail
+			, B.USER_NM 
+			, C.MAIL_DATA
+		FROM 
+		SNET_REPORT_MAIL A
+		, SNET_REPORT_MAIL_RECEIVER B
+		, SNET_REPORT_MAIL_TEMPLATE C
+		WHERE 1=1
+		AND A.MAIL_CD = B.MAIL_CD
+		AND A.MAIL_CD = C.MAIL_CD
+		AND A.MAIL_TYPE = 2
+		AND A.MAIL_SEND ='Y'
+	</select>
+	<select id="monthlySendMailReport" resultType="com.mobigen.snet.supportagent.entity.SendMailReport">
+		SELECT
+			A.MAIL_CD 
+			, A.MAIL_TITLE
+			, A.MAIL_TYPE 
+			, A.MAIL_SEND 
+			, A.MAIL_NOW 
+			, B.USER_ID 
+			, 
+			(
+				SELECT USER_MAIL
+				FROM SNET_CONFIG_USER_VIEW
+				WHERE USER_ID = B.USER_ID
+			) AS userMail
+			, B.USER_NM 
+			, C.MAIL_DATA
+		FROM 
+		SNET_REPORT_MAIL A
+		, SNET_REPORT_MAIL_RECEIVER B
+		, SNET_REPORT_MAIL_TEMPLATE C
+		WHERE 1=1
+		AND A.MAIL_CD = B.MAIL_CD
+		AND A.MAIL_CD = C.MAIL_CD
+		AND A.MAIL_TYPE = 3
+		AND A.MAIL_SEND ='Y'
+	</select>
+	
+	<update id="updateSendMail">
+		UPDATE SNET_REPORT_MAIL
+		<set>
+			<if test="mailNow !=null and mailNow !=''">
+				MAIL_NOW = #{mailNow}, 
+			</if>
+			LAST_SEND_DATE = SYSDATE
+		</set>
+		where MAIL_CD=#{mailCd}
+	</update>
+
+	<select id="selectFireWallConfig"  resultType="com.mobigen.snet.supportagent.entity.FireWallEntity">
+		SELECT *
+		FROM AUDIT_CONFIG_FIREWALL WHERE  FIREWALL_REQ_NUM in
+		(SELECT A.FIREWALL_REQ_NUM FROM AUDIT_CONFIG_FIREWALL A WHERE A.FIREWALL_REQ_NUM not in
+		(SELECT B.FIREWALL_REQ_NUM FROM AUDIT_CONFIG_FIREWALL_RATE B))
+	</select>
+
+	<select id="selectHostIpAsset"  parameterType="java.util.Map" resultType="com.mobigen.snet.supportagent.entity.FireWallRateEntity">
+		SELECT  #{firewallReqNum,jdbcType=VARCHAR} AS FIREWALL_REQ_NUM , #{ipType,jdbcType=VARCHAR} AS IP_TYPE , #{ipAddress,jdbcType=VARCHAR} AS IP_ADDRESS , #{hostNm,jdbcType=VARCHAR} AS HOST_NM , ' ' AS SVC_NM , NVL(SAM.AUDIT_RATE,'0') AS AUDIT_RATE,NVL(SAM.AUDIT_DAY,'-') AS AUDIT_DATE  , #{reqTeam,jdbcType=VARCHAR} AS REQ_TEAM , #{reqUser,jdbcType=VARCHAR} AS REQ_USER , NVL(SAM.BRANCH_NM,'-') AS BRANCH_NM , NVL(SAM.TEAM_NM,'-') AS TEAM_NM , NVL(SAU.USER_NM,'-') AS USER_NM , #{checkType,jdbcType=VARCHAR} AS CHECK_TYPE
+		FROM
+		  (SELECT ASSET_CD as ipassetCD
+		   FROM SNET_ASSET_IP
+		   WHERE  IP_ADDRESS = #{ipAddress,jdbcType=VARCHAR}
+		  )s1, (SELECT *
+				FROM SNET_ASSET_MASTER
+				WHERE UPPER(HOST_NM) = UPPER(#{hostNm,jdbcType=VARCHAR})) SAM,
+		  SNET_ASSET_USER SAU
+		WHERE s1.ipassetCD = SAM.ASSET_CD AND SAM.ASSET_CD = SAU.ASSET_CD
+		GROUP BY SAM.IP_ADDRESS,SAM.AUDIT_RATE,SAM.AUDIT_DAY,SAM.BRANCH_NM,SAM.TEAM_NM,SAU.USER_NM
+	</select>
+
+	<select id="selectIpAsset"  parameterType="java.util.Map" resultType="com.mobigen.snet.supportagent.entity.FireWallRateEntity">
+		SELECT #{firewallReqNum,jdbcType=VARCHAR} AS FIREWALL_REQ_NUM , #{ipType,jdbcType=VARCHAR} AS IP_TYPE , #{ipAddress,jdbcType=VARCHAR} AS IP_ADDRESS , NVL(SAM.HOST_NM,'-') AS HOST_NM , ' ' AS SVC_NM , NVL(SAM.AUDIT_RATE,'0') AS AUDIT_RATE , NVL(SAM.AUDIT_DAY,' ') AS AUDIT_DATE , #{reqTeam,jdbcType=VARCHAR} AS REQ_TEAM , #{reqUser,jdbcType=VARCHAR} AS REQ_USER , NVL(SAM.BRANCH_NM,'-') AS BRANCH_NM , NVL(SAM.TEAM_NM,'-') AS TEAM_NM , NVL(SAU.USER_NM,'-') AS USER_NM , #{checkType,jdbcType=VARCHAR} AS CHECK_TYPE
+		FROM SNET_ASSET_MASTER SAM,SNET_ASSET_USER SAU WHERE
+		SAM.ASSET_CD in (SELECT ASSET_CD as ipassetCD FROM SNET_ASSET_IP SAI
+		WHERE  SAI.IP_ADDRESS = #{ipAddress,jdbcType=VARCHAR}) AND SAU.ASSET_CD = SAM.ASSET_CD GROUP BY SAM.HOST_NM,SAM.AUDIT_RATE,SAM.AUDIT_DAY,SAM.BRANCH_NM,SAM.TEAM_NM,SAU.USER_NM
+	</select>
+
+	<select id="selectHostAsset"  parameterType="java.util.Map" resultType="com.mobigen.snet.supportagent.entity.FireWallRateEntity">
+		SELECT #{firewallReqNum,jdbcType=VARCHAR} AS FIREWALL_REQ_NUM , #{ipType,jdbcType=VARCHAR} AS IP_TYPE , SAM.IP_ADDRESS AS IP_ADDRESS , #{hostNm,jdbcType=VARCHAR} AS HOST_NM , ' ' AS SVC_NM , NVL(SAM.AUDIT_RATE,'0') AS AUDIT_RATE , NVL(SAM.AUDIT_DAY,' ') AS AUDIT_DATE , #{reqTeam,jdbcType=VARCHAR} AS REQ_TEAM , #{reqUser,jdbcType=VARCHAR} AS REQ_USER , NVL(SAM.BRANCH_NM,'-') AS BRANCH_NM,NVL(SAM.TEAM_NM,'-') AS TEAM_NM,NVL(SAU.USER_NM,'-') AS USER_NM , #{checkType,jdbcType=VARCHAR} AS CHECK_TYPE
+		FROM SNET_ASSET_MASTER SAM , SNET_ASSET_USER SAU
+		WHERE UPPER(SAM.HOST_NM)=UPPER(#{hostNm,jdbcType=VARCHAR}) AND SAM.ASSET_CD = SAU.ASSET_CD
+		GROUP BY SAM.IP_ADDRESS,SAM.AUDIT_RATE,SAM.AUDIT_DAY,SAM.BRANCH_NM,SAM.TEAM_NM,SAU.USER_NM
+	</select>
+
+	<insert id="insertFireWallRateData" parameterType="com.mobigen.snet.supportagent.entity.FireWallRateEntity">
+		INSERT INTO AUDIT_CONFIG_FIREWALL_RATE (FIREWALL_REQ_NUM, IP_TYPE, IP_ADDRESS, HOST_NM, SVC_NM, AUDIT_RATE, AUDIT_DATE, REQ_TEAM, REQ_USER, CREATE_DATE, BRANCH_NM, TEAM_NM, USER_NM, CHECK_TYPE)
+		VALUES (#{firewallReqNum,jdbcType=VARCHAR}
+				,#{ipType,jdbcType=VARCHAR}
+				,#{ipAddress,jdbcType=VARCHAR}
+				,#{hostNm,jdbcType=VARCHAR}
+				,#{svcNm,jdbcType=VARCHAR}
+				,#{auditRate,jdbcType=VARCHAR}
+				,#{auditDate,jdbcType=VARCHAR}
+				,#{reqTeam,jdbcType=VARCHAR}
+				,#{reqUser,jdbcType=VARCHAR}
+				,SYSDATE
+				,#{branchNm,jdbcType=VARCHAR}
+				,#{teamNm,jdbcType=VARCHAR}
+				,#{userNm,jdbcType=VARCHAR}
+				,#{checkType,jdbcType=VARCHAR}
+				)
+	</insert>
+
+</mapper>

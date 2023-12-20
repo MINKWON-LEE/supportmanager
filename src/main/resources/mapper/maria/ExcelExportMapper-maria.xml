@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.ExcelExportMapper">
+
+	<!-- AssetSwExport -->
+	<select id="selectAssetSwExportJobList" resultType="java.util.HashMap">
+		SELECT REQ_CD, REQ_USER
+		  FROM SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		WHERE JOB_FLAG = 0
+	</select>
+
+	<!-- 'sg_supprotmanager 프로젝트 - 상세보고서' -->
+	<select id="selectAssetSwExportJobListbyReqcd" resultType="java.util.HashMap">
+		SELECT REQ_CD, REQ_USER
+		  FROM SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		WHERE REQ_CD = #{REQ_CD}
+	</select>
+
+	<!-- 'sg_supprotmanager 프로젝트 - 상세보고서' -->
+	<resultMap id="ResMap" type="java.util.HashMap">
+		<result property="ASSET_CD" column="ASSET_CD"/>
+		<result property="IP_ADDRESS" column="IP_ADDRESS"/>
+		<result property="HOST_NM" column="HOST_NM"/>
+		<result property="SW_TYPE" column="SW_TYPE"/>
+		<result property="SW_NM" column="SW_NM"/>
+		<result property="SW_INFO" column="SW_INFO"/>
+		<result property="SW_DIR" column="SW_DIR"/>
+		<result property="SW_USER" column="SW_USER"/>
+		<result property="SW_ETC" column="SW_ETC"/>
+		<result property="AUDIT_DAY" column="AUDIT_DAY"/>
+		<result property="ITEM_GRP_NM" column="ITEM_GRP_NM"/>
+		<result property="ITEM_NM" column="ITEM_NM"/>
+		<result property="ITEM_STANDARD" column="ITEM_STANDARD"/>
+		<result property="ITEM_GRADE" column="ITEM_GRADE"/>
+		<result property="ITEM_GRADE_VIEW" column="ITEM_GRADE_VIEW"/>
+		<result property="ITEM_RESULT" column="ITEM_RESULT"/>
+		<result property="ITEM_RESULT_VIEW" column="ITEM_RESULT_VIEW"/>
+		<result property="ITEM_STATUS" column="ITEM_STATUS" javaType="java.lang.String"/>
+		<result property="ITEM_COUNTERMEASURE" column="ITEM_COUNTERMEASURE" javaType="java.lang.String"/>
+		<result property="ITEM_COUNTERMEASURE_DETAIL" column="ITEM_COUNTERMEASURE_DETAIL" javaType="java.lang.String"/>
+<!--		<result property="ITEM_COK_REASON" column="ITEM_COK_REASON" javaType="java.lang.String"/>-->
+		<result property="ACTION_PLAN_COMPLATE_DATE" column="ACTION_PLAN_COMPLATE_DATE" javaType="java.lang.String"/>
+		<result property="ACTION_PLAN_REASON" column="ACTION_PLAN_REASON" javaType="java.lang.String"/>
+		<result property="DIAGNOSIS_CD" column="DIAGNOSIS_CD"/>
+	</resultMap>
+
+	<select id="selectAssetSwExportList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+		A.SW_TYPE,
+		A.SW_NM,
+		A.SW_INFO,
+		A.SW_DIR,
+		A.SW_USER,
+		A.SW_ETC,
+		A.AUDIT_DAY,
+		A.ASSET_CD,
+		B.HOST_NM,
+		B.IP_ADDRESS,
+		B.USER_ID,
+		B.USER_NM,
+		B.TEAM_NM,
+		B.BRANCH_NM,
+		B.AUDIT_RATE,
+		D.TEAM_NM AS SW_OPERATOR_TEAM,
+		D.USER_NM AS SW_OPERATOR
+		FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+		LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+		AND A.SW_TYPE = B.SW_TYPE
+		AND A.SW_NM = B.SW_NM
+		AND A.SW_INFO = B.SW_INFO
+		AND A.SW_DIR = B.SW_DIR
+		AND A.SW_USER = B.SW_USER
+		AND A.SW_ETC = B.SW_ETC
+		AND A.ASSET_CD = B.ASSET_CD
+		AND A.AUDIT_DAY = B.AUDIT_DAY)
+		LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_DAY C ON (B.ASSET_CD = C.ASSET_CD
+		AND B.SW_TYPE = C.SW_TYPE
+		AND B.SW_NM = C.SW_NM
+		AND B.SW_INFO = C.SW_INFO
+		AND B.SW_DIR = C.SW_DIR
+		AND B.SW_USER = C.SW_USER
+		AND B.SW_ETC = C.SW_ETC)
+		LEFT OUTER JOIN SNET_CONFIG_USER_VIEW D ON (C.SW_OPERATOR = D.USER_ID)
+		WHERE A.REQ_CD = #{REQ_CD}
+		<choose>
+			<when test="BET_FLAG != null and !BET_FLAG.equals('') ">
+				and STR_TO_DATE(date_format(A.AUDIT_DAY, '%Y%m%d'), '%Y%m%d') between STR_TO_DATE(date_format(#{startAuditDay}, '%Y%m%d'), '%Y%m%d') and STR_TO_DATE(date_format(#{endAuditDay}, '%Y%m%d'), '%Y%m%d')
+			</when>
+			<otherwise>
+				<if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+					and A.AUDIT_DAY = #{AUDIT_DAY}
+				</if>
+			</otherwise>
+		</choose>
+		<if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+			and A.sw_type = #{SW_TYPE}
+		</if>
+		<if test="SW_NM != null and !SW_NM.equals('') ">
+			and A.SW_NM = #{SW_NM}
+		</if>
+		ORDER BY A.SW_TYPE, A.SW_NM
+	</select>
+
+	<select id="selectAssetSwAuditReport" parameterType="java.util.HashMap" resultMap="ResMap">
+		SELECT 	A.ASSET_CD, A.IP_ADDRESS, A.HOST_NM, A.SW_TYPE, A.SW_NM, A.SW_INFO, A.SW_DIR, A.SW_USER, A.SW_ETC, A.AUDIT_DAY,
+				A.ITEM_GRP_NM,
+				A.ITEM_NM AS ITEM_NM,
+				A.ITEM_STANDARD AS ITEM_STANDARD,
+				A.ITEM_GRADE, A.ITEM_RESULT, A.ITEM_STATUS,
+				A.ITEM_COUNTERMEASURE, A.ITEM_COUNTERMEASURE_DETAIL, A.ITEM_COK_REASON, A.DIAGNOSIS_CD,
+				CASE
+					WHEN B.ITEM_COK_REQ_VALID_DATE <![CDATA[ < ]]> NOW() THEN '유효기간 만료'
+					WHEN B.ADMIN_OK_FLAG = 2 THEN '반려'
+					WHEN B.ADMIN_OK_FLAG = 1 THEN '승인'
+					WHEN B.ADMIN_OK_FLAG = 0 THEN '대기'
+					ELSE '-'
+					END AS ADMIN_OK_FLAG_NM,
+				DATE_FORMAT(STR_TO_DATE(C.ACTION_PLAN_DATE, '%Y%m%d%H%i%S'), '%Y%m%d') AS ACTION_PLAN_DATE,
+            	C.ACTION_PLAN_REASON
+		  FROM SNET_ASSET_SW_AUDIT_REPORT A
+        		LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        			ON A.ASSET_CD = B.ASSET_CD
+					AND A.SW_INFO = B.SW_INFO
+					AND A.SW_NM = B.SW_NM
+					AND A.SW_TYPE = B.SW_TYPE
+					AND A.SW_DIR = B.SW_DIR
+					AND A.SW_USER = B.SW_USER
+					AND A.SW_ETC = B.SW_ETC
+					AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+				LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+					ON (A.ASSET_CD = C.ASSET_CD
+					AND A.SW_INFO = C.SW_INFO
+					AND A.SW_NM = C.SW_NM
+					AND A.SW_TYPE = C.SW_TYPE
+					AND A.SW_DIR = C.SW_DIR
+					AND A.SW_USER = C.SW_USER
+					AND A.SW_ETC = C.SW_ETC
+					AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+					AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+		  WHERE A.ASSET_CD = #{ASSET_CD}
+		    AND A.SW_TYPE = #{SW_TYPE}
+		    AND A.AUDIT_DAY = #{AUDIT_DAY}
+		ORDER BY A.DIAGNOSIS_CD, A.ITEM_GRP_NM, A.ITEM_NM
+	</select>
+
+	<select id="selectAssetSwAuditReportNewMap" parameterType="java.util.HashMap" resultMap="ResMap">
+		SELECT 	A.ASSET_CD, A.HOST_NM, A.SW_NM, A.SW_TYPE, A.IP_ADDRESS, A.AUDIT_DAY, A.DIAGNOSIS_CD,
+		A.ITEM_GRP_NM,
+		A.ITEM_NM,
+		A.ITEM_GRADE,
+		CASE WHEN ITEM_GRADE = 'H' THEN '상'
+		WHEN ITEM_GRADE = 'M' THEN '중'
+		WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW,
+		ITEM_RESULT,
+		CASE WHEN ITEM_RESULT = 'T' THEN '양호'
+		WHEN ITEM_RESULT = 'F' THEN '취약'
+		WHEN ITEM_RESULT = 'C' THEN '불가'
+		WHEN ITEM_RESULT = 'R' THEN '인터뷰 필요'
+		WHEN ITEM_RESULT = 'NA' THEN 'N/A' END AS ITEM_RESULT_VIEW,
+		A.ITEM_STATUS, A.ITEM_STANDARD, ITEM_COUNTERMEASURE, A.ITEM_COUNTERMEASURE_DETAIL,
+		DATE_FORMAT(STR_TO_DATE(C.ACTION_PLAN_DATE, '%Y%m%d%H%i%S'), '%Y%m%d') AS ACTION_PLAN_COMPLATE_DATE,
+		C.ACTION_PLAN_REASON
+		FROM SNET_ASSET_SW_AUDIT_REPORT A
+		LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+		ON A.ASSET_CD = B.ASSET_CD
+		AND A.SW_INFO = B.SW_INFO
+		AND A.SW_NM = B.SW_NM
+		AND A.SW_TYPE = B.SW_TYPE
+		AND A.SW_DIR = B.SW_DIR
+		AND A.SW_USER = B.SW_USER
+		AND A.SW_ETC = B.SW_ETC
+		AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+		LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+		ON (A.ASSET_CD = C.ASSET_CD
+		AND A.SW_INFO = C.SW_INFO
+		AND A.SW_NM = C.SW_NM
+		AND A.SW_TYPE = C.SW_TYPE
+		AND A.SW_DIR = C.SW_DIR
+		AND A.SW_USER = C.SW_USER
+		AND A.SW_ETC = C.SW_ETC
+		AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+		AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+		WHERE A.ASSET_CD = #{ASSET_CD}
+		AND A.SW_TYPE = #{SW_TYPE}
+		AND A.AUDIT_DAY = #{AUDIT_DAY}
+		<if test="SW_NM != null and !SW_NM.equals('') ">
+			and A.SW_NM = #{SW_NM}
+		</if>
+		ORDER BY A.DIAGNOSIS_CD, A.ITEM_GRP_NM, A.ITEM_NM
+	</select>
+
+	<!-- SvcAssetSwExport -->
+	<select id="selectSvcAssetSwExportList" resultType="java.util.HashMap">
+		SELECT A.SVC_CD, A.REQ_USER, B.SVC_NM
+          FROM SNET_ASSET_SW_AUDIT_EXCEL_SVC A, SNET_SERVICE_MASTER B
+          WHERE A.SVC_CD = B.SVC_CD
+		    AND (A.JOB_FLAG = 0)
+		    OR (A.JOB_FLAG = 2 AND ROUND((SYSDATE() - JOB_DATE) * 24 * 60, 0) <![CDATA[>]]> 30)
+	</select>
+	
+	<update id="updateSvcAssetSwExport" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_EXCEL_SVC
+		   SET JOB_FLAG = #{JOB_FLAG},
+		   JOB_FILE_NM = #{JOB_FILE_NM}
+		  WHERE SVC_CD = #{SVC_CD} 
+	</update>
+	
+	<update id="updateSvcAssetSwExportFinish" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_EXCEL_SVC
+		   SET JOB_FLAG = #{JOB_FLAG},
+		   JOB_FILE_NM = #{JOB_FILE_NM}, 
+		   JOB_DATE = NOW()
+		  WHERE SVC_CD = #{SVC_CD} 
+	</update>
+		
+	<select id="selectSvcAssetSwInfoList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT SW_TYPE, AUDIT_DAY, 
+			SUM(AD_RESULT_OK) AS AD_RESULT_OK, 
+			SUM(AD_RESULT_NOK) AS AD_RESULT_NOK, 
+			SUM(AD_RESULT_NA) AS AD_RESULT_NA, 
+			SUM(AD_RESULT_PASS) AS AD_RESULT_PASS, 
+			SUM(AD_RESULT_REQ) AS AD_RESULT_REQ, 
+			SUM(AD_TOTAL) AS AD_TOTAL,
+			(SUM(AUDIT_RATE) / COUNT(*)) AS AUDIT_RATE
+			  FROM ( 
+			        SELECT A.SVC_CD, A.SW_TYPE, A.SW_NM, A.SW_INFO, A.SW_DIR, A.SW_USER, A.SW_ETC, A.ASSET_CD, A.AUDIT_DAY,
+			          B.AD_RESULT_OK, B.AD_RESULT_NOK, B.AD_RESULT_NA, B.AD_RESULT_PASS, B.AD_RESULT_REQ,
+			          (B.AD_RESULT_OK + B.AD_RESULT_NOK + B.AD_RESULT_NA + B.AD_RESULT_PASS + B.AD_RESULT_REQ) AS AD_TOTAL,
+			          B.AUDIT_RATE
+			          FROM SNET_SERVICE_SW_AUDIT_DAY A, SNET_ASSET_SW_AUDIT_HISTORY B
+			        WHERE A.SW_TYPE = B.SW_TYPE
+			           AND A.SW_NM = B.SW_NM
+			           AND A.SW_INFO = B.SW_INFO
+			           AND A.SW_DIR = B.SW_DIR
+			           AND A.SW_USER = B.SW_USER
+			           AND A.SW_ETC = B.SW_ETC
+			           AND A.ASSET_CD = B.ASSET_CD
+			           AND A.AUDIT_DAY = B.AUDIT_DAY
+			           AND A.SVC_CD = #{SVC_CD}
+			   ) AA
+			   GROUP BY SW_TYPE, AUDIT_DAY
+			   ORDER BY SW_TYPE	
+	</select>
+	
+	<select id="selectSvcAssetSwList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT A.SVC_CD, A.SW_TYPE, A.SW_NM, A.SW_INFO, A.SW_DIR, A.SW_USER, A.SW_ETC, A.IP_ADDRESS, A.HOST_NM, A.AUDIT_DAY, 
+        		A.ASSET_CD, A.USER_ID, A.USER_NM, A.USER_TYPE, A.BRANCH_ID, A.BRANCH_NM, A.TEAM_ID, A.TEAM_NM, B.AUDIT_RATE
+          FROM SNET_SERVICE_SW_AUDIT_DAY A, SNET_ASSET_SW_AUDIT_HISTORY B
+          WHERE A.SW_TYPE = B.SW_TYPE
+            AND A.SW_NM = B.SW_NM
+            AND A.SW_INFO = B.SW_INFO
+            AND A.SW_DIR = B.SW_DIR
+            AND A.SW_USER = B.SW_USER
+            AND A.SW_ETC = B.SW_ETC
+            AND A.ASSET_CD = B.ASSET_CD
+            AND A.AUDIT_DAY = B.AUDIT_DAY
+            AND SVC_CD = #{SVC_CD}
+         ORDER BY SW_TYPE, SW_NM   
+    </select>
+
+	<update id="updateAssetSwExportJob" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		   SET JOB_FLAG = #{JOB_FLAG},
+		   JOB_FILE_NM = #{JOB_FILE_NM}
+		  WHERE REQ_CD = #{REQ_CD}
+	</update>
+
+	<update id="updateAssetSwExportJobFinish" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		   SET JOB_FLAG = #{JOB_FLAG},
+		   JOB_FILE_NM = #{JOB_FILE_NM},
+		   JOB_DATE= NOW()
+		  WHERE REQ_CD = #{REQ_CD}
+	</update>
+
+	<!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+	<delete id="deleteAssetSwExportJob" parameterType="java.util.HashMap">
+		 DELETE FROM SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		  WHERE REQ_CD = #{REQ_CD}
+	</delete>
+</mapper> 

@@ -1,0 +1,133 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+<mapper namespace="com.mobigen.snet.supportagent.dao.was.SnetEquipDelHistoryMainMapper">
+	<sql id="departmentsFilter">
+        <if test="listDepartment != null and listDepartment.size() > 0" >
+            AND A.BRANCH_ID IN (
+              <foreach separator=" , " item="item" collection="listDepartment">
+                  #{item}
+              </foreach>
+            )
+        </if>
+	</sql>
+	<select id="selectSnetEquipDelHistoryMainList" parameterType="hashMap" resultType="SnetEquipDelHistoryMainModel">
+		SELECT
+            X.ASSET_CD , 
+            X.ASSET_CD_VIEW , 
+            X.AGENT_CD , 
+            X.BRANCH_ID , 
+            X.BRANCH_NM , 
+            X.TEAM_ID , 
+            X.TEAM_NM , 
+            X.USER_NM , 
+            X.IP_ADDRESS , 
+            X.HOST_NM , 
+            X.CREATE_DATE , 
+            X.CREATE_DATE_VIEW , 
+            X.USER_ID , 
+            X.SW_NM , 
+            X.DEL_DATE , 
+            X.DEL_DATE_VIEW , 
+            X.DEL_DESC , 
+            X.DEL_USER_ID , 
+            X.DEL_USER_NM
+        FROM
+        (
+            SELECT
+                A.ASSET_CD , 
+                CONCAT(SUBSTRING(A.ASSET_CD,3,6),'-',SUBSTRING(A.ASSET_CD,9,4),'-',SUBSTRING(A.ASSET_CD,13,CHAR_LENGTH(A.ASSET_CD))) AS ASSET_CD_VIEW ,
+                A.IP_ADDRESS ,
+                A.AGENT_CD , 
+                A.BRANCH_ID , 
+                A.BRANCH_NM , 
+                A.TEAM_ID , 
+                A.TEAM_NM , 
+                ( SELECT USER_NM FROM SNET_ASSET_USER WHERE A.ASSET_CD = ASSET_CD AND USER_TYPE = 'OP' LIMIT 1) AS USER_NM ,
+                ( SELECT USER_ID FROM SNET_ASSET_USER WHERE A.ASSET_CD = ASSET_CD AND USER_TYPE = 'OP' LIMIT 1) AS USER_ID ,
+                A.HOST_NM , 
+                A.CREATE_DATE , 
+                DATE_FORMAT(A.CREATE_DATE,'%Y/%m/%d %H:%i:%s') AS CREATE_DATE_VIEW ,
+                A.SW_NM , 
+                A.DEL_DATE , 
+                DATE_FORMAT(A.DEL_DATE,'%Y/%m/%d %H:%i:%s') AS DEL_DATE_VIEW , 
+                A.DEL_DESC , 
+                A.DEL_USER_ID , 
+                ( SELECT USER_NM FROM SNET_CONFIG_USER_VIEW WHERE A.DEL_USER_ID = USER_ID ) AS DEL_USER_NM
+            FROM SNET_ASSET_DEL_HISTORY A
+            WHERE 1=1
+            <if test="branchId != null and branchId != ''">
+			  AND ( A.BRANCH_ID = #{branchId} OR A.BRANCH_ID IS NULL )
+			</if>
+			<include refid="departmentsFilter" />
+			<if test="teamId != null and teamId != ''">
+			  AND ( A.TEAM_ID = #{teamId} OR A.TEAM_ID IS NULL )
+			</if>
+			<if test="hostNm != null and hostNm != ''">
+			  AND ( UPPER( A.HOST_NM ) LIKE CONCAT( '%' , UPPER( #{hostNm} ) , '%' ) 
+			  		 OR ( UPPER( A.HOST_NM ) LIKE CONCAT( '%' , UPPER( #{hostNm} ) , '%' )
+			  		 AND ( BRANCH_ID IS NULL OR TEAM_ID IS NULL ) ) 
+			  )
+			</if>
+			<if test="ipAddress != null and ipAddress != ''">
+			  AND A.IP_ADDRESS LIKE CONCAT( UPPER( #{ipAddress} ) , '%' )
+			</if>
+			<if test="ipAddressList != null and ipAddressList != ''">
+			  AND ( A.IP_ADDRESS , 1 ) IN ( 
+			  	<foreach separator=" , " item="item" collection="ipAddressList">
+					( #{item} , 1 )
+				</foreach>
+			  )
+			</if>
+			<if test="swNm != null and swNm != ''">
+			  AND A.SW_NM = #{swNm}
+			</if>
+			<if test="snetSDay != null and snetSDay != '' and snetEDay != null and snetEDay != ''">
+			  AND DATE_FORMAT(A.DEL_DATE,'%Y%m%d') >= #{snetSDay} AND DATE_FORMAT(A.DEL_DATE,'%Y%m%d') <![CDATA[ <= ]]> #{snetEDay}
+			</if>
+			<if test="delDesc != null and delDesc != ''">
+			  AND UPPER(A.DEL_DESC) LIKE CONCAT('%',UPPER(#{delDesc}),'%')
+			</if>
+        ) X
+        WHERE 1=1
+		<if test="userNm != null and userNm != ''">
+		  AND UPPER( X.USER_NM ) LIKE CONCAT( '%' , UPPER( #{userNm} ) , '%' )
+		</if>
+		<if test="delUserNm != null and delUserNm != ''">
+		  AND X.DEL_USER_NM LIKE CONCAT('%',#{delUserNm},'%')
+		</if>
+		<if test="userId != null and userId != ''">
+		  AND X.USER_ID = #{userId}
+		</if>
+        ORDER BY 
+        	X.DEL_DATE DESC , 
+			X.BRANCH_NM , 
+			X.TEAM_NM , 
+			X.USER_NM , 
+			X.HOST_NM , 
+			X.IP_ADDRESS
+	</select>
+	
+	<select id="selectSnetEquipDelHistoryUserList" parameterType="hashMap" resultType="SnetEquipDelHistoryMainModel">
+		<![CDATA[
+		SELECT A.BRANCH_ID
+		     , A.BRANCH_NM
+		     , A.TEAM_ID
+		     , A.TEAM_NM
+		     , U.USER_NM AS USER_NM
+		     , U.USER_ID AS USER_ID	
+		     , CONCAT(U.USER_NM,'/',U.TEAM_NM,'<',U.USER_MAIL,'>') AS USER_MAIL
+		  FROM SNET_ASSET_DEL_HISTORY A
+		  LEFT OUTER JOIN SNET_ASSET_USER U 
+		       ON A.ASSET_CD = U.ASSET_CD
+		       AND U.USER_TYPE = 'OP'
+		 WHERE 1=1
+		 AND A.BRANCH_ID is not null
+	    ]]>
+		<if test="snetDay != null and snetDay != ''">			
+		   AND DATE_FORMAT(A.DEL_DATE,'%Y%m%d') = #{snetDay}
+		</if>
+         GROUP BY A.TEAM_ID, A.TEAM_NM, U.USER_ID
+	</select>
+</mapper>

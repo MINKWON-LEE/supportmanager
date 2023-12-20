@@ -1,0 +1,61 @@
+<configuration scan="true" scanPeriod="30 seconds">
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+    <!-- 'sg_supprotmanager 프로젝트 - 로컬 실행을 위해서 주석 처리 한 부분' -->
+	<define name="INCLUDED_FILE_EXISTS"
+		class="ch.qos.logback.core.property.FileExistsPropertyDefiner">
+        <!-- 'sg_supprotmanager 프로젝트 - 로컬 실행을 위해서 주석 처리 한 부분' -->
+		<path>/usr/local/snetManager/conf/include-support-logback.xml</path>
+<!--        <path>C:/BitbucketProjects/sg_supprotmanager/src/main/resources/include-support-logback.xml</path>-->
+	</define>
+
+	<if condition='property("INCLUDED_FILE_EXISTS").equals("true")'>
+		<then>
+			<include file="/usr/local/snetManager/conf/include-support-logback.xml" />
+<!--			<include file="C:/BitbucketProjects/sg_supprotmanager/src/main/resources/include-support-logback.xml" />-->
+		</then>
+		<else>
+			<include resource="include-support-logback.xml" />
+		</else>
+	</if>
+    
+    <logger name="ch.qos.logback.core.ConsoleAppender" level="info" >
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="jdbc.sqlonly" additivity="false" level="info">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="FILE_2" />
+    </logger>
+        
+    <logger name="com.mobigen.snet.supportagent" additivity="false" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.mobigen.snet.supportagent.common.PerfInterceptor" additivity="false" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <logger name="com.mobigen.snet.supportagent.task.SupportScheduler" additivity="false" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_2" />
+    </logger>
+    
+    <logger name="com.mobigen.snet.supportagent.service.MakreReportServiceImpl" additivity="false" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_2" />
+    </logger>
+
+    <logger name="org.springframework.jdbc.datasource.DataSourceUtils" additivity="true" level="error" >
+    </logger>
+    <logger name="org.mybatis.spring.SqlSessionUtils" additivity="true" level="error" >
+    </logger>
+    <logger name="org.mybatis.spring.transaction.SpringManagedTransaction" additivity="true" level="error" >
+    </logger>
+
+    <shutdownHook/>
+</configuration>

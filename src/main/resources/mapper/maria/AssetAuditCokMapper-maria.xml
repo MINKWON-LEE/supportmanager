@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.AssetCokMapper">
+
+    <!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+
+    <select id="getAssetCokReqCnt" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT AAA.asset_cd
+        FROM (
+        SELECT A.branch_id, A.team_id, AA.*
+        FROM SNET_ASSET_MASTER A
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY CC ON (B.ASSET_CD = CC.ASSET_CD AND B.SW_TYPE = CC.SW_TYPE AND B.SW_NM = CC.SW_NM AND B.SW_INFO = CC.SW_INFO AND B.SW_DIR = CC.SW_DIR AND B.SW_USER = CC.SW_USER AND B.SW_ETC = CC.SW_ETC AND B.AUDIT_DAY = CC.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT AA ON (AA.ASSET_CD = B.ASSET_CD AND AA.SW_TYPE = B.SW_TYPE AND AA.SW_NM = B.SW_NM AND AA.SW_INFO = B.SW_INFO AND AA.SW_DIR = B.SW_DIR AND AA.SW_USER = B.SW_USER AND AA.SW_ETC = B.SW_ETC AND AA.AUDIT_DAY = B.AUDIT_DAY)
+        where AA.ITEM_RESULT != 'T'
+        ) AAA
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK BBB ON(AAA.ASSET_CD = BBB.ASSET_CD AND AAA.DIAGNOSIS_CD = BBB.DIAGNOSIS_CD AND AAA.SW_TYPE = BBB.SW_TYPE AND AAA.SW_NM = BBB.SW_NM AND AAA.SW_INFO = BBB.SW_INFO AND AAA.SW_DIR = BBB.SW_DIR AND AAA.SW_USER = BBB.SW_USER AND AAA.SW_ETC = BBB.SW_ETC)
+        WHERE 1=1
+        <if test="branchId != null and !branchId.equals('') ">
+            and AAA.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and AAA.TEAM_ID = #{teamId}
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and AAA.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+
+    <select id="getAssetCokWaitCnt" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT AAA.asset_cd
+        FROM (
+        SELECT A.branch_id, A.team_id, AA.*
+        FROM SNET_ASSET_MASTER A
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY CC ON (B.ASSET_CD = CC.ASSET_CD AND B.SW_TYPE = CC.SW_TYPE AND B.SW_NM = CC.SW_NM AND B.SW_INFO = CC.SW_INFO AND B.SW_DIR = CC.SW_DIR AND B.SW_USER = CC.SW_USER AND B.SW_ETC = CC.SW_ETC AND B.AUDIT_DAY = CC.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT AA ON (AA.ASSET_CD = B.ASSET_CD AND AA.SW_TYPE = B.SW_TYPE AND AA.SW_NM = B.SW_NM AND AA.SW_INFO = B.SW_INFO AND AA.SW_DIR = B.SW_DIR AND AA.SW_USER = B.SW_USER AND AA.SW_ETC = B.SW_ETC AND AA.AUDIT_DAY = B.AUDIT_DAY)
+        ) AAA
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK BBB ON(AAA.ASSET_CD = BBB.ASSET_CD AND AAA.DIAGNOSIS_CD = BBB.DIAGNOSIS_CD AND AAA.SW_TYPE = BBB.SW_TYPE AND AAA.SW_NM = BBB.SW_NM AND AAA.SW_INFO = BBB.SW_INFO AND AAA.SW_DIR = BBB.SW_DIR AND AAA.SW_USER = BBB.SW_USER AND AAA.SW_ETC = BBB.SW_ETC)
+        WHERE 1=1
+        AND BBB.ADMIN_OK_FLAG = 0
+        <if test="branchId != null and !branchId.equals('') ">
+            and AAA.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and AAA.TEAM_ID = #{teamId}
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and AAA.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+
+    <select id="getAssetCokOkCnt" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT AAA.asset_cd
+        FROM (
+        SELECT A.branch_id, A.team_id, AA.*
+        FROM SNET_ASSET_MASTER A
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY CC ON (B.ASSET_CD = CC.ASSET_CD AND B.SW_TYPE = CC.SW_TYPE AND B.SW_NM = CC.SW_NM AND B.SW_INFO = CC.SW_INFO AND B.SW_DIR = CC.SW_DIR AND B.SW_USER = CC.SW_USER AND B.SW_ETC = CC.SW_ETC AND B.AUDIT_DAY = CC.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT AA ON (AA.ASSET_CD = B.ASSET_CD AND AA.SW_TYPE = B.SW_TYPE AND AA.SW_NM = B.SW_NM AND AA.SW_INFO = B.SW_INFO AND AA.SW_DIR = B.SW_DIR AND AA.SW_USER = B.SW_USER AND AA.SW_ETC = B.SW_ETC AND AA.AUDIT_DAY = B.AUDIT_DAY)
+        ) AAA
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK BBB ON(AAA.ASSET_CD = BBB.ASSET_CD AND AAA.DIAGNOSIS_CD = BBB.DIAGNOSIS_CD AND AAA.SW_TYPE = BBB.SW_TYPE AND AAA.SW_NM = BBB.SW_NM AND AAA.SW_INFO = BBB.SW_INFO AND AAA.SW_DIR = BBB.SW_DIR AND AAA.SW_USER = BBB.SW_USER AND AAA.SW_ETC = BBB.SW_ETC)
+        WHERE 1=1
+        AND BBB.ADMIN_OK_FLAG = 1
+        <if test="branchId != null and !branchId.equals('') ">
+            and AAA.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and AAA.TEAM_ID = #{teamId}
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and AAA.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+    <select id="getAssetCokNokCnt" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT AAA.asset_cd
+        FROM (
+        SELECT A.branch_id, A.team_id, AA.*
+        FROM SNET_ASSET_MASTER A
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY CC ON (B.ASSET_CD = CC.ASSET_CD AND B.SW_TYPE = CC.SW_TYPE AND B.SW_NM = CC.SW_NM AND B.SW_INFO = CC.SW_INFO AND B.SW_DIR = CC.SW_DIR AND B.SW_USER = CC.SW_USER AND B.SW_ETC = CC.SW_ETC AND B.AUDIT_DAY = CC.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT AA ON (AA.ASSET_CD = B.ASSET_CD AND AA.SW_TYPE = B.SW_TYPE AND AA.SW_NM = B.SW_NM AND AA.SW_INFO = B.SW_INFO AND AA.SW_DIR = B.SW_DIR AND AA.SW_USER = B.SW_USER AND AA.SW_ETC = B.SW_ETC AND AA.AUDIT_DAY = B.AUDIT_DAY)
+        ) AAA
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK BBB ON(AAA.ASSET_CD = BBB.ASSET_CD AND AAA.DIAGNOSIS_CD = BBB.DIAGNOSIS_CD AND AAA.SW_TYPE = BBB.SW_TYPE AND AAA.SW_NM = BBB.SW_NM AND AAA.SW_INFO = BBB.SW_INFO AND AAA.SW_DIR = BBB.SW_DIR AND AAA.SW_USER = BBB.SW_USER AND AAA.SW_ETC = BBB.SW_ETC)
+        WHERE 1=1
+        AND BBB.ADMIN_OK_FLAG = 2
+        <if test="branchId != null and !branchId.equals('') ">
+            and AAA.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and AAA.TEAM_ID = #{teamId}
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and AAA.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+
+    <select id="getDisanosisresultByImportanceStatus" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditCok">
+        SELECT
+        A.AUDIT_DAY,
+        DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d') as ADMIN_OK_DATE,
+        C.ITEM_COK_REQ_DATE,
+        C.DIAGNOSIS_CD,
+        B.item_grade,
+        C.ADMIN_OK_FLAG
+        FROM  SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT B
+        ON (
+        A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_ETC = B.SW_ETC
+        AND A.SW_USER = B.SW_USER
+        AND A.AUDIT_DAY = B.AUDIT_DAY
+        )
+        INNER JOIN SNET_ASSET_SW_AUDIT_COK C
+        ON (
+        C.ASSET_CD = B.ASSET_CD
+        AND C.SW_TYPE = B.SW_TYPE
+        AND C.SW_NM = B.SW_NM
+        AND C.SW_INFO = B.SW_INFO
+        AND C.SW_DIR = B.SW_DIR
+        AND C.SW_ETC = B.SW_ETC
+        AND C.SW_USER = B.SW_USER
+        AND C.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        )
+        WHERE 1=1
+        and C.ADMIN_OK_FLAG = 1
+        <if test="createDate != null and !createDate.equals('') ">
+            and A.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+
+    <select id="getDisanosisresultByImportanceExceptStatus" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditCok">
+        SELECT
+        A.AUDIT_DAY,
+        DATE_FORMAT(C.ADMIN_OK_DATE,'%Y%m%d') as ADMIN_OK_DATE,
+        C.ITEM_COK_REQ_DATE,
+        C.DIAGNOSIS_CD,
+        B.item_grade,
+        C.ADMIN_OK_FLAG
+        FROM  SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT B
+        ON (
+        A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_ETC = B.SW_ETC
+        AND A.SW_USER = B.SW_USER
+        AND A.AUDIT_DAY = B.AUDIT_DAY
+        )
+        INNER JOIN SNET_ASSET_SW_AUDIT_COK C
+        ON (
+        C.ASSET_CD = B.ASSET_CD
+        AND C.SW_TYPE = B.SW_TYPE
+        AND C.SW_NM = B.SW_NM
+        AND C.SW_INFO = B.SW_INFO
+        AND C.SW_DIR = B.SW_DIR
+        AND C.SW_ETC = B.SW_ETC
+        AND C.SW_USER = B.SW_USER
+        AND C.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        )
+        WHERE 1=1
+        and C.ADMIN_OK_FLAG = 2
+        <if test="createDate != null and !createDate.equals('') ">
+            and A.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+
+    <select id="getAssetSwAuditCokInfo" parameterType="com.mobigen.snet.supportagent.entity.ExcelListEntity" resultType="SnetAssetSwAuditCok">
+        SELECT *
+        FROM SNET_ASSET_SW_AUDIT_COK
+        <where>
+            <if test="assetCd != null">
+                ASSET_CD = #{assetCd}
+            </if>
+        </where>
+    </select>
+
+</mapper>

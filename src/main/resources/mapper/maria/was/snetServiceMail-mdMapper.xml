@@ -1,0 +1,49 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mobigen.snet.supportagent.dao.was.SnetServiceMailMapper">
+
+    <insert id="insertSnetServiceMailNewReg" parameterType="hashMap">
+		INSERT INTO SNET_SERVICE_MAIL
+		(
+			MAIL_CD , SVC_CD , FROM_MAIL , CC_MAIL , MAIL_TITLE , CREATE_TIME , USER_NM , USER_ID , AUDIT_RATE , AUDIT_ASSET_TOT , AUDIT_ASSET_OK , FILE_LIST, SEND_MSG
+		)
+		VALUES
+		(
+			#{mailCd} , #{svcCd} , #{fromMail} , #{ccMail} , #{mailTitle} , NOW() , #{userNm} , #{userId} , 
+			( SELECT IFNULL( CASE WHEN SUM(AD_WEIGHT_TOTAL) - SUM(AD_WEIGHT_PASS) - SUM(AD_WEIGHT_NA) = 0 THEN 0 ELSE ROUND( ( SUM(AD_WEIGHT_OK) / ( SUM(AD_WEIGHT_TOTAL) - SUM(AD_WEIGHT_PASS) - SUM(AD_WEIGHT_NA) ) ) * 100,  2 ) END , 0 ) FROM SNET_SERVICE_ASSET_SW X , SNET_ASSET_SW_AUDIT_DAY Y , SNET_ASSET_SW_AUDIT_HISTORY Z WHERE X.SVC_CD = #{svcCd} AND X.ASSET_CD = Y.ASSET_CD AND X.SW_TYPE = Y.SW_TYPE AND X.SW_NM = Y.SW_NM AND X.SW_INFO = Y.SW_INFO AND X.SW_DIR = Y.SW_DIR AND X.SW_USER = Y.SW_USER AND X.SW_ETC = Y.SW_ETC AND X.ASSET_CD = Z.ASSET_CD AND X.SW_TYPE = Z.SW_TYPE AND X.SW_NM = Z.SW_NM AND X.SW_INFO = Z.SW_INFO AND X.SW_DIR = Z.SW_DIR AND X.SW_USER = Z.SW_USER AND X.SW_ETC = Z.SW_ETC AND Y.AUDIT_DAY = Z.AUDIT_DAY AND Y.AUDIT_DAY >= ( SELECT SVC_CREATE_DAY FROM SNET_SERVICE_MASTER WHERE SVC_CD = X.SVC_CD ) ) , 
+			( SELECT COUNT( * ) FROM SNET_SERVICE_ASSET_SW WHERE SVC_CD = #{svcCd} AND EXCEPT_FLAG = 0 ) , 
+			( SELECT COUNT( * ) 
+				FROM SNET_SERVICE_ASSET_SW X , 
+					SNET_ASSET_SW_AUDIT_DAY Y , 
+					SNET_SERVICE_MASTER A 
+				WHERE X.SVC_CD = #{svcCd} 
+					AND X.ASSET_CD = Y.ASSET_CD 
+					AND X.SW_TYPE = Y.SW_TYPE 
+					AND X.SW_NM = Y.SW_NM 
+					AND X.SW_INFO = Y.SW_INFO 
+					AND X.SW_DIR = Y.SW_DIR 
+					AND X.SW_USER = Y.SW_USER 
+					AND X.SW_ETC = Y.SW_ETC 
+					AND Y.AUDIT_DAY >= A.SVC_CREATE_DAY 
+					AND X.SVC_CD = A.SVC_CD 
+			) , 
+			#{fileList},
+			#{sendMsg}
+		)
+	</insert>
+	
+
+	<insert id="insertSnetServiceMailUserNewReg" parameterType="hashMap">
+		INSERT INTO SNET_SERVICE_MAIL_USER
+		(
+			MAIL_CD, USER_MAIL
+		)
+		VALUES
+		(
+			#{mailCd} ,#{userMail}
+		)
+	</insert>
+
+</mapper>

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetAssetSwAuditDayDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditDayEntity">
+ INSERT INTO SNET_ASSET_SW_AUDIT_DAY
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='assetCd != null '>
+      , asset_cd
+   </if>
+   <if test='swType != null '>
+      , sw_type
+   </if>
+   <if test='swNm != null '>
+      , sw_nm
+   </if>
+   <if test='swInfo != null '>
+      , sw_info
+   </if>
+   <if test='swDir != null '>
+      , sw_dir
+   </if>
+   <if test='swUser != null '>
+      , sw_user
+   </if>
+   <if test='swEtc != null '>
+      , sw_etc
+   </if>
+   <if test='auditDay != null '>
+      , audit_day
+   </if>
+   <if test='auditFileCd != null '>
+      , audit_file_cd
+   </if>
+   <if test='userRegi != null '>
+      , user_regi
+   </if>
+   <if test='swInfoSortNum != null '>
+      , sw_info_sort_num
+   </if>
+   <if test='createDate != null '>
+      , create_date
+   </if>
+   <if test='urlServiceTarget != null '>
+      , url_service_target
+   </if>
+   <if test='urlTargetState != null '>
+      , url_target_state
+   </if>
+   <if test='closedDueDate != null '>
+      , closed_due_date
+   </if>
+   <if test='exceptReason != null '>
+      , except_reason
+   </if>
+   <if test='preChgDate != null '>
+      , pre_chg_date
+   </if>
+   <if test='lastChgDate != null '>
+      , last_chg_date
+   </if>
+   <if test='chgPageCnt != null '>
+      , chg_page_cnt
+   </if>
+   <if test='addedChgPageCnt != null '>
+      , added_chg_page_cnt
+   </if>
+   <if test='addedChgCnt != null '>
+      , added_chg_cnt
+   </if>
+   <if test='representUrl != null '>
+      , represent_url
+   </if>
+   <if test='urlManagementCd != null '>
+      , url_management_cd
+   </if>
+   <if test='urlServiceNm != null '>
+      , url_service_nm
+   </if>
+   <if test='urlPersonFlag != null '>
+      , url_person_flag
+   </if>
+   <if test='urlLocationFlag != null '>
+      , url_location_flag
+   </if>
+   <if test='urlChargeFlag != null '>
+      , url_charge_flag
+   </if>
+   <if test='urlBoardFlag != null '>
+      , url_board_flag
+   </if>
+   <if test='urlServerFlag != null '>
+      , url_server_flag
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='assetCd != null '>
+   	  ,    #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swType != null '>
+   	  ,    #{swType, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swNm != null '>
+   	  ,    #{swNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swInfo != null '>
+   	  ,    #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swDir != null '>
+   	  ,    #{swDir, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swUser != null '>
+   	  ,    #{swUser, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swEtc != null '>
+   	  ,    #{swEtc, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditDay != null '>
+   	  ,    #{auditDay, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditFileCd != null '>
+   	  ,    #{auditFileCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userRegi != null '>
+   	  ,    #{userRegi, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='swInfoSortNum != null '>
+   	  ,    #{swInfoSortNum, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='createDate != null '>
+   	  ,    #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='urlServiceTarget != null '>
+   	  ,    #{urlServiceTarget, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='urlTargetState != null '>
+   	  ,    #{urlTargetState, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='closedDueDate != null '>
+   	  ,    #{closedDueDate, javaType=java.sql.Date, jdbcType=DATE} 
+   </if>
+   <if test='exceptReason != null '>
+   	  ,    #{exceptReason, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='preChgDate != null '>
+   	  ,    #{preChgDate, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='lastChgDate != null '>
+   	  ,    #{lastChgDate, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='chgPageCnt != null '>
+   	  ,    #{chgPageCnt, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='addedChgPageCnt != null '>
+   	  ,    #{addedChgPageCnt, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='addedChgCnt != null '>
+   	  ,    #{addedChgCnt, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='representUrl != null '>
+   	  ,    #{representUrl, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='urlManagementCd != null '>
+   	  ,    #{urlManagementCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='urlServiceNm != null '>
+   	  ,    #{urlServiceNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='urlPersonFlag != null '>
+   	  ,    #{urlPersonFlag, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='urlLocationFlag != null '>
+   	  ,    #{urlLocationFlag, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='urlChargeFlag != null '>
+   	  ,    #{urlChargeFlag, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='urlBoardFlag != null '>
+   	  ,    #{urlBoardFlag, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='urlServerFlag != null '>
+   	  ,    #{urlServerFlag, javaType=String, jdbcType=VARCHAR} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditDayEntity">
+   UPDATE 
+         SNET_ASSET_SW_AUDIT_DAY
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='auditDay != null '>
+      , audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='auditFileCd != null '>
+      , audit_file_cd =   #{auditFileCd, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userRegi != null '>
+      , user_regi =   #{userRegi, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='swInfoSortNum != null '>
+      , sw_info_sort_num =   #{swInfoSortNum, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='createDate != null '>
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+    <if test='urlServiceTarget != null '>
+      , url_service_target =   #{urlServiceTarget, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='urlTargetState != null '>
+      , url_target_state =   #{urlTargetState, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='closedDueDate != null '>
+      , closed_due_date =   #{closedDueDate, javaType=java.sql.Date, jdbcType=DATE} 
+    </if>  
+    <if test='exceptReason != null '>
+      , except_reason =   #{exceptReason, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='preChgDate != null '>
+      , pre_chg_date =   #{preChgDate, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='lastChgDate != null '>
+      , last_chg_date =   #{lastChgDate, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='chgPageCnt != null '>
+      , chg_page_cnt =   #{chgPageCnt, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='addedChgPageCnt != null '>
+      , added_chg_page_cnt =   #{addedChgPageCnt, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='addedChgCnt != null '>
+      , added_chg_cnt =   #{addedChgCnt, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='representUrl != null '>
+      , represent_url =   #{representUrl, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='urlManagementCd != null '>
+      , url_management_cd =   #{urlManagementCd, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='urlServiceNm != null '>
+      , url_service_nm =   #{urlServiceNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='urlPersonFlag != null '>
+      , url_person_flag =   #{urlPersonFlag, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='urlLocationFlag != null '>
+      , url_location_flag =   #{urlLocationFlag, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='urlChargeFlag != null '>
+      , url_charge_flag =   #{urlChargeFlag, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='urlBoardFlag != null '>
+      , url_board_flag =   #{urlBoardFlag, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='urlServerFlag != null '>
+      , url_server_flag =   #{urlServerFlag, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+   AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+   AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+   AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+   AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditDayEntity">
+   UPDATE 
+         SNET_ASSET_SW_AUDIT_DAY
+      SET 
+ <trim  prefixOverrides="," >
+      , audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+      , audit_file_cd =   #{auditFileCd, javaType=String, jdbcType=VARCHAR} 
+      , user_regi =   #{userRegi, javaType=String, jdbcType=INTEGER} 
+      , sw_info_sort_num =   #{swInfoSortNum, javaType=String, jdbcType=VARCHAR} 
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+      , url_service_target =   #{urlServiceTarget, javaType=String, jdbcType=INTEGER} 
+      , url_target_state =   #{urlTargetState, javaType=String, jdbcType=INTEGER} 
+      , closed_due_date =   #{closedDueDate, javaType=java.sql.Date, jdbcType=DATE} 
+      , except_reason =   #{exceptReason, javaType=String, jdbcType=VARCHAR} 
+      , pre_chg_date =   #{preChgDate, javaType=String, jdbcType=VARCHAR} 
+      , last_chg_date =   #{lastChgDate, javaType=String, jdbcType=VARCHAR} 
+      , chg_page_cnt =   #{chgPageCnt, javaType=String, jdbcType=INTEGER} 
+      , added_chg_page_cnt =   #{addedChgPageCnt, javaType=String, jdbcType=INTEGER} 
+      , added_chg_cnt =   #{addedChgCnt, javaType=String, jdbcType=INTEGER} 
+      , represent_url =   #{representUrl, javaType=String, jdbcType=INTEGER} 
+      , url_management_cd =   #{urlManagementCd, javaType=String, jdbcType=VARCHAR} 
+      , url_service_nm =   #{urlServiceNm, javaType=String, jdbcType=VARCHAR} 
+      , url_person_flag =   #{urlPersonFlag, javaType=String, jdbcType=VARCHAR} 
+      , url_location_flag =   #{urlLocationFlag, javaType=String, jdbcType=VARCHAR} 
+      , url_charge_flag =   #{urlChargeFlag, javaType=String, jdbcType=VARCHAR} 
+      , url_board_flag =   #{urlBoardFlag, javaType=String, jdbcType=VARCHAR} 
+      , url_server_flag =   #{urlServerFlag, javaType=String, jdbcType=VARCHAR} 
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+   AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+   AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+   AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+   AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_ASSET_SW_AUDIT_DAY
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+   AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+   AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+   AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+   AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditDayEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , asset_cd AS assetCd
+      , sw_type AS swType
+      , sw_nm AS swNm
+      , sw_info AS swInfo
+      , sw_dir AS swDir
+      , sw_user AS swUser
+      , sw_etc AS swEtc
+      , audit_day AS auditDay
+      , audit_file_cd AS auditFileCd
+      , user_regi AS userRegi
+      , sw_info_sort_num AS swInfoSortNum
+      , create_date AS createDate
+      , url_service_target AS urlServiceTarget
+      , url_target_state AS urlTargetState
+      , closed_due_date AS closedDueDate
+      , except_reason AS exceptReason
+      , pre_chg_date AS preChgDate
+      , last_chg_date AS lastChgDate
+      , chg_page_cnt AS chgPageCnt
+      , added_chg_page_cnt AS addedChgPageCnt
+      , added_chg_cnt AS addedChgCnt
+      , represent_url AS representUrl
+      , url_management_cd AS urlManagementCd
+      , url_service_nm AS urlServiceNm
+      , url_person_flag AS urlPersonFlag
+      , url_location_flag AS urlLocationFlag
+      , url_charge_flag AS urlChargeFlag
+      , url_board_flag AS urlBoardFlag
+      , url_server_flag AS urlServerFlag
+  </trim>
+ FROM 
+      SNET_ASSET_SW_AUDIT_DAY
+WHERE
+      asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+  AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+  AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+  AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+  AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+  AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+  AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+</select>
+
+</mapper>

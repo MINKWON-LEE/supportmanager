@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetConnectMasterDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConnectMasterEntity">
+ INSERT INTO SNET_CONNECT_MASTER
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='assetCd != null '>
+      , asset_cd
+   </if>
+   <if test='tmpAssetFlag != null '>
+      , tmp_asset_flag
+   </if>
+   <if test='swNm != null '>
+      , sw_nm
+   </if>
+   <if test='osBit != null '>
+      , os_bit
+   </if>
+   <if test='updateDate != null '>
+      , update_date
+   </if>
+   <if test='updateUserId != null '>
+      , update_user_id
+   </if>
+   <if test='userIdOs != null '>
+      , user_id_os
+   </if>
+   <if test='userIdDba != null '>
+      , user_id_dba
+   </if>
+   <if test='userIdUrl != null '>
+      , user_id_url
+   </if>
+   <if test='userIdRoot != null '>
+      , user_id_root
+   </if>
+   <if test='userIdWeb != null '>
+      , user_id_web
+   </if>
+   <if test='userIdWas != null '>
+      , user_id_was
+   </if>
+   <if test='passwordOs != null '>
+      , password_os
+   </if>
+   <if test='passwordDba != null '>
+      , password_dba
+   </if>
+   <if test='passwordUrl != null '>
+      , password_url
+   </if>
+   <if test='passwordWeb != null '>
+      , password_web
+   </if>
+   <if test='passwordWas != null '>
+      , password_was
+   </if>
+   <if test='passwordRoot != null '>
+      , password_root
+   </if>
+   <if test='accountChkOs != null '>
+      , account_chk_os
+   </if>
+   <if test='accountChkDba != null '>
+      , account_chk_dba
+   </if>
+   <if test='accountChkUrl != null '>
+      , account_chk_url
+   </if>
+   <if test='accountChkRoot != null '>
+      , account_chk_root
+   </if>
+   <if test='accountChkWeb != null '>
+      , account_chk_web
+   </if>
+   <if test='accountChkWas != null '>
+      , account_chk_was
+   </if>
+   <if test='accountDesc != null '>
+      , account_desc
+   </if>
+   <if test='promptUserIdOs != null '>
+      , prompt_user_id_os
+   </if>
+   <if test='promptUserIdRoot != null '>
+      , prompt_user_id_root
+   </if>
+   <if test='promptUserIdWeb != null '>
+      , prompt_user_id_web
+   </if>
+   <if test='promptUserIdWas != null '>
+      , prompt_user_id_was
+   </if>
+   <if test='promptUserIdDb != null '>
+      , prompt_user_id_db
+   </if>
+   <if test='portSsh != null '>
+      , port_ssh
+   </if>
+   <if test='portSftp != null '>
+      , port_sftp
+   </if>
+   <if test='portTelnet != null '>
+      , port_telnet
+   </if>
+   <if test='portFtp != null '>
+      , port_ftp
+   </if>
+   <if test='connectLog != null '>
+      , connect_log
+   </if>
+   <if test='connectShellRoot != null '>
+      , connect_shell_root
+   </if>
+   <if test='connectShellOs != null '>
+      , connect_shell_os
+   </if>
+   <if test='connectShellWeb != null '>
+      , connect_shell_web
+   </if>
+   <if test='connectShellWas != null '>
+      , connect_shell_was
+   </if>
+   <if test='connectShellDb != null '>
+      , connect_shell_db
+   </if>
+   <if test='connectIpAddress != null '>
+      , connect_ip_address
+   </if>
+   <if test='portSshAlive != null '>
+      , port_ssh_alive
+   </if>
+   <if test='portSftpAlive != null '>
+      , port_sftp_alive
+   </if>
+   <if test='portTelnetAlive != null '>
+      , port_telnet_alive
+   </if>
+   <if test='portFtpAlive != null '>
+      , port_ftp_alive
+   </if>
+   <if test='nwGetConfigCmdCd != null '>
+      , nw_get_config_cmd_cd
+   </if>
+   <if test='dirDba != null '>
+      , dir_dba
+   </if>
+   <if test='dirUrl != null '>
+      , dir_url
+   </if>
+   <if test='dirWeb != null '>
+      , dir_web
+   </if>
+   <if test='dirWas != null '>
+      , dir_was
+   </if>
+   <if test='instAccountDba != null '>
+      , inst_account_dba
+   </if>
+   <if test='instAccountUrl != null '>
+      , inst_account_url
+   </if>
+   <if test='instAccountWeb != null '>
+      , inst_account_web
+   </if>
+   <if test='instAccountWas != null '>
+      , inst_account_was
+   </if>
+   <if test='userIdUrlAdm != null '>
+      , user_id_url_adm
+   </if>
+   <if test='passwordUrlAdm != null '>
+      , password_url_adm
+   </if>
+   <if test='accountChkUrlAdm != null '>
+      , account_chk_url_adm
+   </if>
+   <if test='portDatabase != null '>
+      , port_database
+   </if>
+   <if test='portWindow != null '>
+      , port_window
+   </if>
+   <if test='portWindowAlive != null '>
+      , port_window_alive
+   </if>
+   <if test='loginType != null '>
+      , login_type
+   </if>
+   <if test='relayAssetCd != null '>
+      , relay_asset_cd
+   </if>
+   <if test='useSudo != null '>
+      , use_sudo
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='assetCd != null '>
+   	  ,    #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='tmpAssetFlag != null '>
+   	  ,    #{tmpAssetFlag, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='swNm != null '>
+   	  ,    #{swNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='osBit != null '>
+   	  ,    #{osBit, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='updateDate != null '>
+   	  ,    #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='updateUserId != null '>
+   	  ,    #{updateUserId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdOs != null '>
+   	  ,    #{userIdOs, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdDba != null '>
+   	  ,    #{userIdDba, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdUrl != null '>
+   	  ,    #{userIdUrl, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdRoot != null '>
+   	  ,    #{userIdRoot, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdWeb != null '>
+   	  ,    #{userIdWeb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdWas != null '>
+   	  ,    #{userIdWas, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordOs != null '>
+   	  ,    #{passwordOs, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordDba != null '>
+   	  ,    #{passwordDba, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordUrl != null '>
+   	  ,    #{passwordUrl, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordWeb != null '>
+   	  ,    #{passwordWeb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordWas != null '>
+   	  ,    #{passwordWas, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordRoot != null '>
+   	  ,    #{passwordRoot, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='accountChkOs != null '>
+   	  ,    #{accountChkOs, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='accountChkDba != null '>
+   	  ,    #{accountChkDba, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='accountChkUrl != null '>
+   	  ,    #{accountChkUrl, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='accountChkRoot != null '>
+   	  ,    #{accountChkRoot, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='accountChkWeb != null '>
+   	  ,    #{accountChkWeb, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='accountChkWas != null '>
+   	  ,    #{accountChkWas, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='accountDesc != null '>
+   	  ,    #{accountDesc, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='promptUserIdOs != null '>
+   	  ,    #{promptUserIdOs, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='promptUserIdRoot != null '>
+   	  ,    #{promptUserIdRoot, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='promptUserIdWeb != null '>
+   	  ,    #{promptUserIdWeb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='promptUserIdWas != null '>
+   	  ,    #{promptUserIdWas, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='promptUserIdDb != null '>
+   	  ,    #{promptUserIdDb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='portSsh != null '>
+   	  ,    #{portSsh, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portSftp != null '>
+   	  ,    #{portSftp, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portTelnet != null '>
+   	  ,    #{portTelnet, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portFtp != null '>
+   	  ,    #{portFtp, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='connectLog != null '>
+   	  ,    #{connectLog, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='connectShellRoot != null '>
+   	  ,    #{connectShellRoot, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='connectShellOs != null '>
+   	  ,    #{connectShellOs, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='connectShellWeb != null '>
+   	  ,    #{connectShellWeb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='connectShellWas != null '>
+   	  ,    #{connectShellWas, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='connectShellDb != null '>
+   	  ,    #{connectShellDb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='connectIpAddress != null '>
+   	  ,    #{connectIpAddress, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='portSshAlive != null '>
+   	  ,    #{portSshAlive, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portSftpAlive != null '>
+   	  ,    #{portSftpAlive, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portTelnetAlive != null '>
+   	  ,    #{portTelnetAlive, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portFtpAlive != null '>
+   	  ,    #{portFtpAlive, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='nwGetConfigCmdCd != null '>
+   	  ,    #{nwGetConfigCmdCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='dirDba != null '>
+   	  ,    #{dirDba, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='dirUrl != null '>
+   	  ,    #{dirUrl, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='dirWeb != null '>
+   	  ,    #{dirWeb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='dirWas != null '>
+   	  ,    #{dirWas, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='instAccountDba != null '>
+   	  ,    #{instAccountDba, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='instAccountUrl != null '>
+   	  ,    #{instAccountUrl, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='instAccountWeb != null '>
+   	  ,    #{instAccountWeb, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='instAccountWas != null '>
+   	  ,    #{instAccountWas, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userIdUrlAdm != null '>
+   	  ,    #{userIdUrlAdm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='passwordUrlAdm != null '>
+   	  ,    #{passwordUrlAdm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='accountChkUrlAdm != null '>
+   	  ,    #{accountChkUrlAdm, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portDatabase != null '>
+   	  ,    #{portDatabase, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portWindow != null '>
+   	  ,    #{portWindow, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='portWindowAlive != null '>
+   	  ,    #{portWindowAlive, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='loginType != null '>
+   	  ,    #{loginType, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='relayAssetCd != null '>
+   	  ,    #{relayAssetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='useSudo != null '>
+   	  ,    #{useSudo, javaType=String, jdbcType=VARCHAR} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConnectMasterEntity">
+   UPDATE 
+         SNET_CONNECT_MASTER
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='tmpAssetFlag != null '>
+      , tmp_asset_flag =   #{tmpAssetFlag, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='swNm != null '>
+      , sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='osBit != null '>
+      , os_bit =   #{osBit, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='updateDate != null '>
+      , update_date =   #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+    <if test='updateUserId != null '>
+      , update_user_id =   #{updateUserId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdOs != null '>
+      , user_id_os =   #{userIdOs, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdDba != null '>
+      , user_id_dba =   #{userIdDba, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdUrl != null '>
+      , user_id_url =   #{userIdUrl, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdRoot != null '>
+      , user_id_root =   #{userIdRoot, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdWeb != null '>
+      , user_id_web =   #{userIdWeb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdWas != null '>
+      , user_id_was =   #{userIdWas, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordOs != null '>
+      , password_os =   #{passwordOs, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordDba != null '>
+      , password_dba =   #{passwordDba, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordUrl != null '>
+      , password_url =   #{passwordUrl, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordWeb != null '>
+      , password_web =   #{passwordWeb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordWas != null '>
+      , password_was =   #{passwordWas, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordRoot != null '>
+      , password_root =   #{passwordRoot, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='accountChkOs != null '>
+      , account_chk_os =   #{accountChkOs, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='accountChkDba != null '>
+      , account_chk_dba =   #{accountChkDba, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='accountChkUrl != null '>
+      , account_chk_url =   #{accountChkUrl, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='accountChkRoot != null '>
+      , account_chk_root =   #{accountChkRoot, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='accountChkWeb != null '>
+      , account_chk_web =   #{accountChkWeb, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='accountChkWas != null '>
+      , account_chk_was =   #{accountChkWas, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='accountDesc != null '>
+      , account_desc =   #{accountDesc, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='promptUserIdOs != null '>
+      , prompt_user_id_os =   #{promptUserIdOs, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='promptUserIdRoot != null '>
+      , prompt_user_id_root =   #{promptUserIdRoot, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='promptUserIdWeb != null '>
+      , prompt_user_id_web =   #{promptUserIdWeb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='promptUserIdWas != null '>
+      , prompt_user_id_was =   #{promptUserIdWas, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='promptUserIdDb != null '>
+      , prompt_user_id_db =   #{promptUserIdDb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='portSsh != null '>
+      , port_ssh =   #{portSsh, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portSftp != null '>
+      , port_sftp =   #{portSftp, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portTelnet != null '>
+      , port_telnet =   #{portTelnet, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portFtp != null '>
+      , port_ftp =   #{portFtp, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='connectLog != null '>
+      , connect_log =   #{connectLog, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='connectShellRoot != null '>
+      , connect_shell_root =   #{connectShellRoot, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='connectShellOs != null '>
+      , connect_shell_os =   #{connectShellOs, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='connectShellWeb != null '>
+      , connect_shell_web =   #{connectShellWeb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='connectShellWas != null '>
+      , connect_shell_was =   #{connectShellWas, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='connectShellDb != null '>
+      , connect_shell_db =   #{connectShellDb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='connectIpAddress != null '>
+      , connect_ip_address =   #{connectIpAddress, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='portSshAlive != null '>
+      , port_ssh_alive =   #{portSshAlive, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portSftpAlive != null '>
+      , port_sftp_alive =   #{portSftpAlive, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portTelnetAlive != null '>
+      , port_telnet_alive =   #{portTelnetAlive, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portFtpAlive != null '>
+      , port_ftp_alive =   #{portFtpAlive, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='nwGetConfigCmdCd != null '>
+      , nw_get_config_cmd_cd =   #{nwGetConfigCmdCd, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='dirDba != null '>
+      , dir_dba =   #{dirDba, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='dirUrl != null '>
+      , dir_url =   #{dirUrl, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='dirWeb != null '>
+      , dir_web =   #{dirWeb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='dirWas != null '>
+      , dir_was =   #{dirWas, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='instAccountDba != null '>
+      , inst_account_dba =   #{instAccountDba, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='instAccountUrl != null '>
+      , inst_account_url =   #{instAccountUrl, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='instAccountWeb != null '>
+      , inst_account_web =   #{instAccountWeb, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='instAccountWas != null '>
+      , inst_account_was =   #{instAccountWas, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userIdUrlAdm != null '>
+      , user_id_url_adm =   #{userIdUrlAdm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='passwordUrlAdm != null '>
+      , password_url_adm =   #{passwordUrlAdm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='accountChkUrlAdm != null '>
+      , account_chk_url_adm =   #{accountChkUrlAdm, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portDatabase != null '>
+      , port_database =   #{portDatabase, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portWindow != null '>
+      , port_window =   #{portWindow, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='portWindowAlive != null '>
+      , port_window_alive =   #{portWindowAlive, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='loginType != null '>
+      , login_type =   #{loginType, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='relayAssetCd != null '>
+      , relay_asset_cd =   #{relayAssetCd, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='useSudo != null '>
+      , use_sudo =   #{useSudo, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConnectMasterEntity">
+   UPDATE 
+         SNET_CONNECT_MASTER
+      SET 
+ <trim  prefixOverrides="," >
+      , tmp_asset_flag =   #{tmpAssetFlag, javaType=String, jdbcType=INTEGER} 
+      , sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+      , os_bit =   #{osBit, javaType=String, jdbcType=INTEGER} 
+      , update_date =   #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+      , update_user_id =   #{updateUserId, javaType=String, jdbcType=VARCHAR} 
+      , user_id_os =   #{userIdOs, javaType=String, jdbcType=VARCHAR} 
+      , user_id_dba =   #{userIdDba, javaType=String, jdbcType=VARCHAR} 
+      , user_id_url =   #{userIdUrl, javaType=String, jdbcType=VARCHAR} 
+      , user_id_root =   #{userIdRoot, javaType=String, jdbcType=VARCHAR} 
+      , user_id_web =   #{userIdWeb, javaType=String, jdbcType=VARCHAR} 
+      , user_id_was =   #{userIdWas, javaType=String, jdbcType=VARCHAR} 
+      , password_os =   #{passwordOs, javaType=String, jdbcType=VARCHAR} 
+      , password_dba =   #{passwordDba, javaType=String, jdbcType=VARCHAR} 
+      , password_url =   #{passwordUrl, javaType=String, jdbcType=VARCHAR} 
+      , password_web =   #{passwordWeb, javaType=String, jdbcType=VARCHAR} 
+      , password_was =   #{passwordWas, javaType=String, jdbcType=VARCHAR} 
+      , password_root =   #{passwordRoot, javaType=String, jdbcType=VARCHAR} 
+      , account_chk_os =   #{accountChkOs, javaType=String, jdbcType=INTEGER} 
+      , account_chk_dba =   #{accountChkDba, javaType=String, jdbcType=INTEGER} 
+      , account_chk_url =   #{accountChkUrl, javaType=String, jdbcType=INTEGER} 
+      , account_chk_root =   #{accountChkRoot, javaType=String, jdbcType=INTEGER} 
+      , account_chk_web =   #{accountChkWeb, javaType=String, jdbcType=INTEGER} 
+      , account_chk_was =   #{accountChkWas, javaType=String, jdbcType=INTEGER} 
+      , account_desc =   #{accountDesc, javaType=String, jdbcType=VARCHAR} 
+      , prompt_user_id_os =   #{promptUserIdOs, javaType=String, jdbcType=VARCHAR} 
+      , prompt_user_id_root =   #{promptUserIdRoot, javaType=String, jdbcType=VARCHAR} 
+      , prompt_user_id_web =   #{promptUserIdWeb, javaType=String, jdbcType=VARCHAR} 
+      , prompt_user_id_was =   #{promptUserIdWas, javaType=String, jdbcType=VARCHAR} 
+      , prompt_user_id_db =   #{promptUserIdDb, javaType=String, jdbcType=VARCHAR} 
+      , port_ssh =   #{portSsh, javaType=String, jdbcType=INTEGER} 
+      , port_sftp =   #{portSftp, javaType=String, jdbcType=INTEGER} 
+      , port_telnet =   #{portTelnet, javaType=String, jdbcType=INTEGER} 
+      , port_ftp =   #{portFtp, javaType=String, jdbcType=INTEGER} 
+      , connect_log =   #{connectLog, javaType=String, jdbcType=VARCHAR} 
+      , connect_shell_root =   #{connectShellRoot, javaType=String, jdbcType=VARCHAR} 
+      , connect_shell_os =   #{connectShellOs, javaType=String, jdbcType=VARCHAR} 
+      , connect_shell_web =   #{connectShellWeb, javaType=String, jdbcType=VARCHAR} 
+      , connect_shell_was =   #{connectShellWas, javaType=String, jdbcType=VARCHAR} 
+      , connect_shell_db =   #{connectShellDb, javaType=String, jdbcType=VARCHAR} 
+      , connect_ip_address =   #{connectIpAddress, javaType=String, jdbcType=VARCHAR} 
+      , port_ssh_alive =   #{portSshAlive, javaType=String, jdbcType=INTEGER} 
+      , port_sftp_alive =   #{portSftpAlive, javaType=String, jdbcType=INTEGER} 
+      , port_telnet_alive =   #{portTelnetAlive, javaType=String, jdbcType=INTEGER} 
+      , port_ftp_alive =   #{portFtpAlive, javaType=String, jdbcType=INTEGER} 
+      , nw_get_config_cmd_cd =   #{nwGetConfigCmdCd, javaType=String, jdbcType=VARCHAR} 
+      , dir_dba =   #{dirDba, javaType=String, jdbcType=VARCHAR} 
+      , dir_url =   #{dirUrl, javaType=String, jdbcType=VARCHAR} 
+      , dir_web =   #{dirWeb, javaType=String, jdbcType=VARCHAR} 
+      , dir_was =   #{dirWas, javaType=String, jdbcType=VARCHAR} 
+      , inst_account_dba =   #{instAccountDba, javaType=String, jdbcType=VARCHAR} 
+      , inst_account_url =   #{instAccountUrl, javaType=String, jdbcType=VARCHAR} 
+      , inst_account_web =   #{instAccountWeb, javaType=String, jdbcType=VARCHAR} 
+      , inst_account_was =   #{instAccountWas, javaType=String, jdbcType=VARCHAR} 
+      , user_id_url_adm =   #{userIdUrlAdm, javaType=String, jdbcType=VARCHAR} 
+      , password_url_adm =   #{passwordUrlAdm, javaType=String, jdbcType=VARCHAR} 
+      , account_chk_url_adm =   #{accountChkUrlAdm, javaType=String, jdbcType=INTEGER} 
+      , port_database =   #{portDatabase, javaType=String, jdbcType=INTEGER} 
+      , port_window =   #{portWindow, javaType=String, jdbcType=INTEGER} 
+      , port_window_alive =   #{portWindowAlive, javaType=String, jdbcType=INTEGER} 
+      , login_type =   #{loginType, javaType=String, jdbcType=VARCHAR} 
+      , relay_asset_cd =   #{relayAssetCd, javaType=String, jdbcType=VARCHAR} 
+      , use_sudo =   #{useSudo, javaType=String, jdbcType=VARCHAR} 
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_CONNECT_MASTER
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetConnectMasterEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , asset_cd AS assetCd
+      , tmp_asset_flag AS tmpAssetFlag
+      , sw_nm AS swNm
+      , os_bit AS osBit
+      , update_date AS updateDate
+      , update_user_id AS updateUserId
+      , user_id_os AS userIdOs
+      , user_id_dba AS userIdDba
+      , user_id_url AS userIdUrl
+      , user_id_root AS userIdRoot
+      , user_id_web AS userIdWeb
+      , user_id_was AS userIdWas
+      , password_os AS passwordOs
+      , password_dba AS passwordDba
+      , password_url AS passwordUrl
+      , password_web AS passwordWeb
+      , password_was AS passwordWas
+      , password_root AS passwordRoot
+      , account_chk_os AS accountChkOs
+      , account_chk_dba AS accountChkDba
+      , account_chk_url AS accountChkUrl
+      , account_chk_root AS accountChkRoot
+      , account_chk_web AS accountChkWeb
+      , account_chk_was AS accountChkWas
+      , account_desc AS accountDesc
+      , prompt_user_id_os AS promptUserIdOs
+      , prompt_user_id_root AS promptUserIdRoot
+      , prompt_user_id_web AS promptUserIdWeb
+      , prompt_user_id_was AS promptUserIdWas
+      , prompt_user_id_db AS promptUserIdDb
+      , port_ssh AS portSsh
+      , port_sftp AS portSftp
+      , port_telnet AS portTelnet
+      , port_ftp AS portFtp
+      , connect_log AS connectLog
+      , connect_shell_root AS connectShellRoot
+      , connect_shell_os AS connectShellOs
+      , connect_shell_web AS connectShellWeb
+      , connect_shell_was AS connectShellWas
+      , connect_shell_db AS connectShellDb
+      , connect_ip_address AS connectIpAddress
+      , port_ssh_alive AS portSshAlive
+      , port_sftp_alive AS portSftpAlive
+      , port_telnet_alive AS portTelnetAlive
+      , port_ftp_alive AS portFtpAlive
+      , nw_get_config_cmd_cd AS nwGetConfigCmdCd
+      , dir_dba AS dirDba
+      , dir_url AS dirUrl
+      , dir_web AS dirWeb
+      , dir_was AS dirWas
+      , inst_account_dba AS instAccountDba
+      , inst_account_url AS instAccountUrl
+      , inst_account_web AS instAccountWeb
+      , inst_account_was AS instAccountWas
+      , user_id_url_adm AS userIdUrlAdm
+      , password_url_adm AS passwordUrlAdm
+      , account_chk_url_adm AS accountChkUrlAdm
+      , port_database AS portDatabase
+      , port_window AS portWindow
+      , port_window_alive AS portWindowAlive
+      , login_type AS loginType
+      , relay_asset_cd AS relayAssetCd
+      , use_sudo AS useSudo
+  </trim>
+ FROM 
+      SNET_CONNECT_MASTER
+WHERE
+      asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</select>
+
+</mapper>

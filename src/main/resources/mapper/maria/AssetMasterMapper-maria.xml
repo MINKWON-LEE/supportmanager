@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.AssetMasterMapper">
+
+    <!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+
+    <select id="getAssetMasterList" parameterType="java.util.HashMap" resultType="SnetAssetMaster">
+        SELECT C.*
+        FROM SNET_ASSET_MASTER C
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (A.ASSET_CD = C.ASSET_CD)
+        WHERE A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+        <if test="TEAM_ID != null and !TEAM_ID.equals('') ">
+            and C.TEAM_ID = #{TEAM_ID}
+        </if>
+        <if test="BRANCH_ID != null and !BRANCH_ID.equals('') ">
+            and C.BRANCH_ID = #{BRANCH_ID}
+        </if>
+    </select>
+
+    <select id="getAssetMasterAuditDayList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT C.SW_TYPE,
+        C.SW_NM,
+        C.SW_INFO,
+        C.SW_DIR,
+        C.SW_USER,
+        C.SW_ETC,
+        C.AUDIT_DAY,
+        C.ASSET_CD,
+        K.HOST_NM,
+        K.IP_ADDRESS,
+        K.USER_ID,
+        K.USER_NM,
+        K.TEAM_NM,
+        K.BRANCH_NM,
+        K.AUDIT_RATE as AUDIT_RATE,
+        K.AUDIT_RATE_FIREWALL,
+        C.AUDIT_DAY as CREATE_DATE
+        FROM SNET_ASSET_SW_AUDIT_DAY C
+        INNER JOIN SNET_ASSET_MASTER A ON (C.ASSET_CD = A.ASSET_CD)
+        LEFT OUTER
+        JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON (C.ASSET_CD = K.ASSET_CD AND C.SW_TYPE = K.SW_TYPE AND C.SW_INFO = K.SW_INFO AND C.SW_NM = K.SW_NM AND C.SW_DIR = K.SW_DIR AND C.SW_USER = K.SW_USER AND C.SW_ETC = K.SW_ETC AND C.AUDIT_DAY = K.AUDIT_DAY)
+        WHERE 1=1
+        /*AND C.AUDIT_DAY != '19990101'*/
+        AND C.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV')
+        <if test="BRANCH_ID != null and !BRANCH_ID.equals('') ">
+            and A.BRANCH_ID = #{BRANCH_ID}
+        </if>
+        <if test="TEAM_ID != null and !TEAM_ID.equals('') ">
+            and A.TEAM_ID = #{TEAM_ID}
+        </if>
+        <if test="endDay != null and !endDay.equals('') ">
+            and C.AUDIT_DAY <![CDATA[ <= ]]> #{endDay}
+        </if>
+    </select>
+
+    <select id="getAssetNotAuditCntList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT count(*) as not_cnt
+        FROM SNET_ASSET_MASTER AA, (
+        SELECT B.ASSET_CD, B.SW_TYPE, B.SW_NM, B.SW_INFO, B.SW_DIR, B.SW_USER, B.SW_ETC, B.AUDIT_DAY, IFNULL(A.AUDIT_RATE, 0) AUDIT_RATE, DATEDIFF(NOW(), CAST(IFNULL(A.AUDIT_DAY, B.CREATE_DATE) AS DATETIME)) AS UNACTED_DAY, B.ACTION_DATE, B.URL_SERVICE_NM, B.URL_MANAGEMENT_CD
+        FROM SNET_ASSET_SW_AUDIT_HISTORY A
+        RIGHT OUTER
+        JOIN SNET_ASSET_SW_AUDIT_DAY B ON A.AUDIT_DAY = B.AUDIT_DAY AND A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND IFNULL(A.SW_INFO, '-') = IFNULL(B.SW_INFO, '-')
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        WHERE DATEDIFF(NOW(), CAST(IFNULL(A.AUDIT_DAY, B.CREATE_DATE) AS DATETIME)) >= 0
+        AND B.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'NW', 'URL', 'SE', 'Pentest')
+        ) BB
+        WHERE AA.ASSET_CD = BB.ASSET_CD
+        <if test="BRANCH_ID != null and !BRANCH_ID.equals('') ">
+            and AA.BRANCH_ID = #{BRANCH_ID}
+        </if>
+        <if test="TEAM_ID != null and !TEAM_ID.equals('') ">
+            and AA.TEAM_ID = #{TEAM_ID}
+        </if>
+    </select>
+
+    <select id="getAssetMasterHstAuditDayCntList2" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT count(*) as not_cnt
+        FROM SNET_ASSET_MASTER AA, (
+        SELECT A.ASSET_CD, A.SW_TYPE, A.SW_NM, A.SW_INFO, A.SW_DIR, A.SW_USER, A.SW_ETC, A.AUDIT_DAY, A.AUDIT_RATE, DATEDIFF(NOW(), CAST(A.AUDIT_DAY AS DATETIME)) AS UNACTED_DAY, B.ACTION_DATE, B.URL_SERVICE_NM, B.URL_MANAGEMENT_CD
+        FROM SNET_ASSET_SW_AUDIT_HISTORY A
+        RIGHT OUTER
+        JOIN SNET_ASSET_SW_AUDIT_DAY B ON A.AUDIT_DAY = B.AUDIT_DAY AND A.ASSET_CD = B.ASSET_CD AND A.SW_TYPE = B.SW_TYPE AND A.SW_NM = B.SW_NM AND IFNULL(A.SW_INFO, '-') = IFNULL(B.SW_INFO, '-') AND A.SW_DIR = B.SW_DIR AND A.SW_USER = B.SW_USER AND A.SW_ETC = B.SW_ETC
+        WHERE IFNULL(A.AUDIT_RATE, 0) <![CDATA[ < ]]> 100
+        AND DATEDIFF(NOW(), CAST(IFNULL(A.AUDIT_DAY, B.CREATE_DATE) AS DATETIME)) >= 0
+        AND B.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'NW', 'URL', 'SE', 'Pentest')
+        ) BB
+        WHERE AA.ASSET_CD = BB.ASSET_CD
+        <if test="BRANCH_ID != null and !BRANCH_ID.equals('') ">
+            and AA.BRANCH_ID = #{BRANCH_ID}
+        </if>
+        <if test="TEAM_ID != null and !TEAM_ID.equals('') ">
+            and AA.TEAM_ID = #{TEAM_ID}
+        </if>
+    </select>
+
+    <select id="getAssetMasterGroupingAgentCd" parameterType="java.util.HashMap" resultType="SnetAssetMaster">
+        select length(A.agent_cd) as equipLength, A.*
+        from SNET_ASSET_MASTER A
+        LEFT OUTER JOIN SNET_AGENT_MASTER B ON (A.AGENT_CD = B.AGENT_CD)
+        LEFT OUTER JOIN (
+        SELECT DISTINCT A.ASSET_CD, A.AGENT_STATUS_DATE, B.AGENT_STATUS_DESC, B.AGENT_STATUS
+        FROM (
+        SELECT ASSET_CD, MAX(AGENT_STATUS_DATE) AS AGENT_STATUS_DATE
+        FROM SNET_AGENT_STATUS_HISTORY
+        GROUP BY ASSET_CD
+        ) A, SNET_AGENT_STATUS_HISTORY B
+        WHERE A.ASSET_CD = B.ASSET_CD AND A.AGENT_STATUS_DATE = B.AGENT_STATUS_DATE
+        ) C ON (A.ASSET_CD = C.ASSET_CD)
+        LEFT OUTER JOIN SNET_CONNECT_MASTER D ON (A.ASSET_CD = D.ASSET_CD)
+        where 1=1
+        and A.ASSET_CD = D.ASSET_CD
+        <if test="createDate != null and !createDate.equals('') ">
+            and DATE_FORMAT(A.CREATE_DATE, '%Y%m%d') = #{createDate}
+        </if>
+        <if test="branchId != null and !branchId.equals('') ">
+            and A.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and A.TEAM_ID = #{teamId}
+        </if>
+    </select>
+
+</mapper>

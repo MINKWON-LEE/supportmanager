@@ -1,0 +1,33 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mobigen.snet.supportagent.dao.was.SnetInactionsMailSendHistoryMainMapper">
+	<!-- 미조치메일발송 이력등록 -->
+	<insert id="insertInactionsMailHis" parameterType="hashMap">
+		INSERT INTO SNET_ASSET_SW_AUDIT_INACTIONS_MAIL_HISTORY (
+		   ASSET_CD , 
+		   SW_TYPE , 
+		   SW_NM , 
+		   SW_DIR , 
+		   SW_USER , 
+		   SW_ETC , 
+		   SW_INFO , 
+		   MAIL_SEND_DAY ,
+		   COMMENT,
+           TO_USER_NM
+		)
+		VALUES ( 
+			#{assetCd, jdbcType=VARCHAR} ,
+			#{swType, jdbcType=VARCHAR} ,
+			#{swNm, jdbcType=VARCHAR} ,
+			#{swDir, jdbcType=VARCHAR} ,
+			#{swUser, jdbcType=VARCHAR} ,
+			#{swEtc, jdbcType=VARCHAR} , 
+			#{swInfo, jdbcType=VARCHAR} , 
+			#{mailSendDay, jdbcType=VARCHAR} , 
+			#{mailTitle, jdbcType=VARCHAR} ,
+			#{toUserNm, jdbcType=VARCHAR}
+		)
+	</insert>
+</mapper>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.AssetAuditResultMapper">
+
+    <select id="getAssetSwAuditResultList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        A.AUDIT_DAY,
+        A.ASSET_CD,
+        K.AUDIT_RATE as AUDIT_RATE,
+        A.AUDIT_DAY as CREATE_DATE
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY K ON (
+        A.ASSET_CD = K.ASSET_CD
+        AND A.SW_TYPE = K.SW_TYPE
+        AND A.SW_INFO = K.SW_INFO
+        AND A.SW_NM = K.SW_NM
+        AND A.SW_DIR = K.SW_DIR
+        AND A.SW_USER = K.SW_USER
+        AND A.SW_ETC = K.SW_ETC
+        AND A.AUDIT_DAY = K.AUDIT_DAY)
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV')
+        <!--<if test="ALL_FLAG != null and !ALL_FLAG.equals('') ">
+            and A.asset_cd in
+            <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>-->
+        <if test="createDate != null and !createDate.equals('') ">
+            and A.AUDIT_DAY = #{createDate}
+        </if>
+        <if test="endDay != null and !endDay.equals('') ">
+            and A.AUDIT_DAY <![CDATA[ <= ]]> #{endDay}
+        </if>
+        <if test="branchId != null and !branchId.equals('') ">
+            and M.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and M.TEAM_ID = #{teamId}
+        </if>
+        and ((K.AUDIT_RATE <![CDATA[ >= ]]> 0 AND K.AUDIT_RATE <![CDATA[ <= ]]> 100) OR (K.AUDIT_RATE IS NULL))
+        order by CASE WHEN A.sw_type = 'OS' and A.sw_nm != 'Windows' THEN 1
+        WHEN A.sw_type = 'OS' and A.sw_nm = 'Windows' THEN 2
+        WHEN A.sw_type = 'DB' THEN 3
+        WHEN A.sw_type = 'WEB' THEN 4
+        WHEN A.sw_type = 'WAS' THEN 5
+        WHEN A.sw_type = 'NW' THEN 6
+        WHEN A.sw_type = 'URL' THEN 7
+        else 8
+        END
+    </select>
+
+    <select id="getAssetSwAuditResultReportList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT  A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        A.AUDIT_DAY,
+        A.ASSET_CD,
+        A.AUDIT_RATE as AUDIT_RATE,
+        A.AUDIT_DAY as CREATE_DATE
+        FROM SNET_ASSET_SW_AUDIT_HISTORY A
+        LEFT OUTER
+        JOIN SNET_ASSET_MASTER B ON (A.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER
+        JOIN SNET_ASSET_SW_AUDIT_DAY C ON (
+        A.ASSET_CD = C.ASSET_CD
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        )
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN', 'LIB', 'PORTTCP4', 'PORTTCP6', 'PR', 'SV')
+        <!--<if test="ALL_FLAG != null and !ALL_FLAG.equals('') ">
+            and A.asset_cd in
+            <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>-->
+        <if test="createDate != null and !createDate.equals('') ">
+            and A.AUDIT_DAY = #{createDate}
+        </if>
+        <if test="branchId != null and !branchId.equals('') ">
+            and M.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and M.TEAM_ID = #{teamId}
+        </if>
+        order by CASE WHEN A.sw_type = 'OS' and A.sw_nm != 'Windows' THEN 1
+        WHEN A.sw_type = 'OS' and A.sw_nm = 'Windows' THEN 2
+        WHEN A.sw_type = 'DB' THEN 3
+        WHEN A.sw_type = 'WEB' THEN 4
+        WHEN A.sw_type = 'WAS' THEN 5
+        WHEN A.sw_type = 'NW' THEN 6
+        WHEN A.sw_type = 'URL' THEN 7
+        else 8
+        END
+    </select>
+
+</mapper>

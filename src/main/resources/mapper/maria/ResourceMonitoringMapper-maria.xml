@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.ResourceMonitoringMapper">
+	<insert id="insertProcess">
+		INSERT INTO SNET_REPORT_PROCESS
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, PR_NM
+			, PUSER
+			, PID
+			, MEM
+			, CPU
+			, STATUS
+			, SERVER_IP
+		)VALUES(
+			DATE_FORMAT(NOW(), '%Y%m%d')
+			, DATE_FORMAT(NOW(), '%H')
+			, DATE_FORMAT(NOW(), '%i')
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{procesNm,jdbcType=VARCHAR}
+			, #{user,jdbcType=VARCHAR}
+			, #{pid,jdbcType=VARCHAR}
+			, #{mem,jdbcType=VARCHAR}
+			, #{cpu,jdbcType=VARCHAR}
+			, #{status,jdbcType=INTEGER}
+			, #{serverIp,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="insertCpu">
+		INSERT INTO SNET_REPORT_CPU
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, CPU_RATE
+			, SERVER_IP
+		)
+		VALUES
+		(
+			DATE_FORMAT(NOW(), '%Y%m%d')
+			, DATE_FORMAT(NOW(), '%H')
+			, DATE_FORMAT(NOW(), '%i')
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{cpu,jdbcType=VARCHAR}
+			, #{serverIp,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="insertDisk">
+		INSERT INTO SNET_REPORT_DISK
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, FILE_SYSTEM
+			, DISK_SIZE
+			, USED
+			, AVAIL
+			, USE_RATE
+			, MOUNTED_ON
+			, SERVER_IP
+		)
+		VALUES
+		(
+			DATE_FORMAT(NOW(), '%Y%m%d')
+			, DATE_FORMAT(NOW(), '%H')
+			, DATE_FORMAT(NOW(), '%i')		
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{fileSystem,jdbcType=VARCHAR}
+			, #{size,jdbcType=VARCHAR}
+			, #{used,jdbcType=VARCHAR}
+			, #{avail,jdbcType=VARCHAR}
+			, #{useRate,jdbcType=VARCHAR}
+			, #{mountedOn,jdbcType=VARCHAR}
+			, #{serverIp,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="insertMemory">
+		INSERT INTO SNET_REPORT_MEMORY
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, TOTAL
+			, FREE
+			, USED
+			, USE_RATE
+			, SERVER_IP
+		)
+		VALUES
+		(
+			DATE_FORMAT(NOW(), '%Y%m%d')
+			, DATE_FORMAT(NOW(), '%H')
+			, DATE_FORMAT(NOW(), '%i')		
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{total,jdbcType=VARCHAR}
+			, #{free,jdbcType=VARCHAR}
+			, #{used,jdbcType=VARCHAR}
+			, #{useRate,jdbcType=VARCHAR}
+			, #{serverIp,jdbcType=VARCHAR}
+		)
+	</insert>
+	<select id="selectThreshold" parameterType="com.mobigen.snet.supportagent.entity.Threshold" resultType="com.mobigen.snet.supportagent.entity.Threshold">
+		SELECT *
+		FROM SNET_CONFIG_THRESHOLD
+		<where>
+			<if test="checkTarget !=null and checkTarget != ''">
+				CHECK_TARGET = #{checkTarget}
+			</if>
+			<if test="alarmLevel !=null and alarmLevel != ''">
+				AND ALARM_LEVEL = #{alarmLevel}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectAlarmUser" parameterType="com.mobigen.snet.supportagent.entity.AlarmUser" resultType="com.mobigen.snet.supportagent.entity.AlarmUser">
+		SELECT *
+		FROM SNET_CONFIG_ALARM_USER
+		<where>
+			<if test="alarmLevel !=null and alarmLevel != ''">
+				ALARM_LEVEL = #{alarmLevel}
+			</if>
+		</where>
+	</select>
+	
+	<select id="checkProcess" parameterType="String" resultType="double">
+		SELECT IFNULL(AVG(A.CPU), 0)
+		FROM SNET_REPORT_PROCESS A
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d') AND CHOUR = DATE_FORMAT(NOW(), '%H')
+		AND PR_NM = #{processNm}
+		ORDER BY CMIN DESC
+		limit 0,5
+	</select>
+
+	<select id="checkCpu" parameterType="String" resultType="double">
+		SELECT IFNULL(AVG(A.CPU_RATE), 0)
+		FROM SNET_REPORT_CPU A
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d') AND CHOUR = DATE_FORMAT(NOW(), '%H')
+			AND SERVER_NM = #{serverNm}
+		ORDER BY CMIN DESC
+		limit 0,5
+	</select>
+
+	<select id="checkDisk" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.DiskEntity">
+	<![CDATA[
+		SELECT *
+		FROM
+		(
+			SELECT FILE_SYSTEM, DISK_SIZE, USED, AVAIL, IFNULL(substring("20%", 1, CHAR_LENGTH("20%") -1),0) as useRate
+			FROM SNET_REPORT_DISK a
+			WHERE     
+				CDATE = DATE_FORMAT(NOW(), '%Y%m%d') 
+				AND CHOUR = DATE_FORMAT(NOW(), '%H')
+				AND CMIN = DATE_FORMAT(NOW(), '%i')
+				AND SERVER_NM =#{serverNm}
+		)C
+		WHERE C.useRate > 90	
+	]]>
+	</select>
+
+	<select id="checkMemory" parameterType="String" resultType="double">
+		SELECT IFNULL(AVG(A.USE_RATE), 0)
+		FROM SNET_REPORT_MEMORY A
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d') 
+			AND CHOUR = DATE_FORMAT(NOW(), '%H')
+			AND SERVER_NM =#{serverNm}
+		ORDER BY CMIN DESC
+		limit 0,5	
+	</select>
+
+	<delete id="deleteReportTerm" parameterType="String">
+		<![CDATA[
+			DELETE FROM ${tableName}
+			WHERE CDATE < DATE_FORMAT(date_add(now(), interval -14 day), '%Y%m%d')
+		]]>
+	</delete>
+
+	<select id="getAuditExcelJob" resultType="com.mobigen.snet.supportagent.entity.ExcelJobEntity">
+		SELECT REQ_CD, REQ_USER, JOB_FLAG, JOB_FILE_NM
+		FROM SNET_ASSET_SW_AUDIT_EXCEL_JOB
+		where 1=1
+		and req_date <![CDATA[ < ]]> date_add(now(), interval -#{jobDeleteDay} day)
+		order by req_date asc
+	</select>
+
+	<delete id="deleteAgentResource" parameterType="String">
+	  DELETE FROM SNET_ASSET_RESOURCE_MONITORING
+	  WHERE CDATE <![CDATA[ < ]]> DATE_FORMAT(date_add(now(), interval -#{resourceDeleteDay} day), '%Y%m%d%H%i')
+	</delete>
+</mapper>

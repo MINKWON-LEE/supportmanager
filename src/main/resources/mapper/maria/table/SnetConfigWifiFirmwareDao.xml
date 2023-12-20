@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetConfigWifiFirmwareDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigWifiFirmwareEntity">
+ INSERT INTO SNET_CONFIG_WIFI_FIRMWARE
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='companyId != null '>
+      , company_id
+   </if>
+   <if test='firmwareVer != null '>
+      , firmware_ver
+   </if>
+   <if test='companyNm != null '>
+      , company_nm
+   </if>
+   <if test='useYn != null '>
+      , use_yn
+   </if>
+   <if test='createDate != null '>
+      , create_date
+   </if>
+   <if test='updateDate != null '>
+      , update_date
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='companyId != null '>
+   	  ,    #{companyId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='firmwareVer != null '>
+   	  ,    #{firmwareVer, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='companyNm != null '>
+   	  ,    #{companyNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='useYn != null '>
+   	  ,    #{useYn, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='createDate != null '>
+   	  ,    #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='updateDate != null '>
+   	  ,    #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigWifiFirmwareEntity">
+   UPDATE 
+         SNET_CONFIG_WIFI_FIRMWARE
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='companyNm != null '>
+      , company_nm =   #{companyNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='useYn != null '>
+      , use_yn =   #{useYn, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='createDate != null '>
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+    <if test='updateDate != null '>
+      , update_date =   #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+ </trim>
+ WHERE 
+       company_id =   #{companyId, javaType=String, jdbcType=VARCHAR} 
+   AND firmware_ver =   #{firmwareVer, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigWifiFirmwareEntity">
+   UPDATE 
+         SNET_CONFIG_WIFI_FIRMWARE
+      SET 
+ <trim  prefixOverrides="," >
+      , company_nm =   #{companyNm, javaType=String, jdbcType=VARCHAR} 
+      , use_yn =   #{useYn, javaType=String, jdbcType=VARCHAR} 
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+      , update_date =   #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+ </trim>
+ WHERE 
+       company_id =   #{companyId, javaType=String, jdbcType=VARCHAR} 
+   AND firmware_ver =   #{firmwareVer, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_CONFIG_WIFI_FIRMWARE
+ WHERE 
+       company_id =   #{companyId, javaType=String, jdbcType=VARCHAR} 
+   AND firmware_ver =   #{firmwareVer, javaType=String, jdbcType=VARCHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigWifiFirmwareEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , company_id AS companyId
+      , firmware_ver AS firmwareVer
+      , company_nm AS companyNm
+      , use_yn AS useYn
+      , create_date AS createDate
+      , update_date AS updateDate
+  </trim>
+ FROM 
+      SNET_CONFIG_WIFI_FIRMWARE
+WHERE
+      company_id =   #{companyId, javaType=String, jdbcType=VARCHAR} 
+  AND firmware_ver =   #{firmwareVer, javaType=String, jdbcType=VARCHAR} 
+</select>
+
+</mapper>

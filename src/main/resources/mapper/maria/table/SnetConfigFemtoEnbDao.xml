@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetConfigFemtoEnbDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigFemtoEnbEntity">
+ INSERT INTO SNET_CONFIG_FEMTO_ENB
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='eci != null '>
+      , eci
+   </if>
+   <if test='femtoNm != null '>
+      , femto_nm
+   </if>
+   <if test='branchId != null '>
+      , branch_id
+   </if>
+   <if test='branchNm != null '>
+      , branch_nm
+   </if>
+   <if test='teamId != null '>
+      , team_id
+   </if>
+   <if test='teamNm != null '>
+      , team_nm
+   </if>
+   <if test='useYn != null '>
+      , use_yn
+   </if>
+   <if test='createDate != null '>
+      , create_date
+   </if>
+   <if test='updateDate != null '>
+      , update_date
+   </if>
+   <if test='enbType != null '>
+      , enb_type
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='eci != null '>
+   	  ,    #{eci, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='femtoNm != null '>
+   	  ,    #{femtoNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='branchId != null '>
+   	  ,    #{branchId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='branchNm != null '>
+   	  ,    #{branchNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamId != null '>
+   	  ,    #{teamId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamNm != null '>
+   	  ,    #{teamNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='useYn != null '>
+   	  ,    #{useYn, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='createDate != null '>
+   	  ,    #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='updateDate != null '>
+   	  ,    #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='enbType != null '>
+   	  ,    #{enbType, javaType=String, jdbcType=VARCHAR} 
+   </if>
+  </trim>
+</insert>
+
+
+
+
+
+
+
+
+
+</mapper>

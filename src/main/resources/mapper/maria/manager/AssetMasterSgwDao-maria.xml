@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--suppress ALL -->
+<mapper namespace="com.mobigen.snet.supportagent.dao.manager.AssetMasterSgwDao">
+
+	<select id="selectAssetMasterSgwRegiIn" resultType="String">
+		SELECT DISTINCT (R.ASSET_CD) AS ASSET_CD
+			FROM (
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS
+				LEFT OUTER JOIN SNET_ASSET_MASTER SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+				UNION
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS
+				LEFT OUTER JOIN (
+					SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					, SAI.IP_ADDRESS
+					FROM SNET_ASSET_MASTER SAM
+					LEFT OUTER JOIN SNET_ASSET_IP SAI
+					ON(SAM.ASSET_CD = SAI.ASSET_CD)
+				) SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+			) R
+	</select>
+
+	<select id="selectDiagnosisJob" resultType="String">
+		SELECT
+     	CONCAT('DGEXECREQ',
+            '|',
+            B.ASSET_CD,
+            '|',
+            K.SW_TYPE,
+            '|',
+            K.SW_NM,
+            '|',
+            K.SW_INFO,
+            '|',
+            K.SW_DIR,
+            '|',
+            K.SW_USER,
+            '|',
+            K.SW_ETC,
+            '|',
+            (SELECT
+                    MANAGER_CD
+                FROM
+                    SNET_ASSET_USER BB,
+                    SNET_CONFIG_USER_VIEW CC
+                WHERE
+                    BB.ASSET_CD = B.ASSET_CD
+                        AND BB.USER_TYPE = 'OP'
+                        AND BB.USER_ID = CC.USER_ID),
+            '|',
+            C.AGENT_USE_STIME,
+            '|',
+            C.AGENT_USE_ETIME)
+		FROM
+			SNET_AGENT_JOB_HISTORY B
+				LEFT OUTER JOIN
+			SNET_AGENT_MASTER C ON (C.AGENT_CD = B.AGENT_CD),
+			SNET_AGENT_JOB_RDATE K,
+			SNET_ASSET_SW_AUDIT_DAY P
+		WHERE
+			B.AGENT_JOB_FLAG = 1
+				AND B.AGENT_JOB_RDATE = K.AGENT_JOB_RDATE
+				AND B.AGENT_CD = K.AGENT_CD
+				AND B.SW_TYPE = K.SW_TYPE
+				AND B.SW_NM = K.SW_NM
+				AND B.SW_INFO = K.SW_INFO
+				AND B.SW_DIR = K.SW_DIR
+				AND B.SW_USER = K.SW_USER
+				AND B.SW_ETC = K.SW_ETC
+				AND B.ASSET_CD = P.ASSET_CD
+				AND B.SW_TYPE = P.SW_TYPE
+				AND B.SW_NM = P.SW_NM
+				AND B.SW_INFO = P.SW_INFO
+				AND B.SW_DIR = P.SW_DIR
+				AND B.SW_USER = P.SW_USER
+				AND B.SW_ETC = P.SW_ETC
+				AND K.AGENT_CD IN (SELECT
+					AGENT_CD
+				FROM
+					SNET_AGENT_MASTER
+				WHERE
+					DATE_FORMAT(NOW(), '%Y%m%d%H%i') BETWEEN CONCAT(DATE_FORMAT(NOW(), '%Y%m%d'),
+							AGENT_USE_STIME) AND CONCAT(DATE_FORMAT(NOW(), '%Y%m%d'),
+							AGENT_USE_ETIME))
+	</select>
+
+	<update id="updateAssetMasterSgwRegiIn">
+		UPDATE SNET_ASSET_MASTER SET
+		SGW_REGI = 1
+		WHERE ASSET_CD IN (
+			SELECT DISTINCT (R.ASSET_CD) AS ASSET_CD
+			FROM (
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM 
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS
+				LEFT OUTER JOIN SNET_ASSET_MASTER SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+				UNION
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM 
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS	
+				LEFT OUTER JOIN (
+					SELECT 
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					, SAI.IP_ADDRESS
+					FROM SNET_ASSET_MASTER SAM
+					LEFT OUTER JOIN SNET_ASSET_IP SAI
+					ON(SAM.ASSET_CD = SAI.ASSET_CD)
+				) SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+			) R
+		)
+		AND SGW_REGI = 0
+	</update>
+
+	<update id="updateAssetMasterSgwRegiNotIn">
+		UPDATE SNET_ASSET_MASTER SET
+		SGW_REGI = 0
+		WHERE ASSET_CD NOT IN (
+			SELECT DISTINCT (R.ASSET_CD) AS ASSET_CD
+			FROM (
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM 
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS
+				LEFT OUTER JOIN SNET_ASSET_MASTER SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+				UNION
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM 
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS	
+				LEFT OUTER JOIN (
+					SELECT 
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					, SAI.IP_ADDRESS
+					FROM SNET_ASSET_MASTER SAM
+					LEFT OUTER JOIN SNET_ASSET_IP SAI
+					ON(SAM.ASSET_CD = SAI.ASSET_CD)
+				) SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+			) R
+		)
+		AND SGW_REGI = 1
+	</update>
+
+	<select id="selectAssetMasterAll" resultType="com.igloosec.smartguard.next.agentmanager.entity.AssetMasterStatusDBEntity">
+		SELECT
+			DISTINCT (R.ASSET_CD) AS assetCd
+						, R.HOST_NM AS HOSTNAME
+						, R.IP_ADDRESS AS masterIp
+						, R.ALIVE_CHK AS aliveChk
+						, R.SSH
+						, R.TELNET
+						, R.FTP
+						, R.SFTP
+						, R.WINDOW
+		  FROM (SELECT SAM.ASSET_CD,
+		               SAM.HOST_NM,
+		               SAM.IP_ADDRESS,
+					   SAM.ALIVE_CHK,
+		               ACS.SSH,
+		               ACS.TELNET,
+		               ACS.FTP,
+		               ACS.SFTP,
+		               ACS.WINDOW
+		          FROM AUDIT_CONFIG_SG ACS
+		               LEFT OUTER JOIN SNET_ASSET_MASTER SAM
+		                  ON (    LOWER (SAM.HOST_NM) = LOWER (ACS.HOSTNAME)
+		                      AND SAM.IP_ADDRESS = ACS.IPADDR)
+		         WHERE SAM.ASSET_CD IS NOT NULL
+		        UNION
+		        SELECT SAM.ASSET_CD,
+		               SAM.HOST_NM,
+		               SAM.IP_ADDRESS,
+					   SAM.ALIVE_CHK,
+		               ACS.SSH,
+		               ACS.TELNET,
+		               ACS.FTP,
+		               ACS.SFTP,
+		               ACS.WINDOW
+		          FROM AUDIT_CONFIG_SG ACS
+		               LEFT OUTER JOIN
+		               (SELECT SAM.ASSET_CD, SAM.HOST_NM, SAI.IP_ADDRESS, SAM.ALIVE_CHK
+		                  FROM SNET_ASSET_MASTER SAM
+		                       LEFT OUTER JOIN SNET_ASSET_IP SAI
+		                          ON (SAM.ASSET_CD = SAI.ASSET_CD)) SAM
+		                  ON (    LOWER (SAM.HOST_NM) = LOWER (ACS.HOSTNAME)
+		                      AND SAM.IP_ADDRESS = ACS.IPADDR)
+		         WHERE SAM.ASSET_CD IS NOT NULL) R
+	</select>
+
+	<update id="updateAssetMasterAliveChk"
+			parameterType="com.igloosec.smartguard.next.agentmanager.entity.AssetMasterDBEntity">
+		UPDATE
+			SNET_ASSET_MASTER
+		SET
+			ALIVE_CHK = #{aliveChk}
+		WHERE
+			ASSET_CD = #{assetCd}
+	</update>
+
+	<update id="updateAssetMasterAliveChkNotIn">
+		UPDATE SNET_ASSET_MASTER SET
+		ALIVE_CHK = 0
+		WHERE ASSET_CD NOT IN (
+			SELECT DISTINCT (R.ASSET_CD) AS ASSET_CD
+			FROM (
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS
+				LEFT OUTER JOIN SNET_ASSET_MASTER SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+				UNION
+				SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					,SAM.IP_ADDRESS
+				FROM AUDIT_CONFIG_SG ACS
+				LEFT OUTER JOIN (
+					SELECT
+					SAM.ASSET_CD
+					, SAM.HOST_NM
+					, SAI.IP_ADDRESS
+					FROM SNET_ASSET_MASTER SAM
+					LEFT OUTER JOIN SNET_ASSET_IP SAI
+					ON(SAM.ASSET_CD = SAI.ASSET_CD)
+				) SAM
+				ON (LOWER(SAM.HOST_NM) = LOWER(ACS.HOSTNAME) AND SAM.IP_ADDRESS = ACS.IPADDR)
+				WHERE SAM.ASSET_CD IS NOT NULL
+			) R
+		)
+		AND ALIVE_CHK =1
+	</update>
+
+</mapper>

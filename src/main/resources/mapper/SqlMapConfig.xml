@@ -1,0 +1,80 @@
+<!DOCTYPE configuration
+		PUBLIC "-//com.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+		<setting name="autoMappingBehavior" value="PARTIAL" />
+		<setting name="defaultStatementTimeout" value="25000" />
+		<setting name="safeRowBoundsEnabled" value="false" />
+		<!-- 이놈이 문제임 start -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<!-- 이놈이 문제임 end -->
+		<setting name="localCacheScope" value="SESSION" />
+		<setting name="jdbcTypeForNull" value="OTHER" />
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />
+	</settings>
+
+	<typeAliases>
+		<!-- 관리자 > 이력 관리 > 장비삭제 이력 -->
+		<typeAlias type="com.mobigen.snet.supportagent.models.was.SnetEquipDelHistoryMainModel" alias="SnetEquipDelHistoryMainModel"/>
+		<!-- 자동발송메일 설정 -->
+		<typeAlias type="com.mobigen.snet.supportagent.models.was.SnetConfigMailSettingModel" alias="SnetConfigMailSettingModel"/>
+
+	</typeAliases>
+
+	<mappers>
+
+		<!-- maria -->
+		<mapper resource="mapper/maria/dataDBMapper-maria.xml" />
+		<mapper resource="mapper/maria/MakeReportMapper-maria.xml" />
+		<mapper resource="mapper/maria/ExcelImportMapper-maria.xml" />
+		<mapper resource="mapper/maria/ExcelExportMapper-maria.xml" />
+		<mapper resource="mapper/maria/ResourceMonitoringMapper-maria.xml" />
+		<mapper resource="mapper/maria/PatchDBMapper-maria.xml" />
+		<mapper resource="mapper/maria/Dao2.xml" />
+
+		<!-- tables -->
+		<mapper resource="mapper/maria/table/SnetAssetIpDao.xml" />
+		<mapper resource="mapper/maria/table/SnetAssetMasterDao.xml" />
+		<mapper resource="mapper/maria/table/SnetAssetSwAuditDayDao.xml" />
+		<mapper resource="mapper/maria/table/SnetAssetSwAuditHistoryDao.xml" />
+		<mapper resource="mapper/maria/table/SnetAssetUserDao.xml" />
+		<mapper resource="mapper/maria/table/SnetConnectMasterDao.xml" />
+		<mapper resource="mapper/maria/table/SnetConfigWifiFirmwareDao.xml" />
+		<mapper resource="mapper/maria/table/SnetConfigFemtoAssetDao.xml" />
+		<mapper resource="mapper/maria/table/SnetConfigFemtoEnbDao.xml" />
+		<mapper resource="mapper/maria/table/SnetConfigFemtoFirmwareDao.xml" />
+
+		<!-- 'sg_supprotmanager 프로젝트 - 상세보고서' -->
+		<!-- 'sg_supprotmanager 프로젝트 - 종합보고서' -->
+		<mapper resource="mapper/maria/TestMapper-maria.xml" />
+
+		<!-- Was -->
+		<mapper resource="mapper/maria/was/common-mdMapper.xml" />
+		<mapper resource="mapper/maria/was/snetConfigMailSetting-mdMapper.xml" />
+		<mapper resource="mapper/maria/was/snetEquipDelHistoryMain-mdMapper.xml" />
+		<mapper resource="mapper/maria/was/snetInactionsMailSendHIstoryMain-mdMapper.xml" />
+		<mapper resource="mapper/maria/was/snetNewDiagnosis-mapper.xml" />
+		<mapper resource="mapper/maria/was/snetServiceMail-mdMapper.xml" />
+
+		<!-- Manager -->
+		<mapper resource="mapper/maria/manager/AssetMasterSgwDao-maria.xml" />
+
+		<!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+		<mapper resource="mapper/maria/AssetUserMapper-maria.xml" />
+		<mapper resource="mapper/maria/AssetMasterMapper-maria.xml" />
+		<mapper resource="mapper/maria/AssetAuditCokMapper-maria.xml" />
+		<mapper resource="mapper/maria/AssetAuditExceptMapper-maria.xml" />
+		<mapper resource="mapper/maria/AssetAuditResultMapper-maria.xml" />
+		<mapper resource="mapper/maria/AuditStatisticsMapper-maria.xml" />
+		<mapper resource="mapper/maria/ResourceMonitoringMapper-maria.xml" />
+
+	</mappers>
+</configuration>

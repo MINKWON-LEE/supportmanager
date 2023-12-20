@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetAssetMasterDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetMasterEntity">
+ INSERT INTO SNET_ASSET_MASTER
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='assetCd != null '>
+      , asset_cd
+   </if>
+   <if test='agentCd != null '>
+      , agent_cd
+   </if>
+   <if test='branchId != null '>
+      , branch_id
+   </if>
+   <if test='branchNm != null '>
+      , branch_nm
+   </if>
+   <if test='teamId != null '>
+      , team_id
+   </if>
+   <if test='teamNm != null '>
+      , team_nm
+   </if>
+   <if test='ipAddress != null '>
+      , ip_address
+   </if>
+   <if test='hostNm != null '>
+      , host_nm
+   </if>
+   <if test='auditDay != null '>
+      , audit_day
+   </if>
+   <if test='auditRate != null '>
+      , audit_rate
+   </if>
+   <if test='sgwRegi != null '>
+      , sgw_regi
+   </if>
+   <if test='aliveChk != null '>
+      , alive_chk
+   </if>
+   <if test='svrRoomId != null '>
+      , svr_room_id
+   </if>
+   <if test='personalData != null '>
+      , personal_data
+   </if>
+   <if test='govFlag != null '>
+      , gov_flag
+   </if>
+   <if test='createDate != null '>
+      , create_date
+   </if>
+   <if test='updateDate != null '>
+      , update_date
+   </if>
+   <if test='getDay != null '>
+      , get_day
+   </if>
+   <if test='infraYn != null '>
+      , infra_yn
+   </if>
+   <if test='ddd != null '>
+      , ddd
+   </if>
+   <if test='autoAuditNDesc != null '>
+      , auto_audit_n_desc
+   </if>
+   <if test='autoAuditYn != null '>
+      , auto_audit_yn
+   </if>
+   <if test='auditSpeed != null '>
+      , audit_speed
+   </if>
+   <if test='serviceId != null '>
+      , service_id
+   </if>
+   <if test='ismsYn != null '>
+      , isms_yn
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='assetCd != null '>
+   	  ,    #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='agentCd != null '>
+   	  ,    #{agentCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='branchId != null '>
+   	  ,    #{branchId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='branchNm != null '>
+   	  ,    #{branchNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamId != null '>
+   	  ,    #{teamId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamNm != null '>
+   	  ,    #{teamNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='ipAddress != null '>
+   	  ,    #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='hostNm != null '>
+   	  ,    #{hostNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditDay != null '>
+   	  ,    #{auditDay, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditRate != null '>
+   	  ,    #{auditRate, javaType=String, jdbcType=DECIMAL} 
+   </if>
+   <if test='sgwRegi != null '>
+   	  ,    #{sgwRegi, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='aliveChk != null '>
+   	  ,    #{aliveChk, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='svrRoomId != null '>
+   	  ,    #{svrRoomId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='personalData != null '>
+   	  ,    #{personalData, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='govFlag != null '>
+   	  ,    #{govFlag, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='createDate != null '>
+   	  ,    #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='updateDate != null '>
+   	  ,    #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='getDay != null '>
+   	  ,    #{getDay, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='infraYn != null '>
+   	  ,    #{infraYn, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='ddd != null '>
+   	  ,    #{ddd, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+   <if test='autoAuditNDesc != null '>
+   	  ,    #{autoAuditNDesc, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='autoAuditYn != null '>
+   	  ,    #{autoAuditYn, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditSpeed != null '>
+   	  ,    #{auditSpeed, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='serviceId != null '>
+   	  ,    #{serviceId, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='ismsYn != null '>
+   	  ,    #{ismsYn, javaType=String, jdbcType=VARCHAR} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetMasterEntity">
+   UPDATE 
+         SNET_ASSET_MASTER
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='agentCd != null '>
+      , agent_cd =   #{agentCd, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='branchId != null '>
+      , branch_id =   #{branchId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='branchNm != null '>
+      , branch_nm =   #{branchNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='teamId != null '>
+      , team_id =   #{teamId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='teamNm != null '>
+      , team_nm =   #{teamNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='ipAddress != null '>
+      , ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='hostNm != null '>
+      , host_nm =   #{hostNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='auditDay != null '>
+      , audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='auditRate != null '>
+      , audit_rate =   #{auditRate, javaType=String, jdbcType=DECIMAL} 
+    </if>  
+    <if test='sgwRegi != null '>
+      , sgw_regi =   #{sgwRegi, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='aliveChk != null '>
+      , alive_chk =   #{aliveChk, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='svrRoomId != null '>
+      , svr_room_id =   #{svrRoomId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='personalData != null '>
+      , personal_data =   #{personalData, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='govFlag != null '>
+      , gov_flag =   #{govFlag, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='createDate != null '>
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+    <if test='updateDate != null '>
+      , update_date =   #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+    <if test='getDay != null '>
+      , get_day =   #{getDay, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='infraYn != null '>
+      , infra_yn =   #{infraYn, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='ddd != null '>
+      , ddd =   #{ddd, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+    <if test='autoAuditNDesc != null '>
+      , auto_audit_n_desc =   #{autoAuditNDesc, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='autoAuditYn != null '>
+      , auto_audit_yn =   #{autoAuditYn, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='auditSpeed != null '>
+      , audit_speed =   #{auditSpeed, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='serviceId != null '>
+      , service_id =   #{serviceId, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='ismsYn != null '>
+      , isms_yn =   #{ismsYn, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetMasterEntity">
+   UPDATE 
+         SNET_ASSET_MASTER
+      SET 
+ <trim  prefixOverrides="," >
+      , agent_cd =   #{agentCd, javaType=String, jdbcType=VARCHAR} 
+      , branch_id =   #{branchId, javaType=String, jdbcType=VARCHAR} 
+      , branch_nm =   #{branchNm, javaType=String, jdbcType=VARCHAR} 
+      , team_id =   #{teamId, javaType=String, jdbcType=VARCHAR} 
+      , team_nm =   #{teamNm, javaType=String, jdbcType=VARCHAR} 
+      , ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+      , host_nm =   #{hostNm, javaType=String, jdbcType=VARCHAR} 
+      , audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+      , audit_rate =   #{auditRate, javaType=String, jdbcType=DECIMAL} 
+      , sgw_regi =   #{sgwRegi, javaType=String, jdbcType=INTEGER} 
+      , alive_chk =   #{aliveChk, javaType=String, jdbcType=INTEGER} 
+      , svr_room_id =   #{svrRoomId, javaType=String, jdbcType=VARCHAR} 
+      , personal_data =   #{personalData, javaType=String, jdbcType=INTEGER} 
+      , gov_flag =   #{govFlag, javaType=String, jdbcType=INTEGER} 
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+      , update_date =   #{updateDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+      , get_day =   #{getDay, javaType=String, jdbcType=VARCHAR} 
+      , infra_yn =   #{infraYn, javaType=String, jdbcType=VARCHAR} 
+      , ddd =   #{ddd, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+      , auto_audit_n_desc =   #{autoAuditNDesc, javaType=String, jdbcType=VARCHAR} 
+      , auto_audit_yn =   #{autoAuditYn, javaType=String, jdbcType=VARCHAR} 
+      , audit_speed =   #{auditSpeed, javaType=String, jdbcType=INTEGER} 
+      , service_id =   #{serviceId, javaType=String, jdbcType=INTEGER} 
+      , isms_yn =   #{ismsYn, javaType=String, jdbcType=VARCHAR} 
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_ASSET_MASTER
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetMasterEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , asset_cd AS assetCd
+      , agent_cd AS agentCd
+      , branch_id AS branchId
+      , branch_nm AS branchNm
+      , team_id AS teamId
+      , team_nm AS teamNm
+      , ip_address AS ipAddress
+      , host_nm AS hostNm
+      , audit_day AS auditDay
+      , audit_rate AS auditRate
+      , sgw_regi AS sgwRegi
+      , alive_chk AS aliveChk
+      , svr_room_id AS svrRoomId
+      , personal_data AS personalData
+      , gov_flag AS govFlag
+      , create_date AS createDate
+      , update_date AS updateDate
+      , get_day AS getDay
+      , infra_yn AS infraYn
+      , ddd AS ddd
+      , auto_audit_n_desc AS autoAuditNDesc
+      , auto_audit_yn AS autoAuditYn
+      , audit_speed AS auditSpeed
+      , service_id AS serviceId
+      , isms_yn AS ismsYn
+  </trim>
+ FROM 
+      SNET_ASSET_MASTER
+WHERE
+      asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+</select>
+
+</mapper>

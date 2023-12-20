@@ -1,0 +1,1842 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.TestMapper">
+
+    <select id="getGroupbyReportGrpNmListGet" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT E.SW_TYPE, E.SW_NM, E.ASSET_CD, E.AUDIT_DAY,
+        IFNULL(I.ITEM_GRP_NM, E.ITEM_GRP_NM) AS ITEM_GRP_NM,
+        E.ITEM_RESULT, DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i') AS CREATE_DATE, count(*) as WEAK_COUNT
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (E.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            AND E.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and E.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            AND E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="F_FLAG != null and !F_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'F'
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and E.AUDIT_DAY = #{createDate}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        group by E.ITEM_GRP_NM, E.ITEM_RESULT
+    </select>
+
+    <select id="getGroupbyReportItemNmListGet" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT E.ITEM_NM, E.ITEM_NM as ITEM_NM_DESC, E.item_result, E.diagnosis_cd, count(*) as WEAK_COUNT
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            AND E.SW_NM = #{SW_NM}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            AND E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="F_FLAG != null and !F_FLAG.equals('') ">
+            and E.item_result = 'F'
+        </if>
+        group by E.DIAGNOSIS_CD, E.ITEM_RESULT
+    </select>
+
+    <select id="getGroupbyReportGrpNmList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT IFNULL(I.ITEM_GRP_NM, E.ITEM_GRP_NM) AS ITEM_GRP_NM, E.item_result, count(*) as WEAK_COUNT
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (E.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            AND E.SW_NM = #{SW_NM}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            AND E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        group by I.ITEM_GRP_NM, E.ITEM_RESULT
+        having E.item_result = 'F'
+        order by weak_count DESC
+        LIMIT 10
+    </select>
+
+    <select id="selectAssetSwExcelListGroupbyWeak" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        select H.REQ_CD,
+        	  H.ASSET_CD,
+        	  H.SW_TYPE,
+        	  H.SW_NM,
+        	  H.SW_INFO,
+        	  H.SW_DIR,
+        	  H.SW_USER,
+        	  H.SW_ETC,
+        	  G.AUDIT_DAY, B.AUDIT_RATE/100 as audit_rate, B.audit_rate_firewall, G.asset_cd, G.host_nm, G.ip_address, G.count as weak_count, 'F' as item_result
+        from SNET_ASSET_SW_AUDIT_EXCEL_LIST H
+        left join (
+        select E.asset_cd, E.AUDIT_DAY, E.host_nm, E.ip_address, E.item_result, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and E.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            and DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i') = #{CREATE_DATE}
+        </if>
+        and E.item_result = 'F'
+        ) G
+        on H.asset_cd = G.asset_cd
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (H.ASSET_CD = H.ASSET_CD
+        AND H.SW_TYPE = B.SW_TYPE
+        AND H.SW_NM = B.SW_NM
+        AND H.SW_INFO = B.SW_INFO
+        AND H.SW_DIR = B.SW_DIR
+        AND H.SW_USER = B.SW_USER
+        AND H.SW_ETC = B.SW_ETC
+        AND H.ASSET_CD = B.ASSET_CD
+        AND H.AUDIT_DAY = B.AUDIT_DAY
+        )
+        WHERE H.REQ_CD = #{REQ_CD}
+        and H.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and H.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and H.SW_DIR = #{SW_DIR}
+        </if>
+        and G.asset_cd is not null
+        and H.audit_day between #{startAuditDay} and #{endAuditDay}
+        group by H.asset_cd
+        order by audit_rate desc, weak_count desc, audit_rate_firewall desc
+        LIMIT 10
+    </select>
+
+    <select id="selectAssetSwExcelListGroupbyNotWeak" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        select H.*, B.AUDIT_RATE/100 as audit_rate, B.audit_rate_firewall, G.asset_cd, G.host_nm, G.ip_address, G.count as weak_count, 'T' as item_result
+        from SNET_ASSET_SW_AUDIT_EXCEL_LIST H
+        left join (
+        select E.asset_cd, E.host_nm, E.ip_address, E.item_result, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and E.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            and DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i') = #{CREATE_DATE}
+        </if>
+        group by E.asset_cd
+        ) G
+        on H.asset_cd = G.asset_cd
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (H.ASSET_CD = H.ASSET_CD
+        AND H.SW_TYPE = B.SW_TYPE
+        AND H.SW_NM = B.SW_NM
+        AND H.SW_INFO = B.SW_INFO
+        AND H.SW_DIR = B.SW_DIR
+        AND H.SW_USER = B.SW_USER
+        AND H.SW_ETC = B.SW_ETC
+        AND H.ASSET_CD = B.ASSET_CD
+        AND H.AUDIT_DAY = B.AUDIT_DAY
+        )
+        WHERE H.REQ_CD = #{REQ_CD}
+        and H.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and H.SW_NM = #{SW_NM}
+        </if>
+        and G.asset_cd is not null
+        and H.audit_day between #{startAuditDay} and #{endAuditDay}
+        group by H.asset_cd
+        order by audit_rate desc, weak_count desc, audit_rate_firewall desc
+        LIMIT 10
+    </select>
+
+    <select id="getWeakLevels" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT E.ASSET_CD, E.ITEM_RESULT, E.ITEM_GRADE,
+        CASE WHEN E.ITEM_GRADE = 'H' THEN '상'
+        WHEN E.ITEM_GRADE = 'M' THEN '중'
+        WHEN E.ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="T_FLAG != null and !T_FLAG.equals('') ">
+        	and E.ITEM_RESULT = 'T'
+        </if>
+        <if test="NA_FLAG != null and !NA_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'NA'
+        </if>
+        <if test="F_FLAG != null and !F_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'F'
+        </if>
+        <if test="C_FLAG != null and !C_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'C'
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            and DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i') = #{CREATE_DATE}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        group by E.item_grade
+        order by (
+        case item_grade
+        when 'H' then 1
+        when 'M' then 2
+        when 'L' then 3
+        else 4
+        end)
+    </select>
+
+    <select id="getReportTot" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT ITEM_RESULT , SUM( CNT ) AS RESULT_CNT , SUM( ITEM_GRADE * CNT ) AS WEIGHT_TOT
+        FROM (
+        SELECT E.ASSET_CD, E.ITEM_RESULT,
+        CASE WHEN E.ITEM_GRADE = 'H' THEN 3
+        WHEN E.ITEM_GRADE = 'M' THEN 2
+        WHEN E.ITEM_GRADE = 'L' THEN 1
+        ELSE 2
+        END AS ITEM_GRADE
+        , COUNT(1) AS CNT
+        FROM SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_INFO != null and !SW_INFO.equals('') ">
+            and E.SW_INFO = #{SW_INFO}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and E.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="SW_USER != null and !SW_USER.equals('') ">
+            and E.SW_USER = #{SW_USER}
+        </if>
+        <if test="SW_ETC != null and !SW_ETC.equals('') ">
+            and E.SW_ETC = #{SW_ETC}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            and DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i') = #{CREATE_DATE}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        <if test="FILE_TYPE != null and !FILE_TYPE.equals('') ">
+            and E.DIAGNOSIS_TYPE = #{FILE_TYPE}
+        </if>
+        GROUP BY E.ITEM_RESULT, E.ITEM_GRADE
+        ) A
+        GROUP BY ITEM_RESULT
+    </select>
+
+    <select id="getItemTotal" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        SELECT 	count(*)
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE 1=1
+        AND A.ASSET_CD = #{ASSET_CD}
+        and A.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        and A.AUDIT_DAY = #{AUDIT_DAY}
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            and DATE_FORMAT(A.CREATE_DATE,'%Y%m%d%H%i') = #{CREATE_DATE}
+        </if>
+        and A.audit_day between #{startAuditDay} and #{endAuditDay}
+    </select>
+
+    <select id="getCountExcelListByReqcdSwType" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+        WHERE A.REQ_CD = #{REQ_CD}
+        AND A.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+    </select>
+
+    <select id="getCheckTargets" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.ASSET_CD = B.ASSET_CD
+        AND A.AUDIT_DAY = B.AUDIT_DAY)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_DAY C ON (B.ASSET_CD = C.ASSET_CD
+        AND B.SW_TYPE = C.SW_TYPE
+        AND B.SW_NM = C.SW_NM
+        AND B.SW_INFO = C.SW_INFO
+        AND B.SW_DIR = C.SW_DIR
+        AND B.SW_USER = C.SW_USER
+        AND B.SW_ETC = C.SW_ETC)
+        LEFT OUTER JOIN SNET_CONFIG_USER_VIEW D ON (C.SW_OPERATOR = D.USER_ID)
+        WHERE A.REQ_CD = #{REQ_CD}
+        AND A.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        and A.asset_cd in (
+        SELECT A.asset_cd
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        WHERE 1=1
+        and A.AUDIT_DAY = #{AUDIT_DAY}
+        and SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        and REQ_CD = #{REQ_CD}
+        )
+        ORDER BY A.SW_TYPE, A.SW_NM
+    </select>
+
+    <select id="getCheckClassifyItems" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(*)
+        from (
+        select (select sw_type
+        from SNET_CONFIG_AUDIT_FILE
+        where FILE_TYPE = #{FILE_TYPE}
+        and SW_TYPE = #{SW_TYPE}
+        LIMIT 1) as sw_type, A.*
+        from SNET_CONFIG_AUDIT_ITEM A
+        where audit_file_cd in (
+        select audit_file_cd
+        from SNET_CONFIG_AUDIT_FILE
+        where FILE_TYPE = #{FILE_TYPE}
+        and SW_TYPE = #{SW_TYPE}
+        )
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and SW_NM = #{SW_NM}
+        </if>
+        group by item_nm
+        ) B
+    </select>
+
+    <select id="getCheckAnalysisStandard" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(*)
+        from (
+        select (select sw_type
+        from SNET_CONFIG_AUDIT_FILE
+        where FILE_TYPE = #{FILE_TYPE}
+        and SW_TYPE = #{SW_TYPE}
+        LIMIT 1) as sw_type, A.*
+        from SNET_CONFIG_AUDIT_ITEM A
+        where audit_file_cd in (
+        select audit_file_cd
+        from SNET_CONFIG_AUDIT_FILE
+        where FILE_TYPE = #{FILE_TYPE}
+        and SW_TYPE = #{SW_TYPE}
+        )
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        group by replace(substr(ITEM_GRP_NM, 3),' ','')
+        ) B
+    </select>
+
+    <select id="getCheckAnalysisStandardDesc" parameterType="java.util.HashMap" resultType="java.lang.String">
+		select type_name
+		from SNET_CONFIG_DIAG_TYPE
+		where FILE_TYPE = #{FILE_TYPE}
+	</select>
+
+    <select id="selectAssetSwProblemCountListNew" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		select sum(count)
+		from (
+		SELECT B.ip_address, (SELECT count(*)
+		FROM SNET_ASSET_SW_AUDIT_REPORT A
+			LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+				ON A.ASSET_CD = B.ASSET_CD
+				AND A.SW_INFO = B.SW_INFO
+				AND A.SW_NM = B.SW_NM
+				AND A.SW_TYPE = B.SW_TYPE
+				AND A.SW_DIR = B.SW_DIR
+				AND A.SW_USER = B.SW_USER
+				AND A.SW_ETC = B.SW_ETC
+				AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+			LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+				ON (A.ASSET_CD = C.ASSET_CD
+				AND A.SW_INFO = C.SW_INFO
+				AND A.SW_NM = C.SW_NM
+				AND A.SW_TYPE = C.SW_TYPE
+				AND A.SW_DIR = C.SW_DIR
+				AND A.SW_USER = C.SW_USER
+				AND A.SW_ETC = C.SW_ETC
+				AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+				AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+		WHERE A.ASSET_CD = #{ASSET_CD}
+		  and A.SW_TYPE = #{SW_TYPE}
+		group by ITEM_RESULT
+		having ITEM_RESULT = 'F') as count, A.ASSET_CD, A.SW_TYPE, A.AUDIT_DAY, B.AUDIT_RATE, B.AUDIT_RATE_FIREWALL
+		  FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+		   LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+			AND A.SW_TYPE = B.SW_TYPE
+			AND A.SW_NM = B.SW_NM
+			AND A.SW_INFO = B.SW_INFO
+			AND A.SW_DIR = B.SW_DIR
+			AND A.SW_USER = B.SW_USER
+			AND A.SW_ETC = B.SW_ETC
+		   AND A.ASSET_CD = B.ASSET_CD
+			AND A.AUDIT_DAY = B.AUDIT_DAY
+			)
+		  WHERE A.REQ_CD = #{REQ_CD}
+		  and A.SW_TYPE = #{SW_TYPE}
+		  and A.ASSET_CD = #{ASSET_CD}
+		  and A.AUDIT_DAY = #{AUDIT_DAY}
+		  order by ip_address asc
+		) C
+		group by ip_address
+	</select>
+
+    <select id="selectAssetSwExcelGroupbyAuditday" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT E.asset_cd, E.audit_day as min_audit_day
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.asset_cd in
+        <foreach item="item" index="index" collection="assetCdIn" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and E.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        order by E.audit_day asc
+        LIMIT 1
+    </select>
+
+    <select id="selectAssetSwExcelGroupbyMaxAuditday" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT E.asset_cd, E.audit_day as max_audit_day
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.asset_cd in
+        <foreach item="item" index="index" collection="assetCdIn" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and E.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        order by E.audit_day desc
+        LIMIT 1
+    </select>
+
+    <select id="selectAssetSwExcelListNew" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT
+        B.FILE_TYPE,
+        A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        A.AUDIT_DAY,
+        A.ASSET_CD,
+        B.HOST_NM,
+        B.IP_ADDRESS,
+        B.AUDIT_RATE/100 as AUDIT_RATE
+        <if test="HOST_GRD_FLAG != null and !HOST_GRD_FLAG.equals('') ">
+            ,M.HOST_GRADE
+        </if>
+        FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+        inner join (
+        SELECT
+        R.*, F.FILE_TYPE
+        FROM    (
+        SELECT A.ASSET_CD,
+        A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        A.AUDIT_DAY,
+        A.HOST_NM,
+        A.IP_ADDRESS,
+        A.AUDIT_RATE,
+        (
+        SELECT MAX(AR.DIAGNOSIS_CD)
+        FROM    SNET_ASSET_SW_AUDIT_REPORT AR,
+        SNET_CONFIG_AUDIT_ITEM BB
+        WHERE
+        AR.ASSET_CD = A.ASSET_CD
+        AND AR.SW_TYPE = A.SW_TYPE
+        AND AR.SW_NM = A.SW_NM
+        AND AR.SW_INFO = A.SW_INFO
+        AND AR.SW_DIR = A.SW_DIR
+        AND AR.SW_USER = A.SW_USER
+        AND AR.SW_ETC = A.SW_ETC
+        AND AR.AUDIT_DAY = A.AUDIT_DAY
+        AND AR.DIAGNOSIS_CD = BB.DIAGNOSIS_CD
+        ) AS DIAGNOSIS_CD, B.GOV_FLAG
+        FROM
+        SNET_ASSET_SW_AUDIT_HISTORY A
+        LEFT OUTER JOIN SNET_ASSET_MASTER B ON (A.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_DAY C ON (A.ASSET_CD = C.ASSET_CD AND A.SW_TYPE = C.SW_TYPE AND A.SW_NM = C.SW_NM AND A.SW_INFO = C.SW_INFO AND A.SW_DIR = C.SW_DIR AND A.SW_USER = C.SW_USER AND A.SW_ETC = C.SW_ETC)
+        WHERE 1 = 1
+        ) R
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM AI ON (R.DIAGNOSIS_CD = AI.DIAGNOSIS_CD)
+        LEFT OUTER JOIN SNET_CONFIG_DIAG_TYPE F ON (F.FILE_TYPE = AI.DIAGNOSIS_TYPE)
+        ) B
+        ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.AUDIT_DAY = B.AUDIT_DAY
+        )
+        LEFT OUTER JOIN SNET_ASSET_MASTER M ON (M.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_DAY C ON (B.ASSET_CD = C.ASSET_CD
+        AND B.SW_TYPE = C.SW_TYPE
+        AND B.SW_NM = C.SW_NM
+        AND B.SW_INFO = C.SW_INFO
+        AND B.SW_DIR = C.SW_DIR
+        AND B.SW_USER = C.SW_USER
+        AND B.SW_ETC = C.SW_ETC)
+        LEFT OUTER JOIN SNET_CONFIG_USER_VIEW D ON (C.SW_OPERATOR = D.USER_ID)
+        WHERE 1=1
+        <if test="REQ_CD != null and !REQ_CD.equals('') ">
+            and A.REQ_CD = #{REQ_CD}
+        </if>
+        <if test="FILE_TYPE != null and !FILE_TYPE.equals('') ">
+            and IFNULL(B.FILE_TYPE, B.GOV_FLAG) = #{FILE_TYPE}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        <if test="NOT_FLAG != null and !NOT_FLAG.equals('') ">
+            and (A.sw_type not in ('OS','DB','WEB','WAS','NW','URL') or (A.sw_type = 'OS' and A.sw_nm = 'mobile_os'))
+        </if>
+        <if test="LNOT_FLAG != null and !LNOT_FLAG.equals('') ">
+            and A.SW_TYPE = 'OS'
+            and A.SW_NM != 'Windows'
+        </if>
+        <if test="TARGET_FLAG != null and !TARGET_FLAG.equals('') ">
+            and A.AUDIT_DAY in (#{minAuditDay},#{maxAuditDay})
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        and (B.HOST_NM is not null and B.IP_ADDRESS is not null and B.AUDIT_RATE is not null)
+        <choose>
+            <when test="HOST_GRD_FLAG != null and !HOST_GRD_FLAG.equals('') ">
+                group by A.asset_cd, A.sw_type, A.sw_nm, A.sw_info, A.sw_etc, A.sw_user, A.sw_dir, B.host_nm
+            </when>
+            <otherwise>
+                group by A.sw_type, A.sw_nm
+            </otherwise>
+        </choose>
+        ORDER BY (
+        case A.sw_type
+        when 'OS' then 1
+        when 'DB' then 2
+        when 'WEB' then 3
+        when 'WAS' then 4
+        when 'NW' then 5
+        when 'URL' then 6
+        else 7
+        end), (
+        case A.sw_nm
+        when 'Linux' then 1
+        when 'Windows' then 2
+        else 3
+        end), B.ip_address asc, B.host_nm asc, A.audit_day desc
+    </select>
+
+    <select id="selectAssetSwExcelListGroupbyNew" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+        SELECT
+        A.*, B.host_nm, B.IP_ADDRESS, B.AUDIT_RATE
+        FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+        inner join (
+        SELECT
+        R.*, F.FILE_TYPE
+        FROM    (
+        SELECT A.ASSET_CD,
+        A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        A.AUDIT_DAY,
+        A.HOST_NM,
+        A.IP_ADDRESS,
+        A.AUDIT_RATE,
+        (
+        SELECT MAX(AR.DIAGNOSIS_CD)
+        FROM    SNET_ASSET_SW_AUDIT_REPORT AR,
+        SNET_CONFIG_AUDIT_ITEM BB
+        WHERE
+        AR.ASSET_CD = A.ASSET_CD
+        AND AR.SW_TYPE = A.SW_TYPE
+        AND AR.SW_NM = A.SW_NM
+        AND AR.SW_INFO = A.SW_INFO
+        AND AR.SW_DIR = A.SW_DIR
+        AND AR.SW_USER = A.SW_USER
+        AND AR.SW_ETC = A.SW_ETC
+        AND AR.AUDIT_DAY = A.AUDIT_DAY
+        AND AR.DIAGNOSIS_CD = BB.DIAGNOSIS_CD
+        ) AS DIAGNOSIS_CD,
+        B.GOV_FLAG
+        FROM
+        SNET_ASSET_SW_AUDIT_HISTORY A
+        LEFT OUTER JOIN SNET_ASSET_MASTER B ON (A.ASSET_CD = B.ASSET_CD)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_DAY C ON (A.ASSET_CD = C.ASSET_CD AND A.SW_TYPE = C.SW_TYPE AND A.SW_NM = C.SW_NM AND A.SW_INFO = C.SW_INFO AND A.SW_DIR = C.SW_DIR AND A.SW_USER = C.SW_USER AND A.SW_ETC = C.SW_ETC)
+        WHERE 1 = 1
+        ) R
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM AI ON (R.DIAGNOSIS_CD = AI.DIAGNOSIS_CD)
+        LEFT OUTER JOIN SNET_CONFIG_DIAG_TYPE F ON (F.FILE_TYPE = AI.DIAGNOSIS_TYPE)
+        ) B
+        ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.AUDIT_DAY = B.AUDIT_DAY
+        )
+        WHERE A.REQ_CD = #{REQ_CD}
+        and IFNULL(B.FILE_TYPE, B.GOV_FLAG) = #{FILE_TYPE}
+        and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        and (B.HOST_NM is not null and B.IP_ADDRESS is not null and B.AUDIT_RATE is not null)
+        <choose>
+            <when test="TOTAL_FLAG != null and !TOTAL_FLAG.equals('') ">
+                group by A.asset_cd, A.sw_type, A.sw_nm, A.sw_info, A.sw_etc, A.sw_user, A.sw_dir, B.host_nm
+            </when>
+            <otherwise>
+                group by A.sw_type, A.sw_nm
+            </otherwise>
+        </choose>
+        ORDER BY (
+        case A.sw_type
+        when 'OS' then 1
+        when 'DB' then 2
+        when 'WEB' then 3
+        when 'WAS' then 4
+        when 'NW' then 5
+        when 'URL' then 6
+        else 7
+        end), (
+        case A.sw_nm
+        when 'Linux' then 1
+        when 'Windows' then 2
+        when 'MariaDB' then 3
+        else 4
+        end), A.audit_day asc
+    </select>
+
+    <select id="getExcelListGroupbyNewMinMaxAuditDay" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcelList">
+		SELECT min(A.audit_day) as min_audit_day, max(A.audit_day) as max_audit_day
+		FROM SNET_ASSET_SW_AUDIT_EXCEL_LIST A
+		WHERE A.REQ_CD = #{REQ_CD}
+	</select>
+
+    <select id="selectAssetMstAuditReportGroupingBy" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT  A.asset_cd,
+        M.BRANCH_ID,
+        M.team_id,
+        A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        A.AUDIT_DAY,
+        A.ASSET_CD,
+        A.AUDIT_DAY as CREATE_DATE,
+        B.HOST_NM,
+        B.AUDIT_RATE
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_ETC = B.SW_ETC
+        AND A.SW_USER = B.SW_USER
+        AND A.AUDIT_DAY = B.AUDIT_DAY)
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+        AND C.SW_TYPE = B.SW_TYPE
+        AND C.SW_NM = B.SW_NM
+        AND C.SW_INFO = B.SW_INFO
+        AND C.SW_DIR = B.SW_DIR
+        AND C.SW_ETC = B.SW_ETC
+        AND C.SW_USER = B.SW_USER
+        AND C.AUDIT_DAY = B.AUDIT_DAY)
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            and A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        LIMIT 1
+    </select>
+
+
+    <select id="selectAssetMstAuditReportGetMaxAuditDayItemGrpNmList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT C.SW_TYPE, C.SW_NM, C.ASSET_CD, A.AUDIT_DAY
+        , C.DIAGNOSIS_CD
+        #, REPLACE(C.ITEM_GRP_NM, CONCAT(SUBSTRING_INDEX(C.ITEM_GRP_NM, ' ', 1), ' '), '') AS ITEM_GRP_NM
+        , ITEM_GRP_NM
+        , C.ITEM_RESULT
+        , C.ITEM_GRADE
+        , COUNT(1) AS TOTAL_CNT
+        , COUNT(1) * CASE
+        WHEN C.ITEM_GRADE = 'H' THEN 3
+        WHEN C.ITEM_GRADE = 'M' THEN 2
+        ELSE 1
+        END AS ITEM_GRADE_TOTAL
+        , DATE_FORMAT(C.CREATE_DATE,'%Y%m%d%H%i') AS CREATE_DATE
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN SNET_CONFIG_AUDIT_FILE F ON (A.AUDIT_FILE_CD = F.AUDIT_FILE_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_ETC = B.SW_ETC
+        AND A.SW_USER = B.SW_USER
+        AND A.AUDIT_DAY = B.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+        AND C.SW_TYPE   = B.SW_TYPE
+        AND C.SW_NM     = B.SW_NM
+        AND C.SW_INFO   = B.SW_INFO
+        AND C.SW_DIR    = B.SW_DIR
+        AND C.SW_ETC    = B.SW_ETC
+        AND C.SW_USER   = B.SW_USER
+        AND C.AUDIT_DAY = B.AUDIT_DAY)
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+        <if test="branchId != null and !branchId.equals('') ">
+            and M.BRANCH_ID = #{branchId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            AND M.TEAM_ID = #{teamId}
+        </if>
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            AND A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="L_NOT_FLAG != null and !L_NOT_FLAG.equals('') ">
+            and C.SW_TYPE = 'OS'
+            and C.SW_NM != 'Windows'
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and C.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            AND C.SW_NM = #{SW_NM}
+        </if>
+        <if test="NOT_FLAG != null and !NOT_FLAG.equals('') ">
+            and C.SW_TYPE not in ('OS','DB','WEB','WAS','NW','URL')
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            AND A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="NA_FLAG != null and !NA_FLAG.equals('') ">
+            and C.ITEM_RESULT != 'NA'
+        </if>
+        <if test="F_FLAG != null and !F_FLAG.equals('') ">
+            and C.ITEM_RESULT = 'F'
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and A.AUDIT_DAY = #{createDate}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        #GROUP BY REPLACE(C.ITEM_GRP_NM, CONCAT(SUBSTRING_INDEX(C.ITEM_GRP_NM, ' ', 1), ' '), ''), ITEM_GRADE
+        GROUP BY ITEM_GRP_NM, ITEM_GRADE
+    </select>
+
+    <select id="selectAssetMstAuditReportGetMaxAuditDayItemGrpNmCntList" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT C.SW_TYPE, C.SW_NM, C.ASSET_CD, A.AUDIT_DAY
+        , C.DIAGNOSIS_CD
+        #, REPLACE(C.ITEM_GRP_NM, CONCAT(SUBSTRING_INDEX(C.ITEM_GRP_NM, ' ', 1), ' '), '') AS ITEM_GRP_NM
+        , ITEM_GRP_NM
+        , C.ITEM_RESULT
+        , C.ITEM_GRADE
+        , COUNT(1) AS TOTAL_CNT
+        , COUNT(1) * CASE
+        WHEN C.ITEM_GRADE = 'H' THEN 3
+        WHEN C.ITEM_GRADE = 'M' THEN 2
+        ELSE 1
+        END AS ITEM_GRADE_TOTAL
+        , DATE_FORMAT(C.CREATE_DATE,'%Y%m%d%H%i') AS CREATE_DATE
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN SNET_CONFIG_AUDIT_FILE F ON (A.AUDIT_FILE_CD = F.AUDIT_FILE_CD)
+        INNER JOIN SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_ETC = B.SW_ETC
+        AND A.SW_USER = B.SW_USER
+        AND A.AUDIT_DAY = B.AUDIT_DAY)
+        INNER JOIN SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+        AND C.SW_TYPE   = B.SW_TYPE
+        AND C.SW_NM     = B.SW_NM
+        AND C.SW_INFO   = B.SW_INFO
+        AND C.SW_DIR    = B.SW_DIR
+        AND C.SW_ETC    = B.SW_ETC
+        AND C.SW_USER   = B.SW_USER
+        AND C.AUDIT_DAY = B.AUDIT_DAY)
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            AND A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="L_NOT_FLAG != null and !L_NOT_FLAG.equals('') ">
+            and C.SW_TYPE = 'OS'
+            and C.SW_NM != 'Windows'
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and C.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            AND C.SW_NM = #{SW_NM}
+        </if>
+        <if test="NOT_FLAG != null and !NOT_FLAG.equals('') ">
+            and C.SW_TYPE not in ('OS','DB','WEB','WAS','NW','URL')
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            AND A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="NA_FLAG != null and !NA_FLAG.equals('') ">
+            and C.ITEM_RESULT = 'NA'
+        </if>
+        <if test="NA_NOT_FLAG != null and !NA_NOT_FLAG.equals('') ">
+            and C.ITEM_RESULT != 'NA'
+        </if>
+        <if test="F_FLAG != null and !F_FLAG.equals('') ">
+            and C.ITEM_RESULT = 'F'
+        </if>
+        <if test="C_FLAG != null and !C_FLAG.equals('') ">
+            and C.ITEM_RESULT = 'C'
+        </if>
+        <if test="T_FLAG != null and !T_FLAG.equals('') ">
+            and C.ITEM_RESULT = 'T'
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and A.AUDIT_DAY = #{createDate}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        <if test="endDay != null and !endDay.equals('') ">
+            AND A.AUDIT_DAY  <![CDATA[ <= ]]> #{endDay}
+        </if>
+        #GROUP BY REPLACE(C.ITEM_GRP_NM, CONCAT(SUBSTRING_INDEX(C.ITEM_GRP_NM, ' ', 1), ' '), '') , ITEM_GRADE
+        GROUP BY ITEM_GRP_NM, ITEM_GRADE
+    </select>
+
+    <select id="selectAssetMstAuditReportGetMaxAuditDay" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT A.asset_cd,
+        M.BRANCH_ID,
+        M.team_id,
+        A.SW_TYPE,
+        A.SW_NM,
+        A.SW_INFO,
+        A.SW_DIR,
+        A.SW_USER,
+        A.SW_ETC,
+        max(A.AUDIT_DAY) as AUDIT_DAY
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_HISTORY B ON (A.ASSET_CD = B.ASSET_CD
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_ETC = B.SW_ETC
+        AND A.SW_USER = B.SW_USER
+        AND A.AUDIT_DAY = B.AUDIT_DAY)
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = B.ASSET_CD
+        AND C.SW_TYPE = B.SW_TYPE
+        AND C.SW_NM = B.SW_NM
+        AND C.SW_INFO = B.SW_INFO
+        AND C.SW_DIR = B.SW_DIR
+        AND C.SW_ETC = B.SW_ETC
+        AND C.SW_USER = B.SW_USER
+        AND C.AUDIT_DAY = B.AUDIT_DAY)
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            and A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+    </select>
+
+    <select id="getWeakLevelsAssetMstAuditReportGetMaxAuditDay" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT A.ASSET_CD, A.SW_TYPE, A.SW_NM, A.AUDIT_DAY, C.ITEM_RESULT, C.ITEM_GRADE,
+        CASE WHEN C.ITEM_GRADE = 'H' THEN '상'
+        WHEN C.ITEM_GRADE = 'M' THEN '중'
+        WHEN C.ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW, count(*) as count
+        FROM SNET_ASSET_MASTER M
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_DAY A ON (M.ASSET_CD = A.ASSET_CD)
+        INNER JOIN
+        SNET_ASSET_SW_AUDIT_REPORT C ON (C.ASSET_CD = A.ASSET_CD
+        AND C.SW_TYPE = A.SW_TYPE
+        AND C.SW_NM = A.SW_NM
+        AND C.SW_INFO = A.SW_INFO
+        AND C.SW_DIR = A.SW_DIR
+        AND C.SW_ETC = A.SW_ETC
+        AND C.SW_USER = A.SW_USER
+        AND C.AUDIT_DAY = A.AUDIT_DAY)
+        WHERE 1=1
+        AND A.SW_TYPE NOT IN ('BIN','LIB','PORTTCP4','PORTTCP6','PR','SV')
+        AND C.ITEM_RESULT = 'F'
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            and A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        group by C.item_grade
+        order by CASE WHEN C.ITEM_GRADE = 'H' THEN 1
+        WHEN C.ITEM_GRADE = 'M' THEN 2
+        WHEN C.ITEM_GRADE = 'L' THEN 3 END
+    </select>
+
+    <select id="selectAssetSwAuditReportNew" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT 	A.ASSET_CD, A.HOST_NM, A.SW_NM, A.SW_TYPE, A.SW_INFO, A.SW_DIR, A.SW_USER, A.SW_ETC, A.IP_ADDRESS, A.AUDIT_DAY, A.DIAGNOSIS_CD,
+        IFNULL(I.ITEM_GRP_NM, A.ITEM_GRP_NM) AS ITEM_GRP_NM,
+        A.ITEM_NM,
+        A.ITEM_NM AS ITEM_NM_DESC,
+        A.ITEM_GRADE,
+        CASE WHEN A.ITEM_GRADE = 'H' THEN '상'
+        WHEN A.ITEM_GRADE = 'M' THEN '중'
+        WHEN A.ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW,
+        ITEM_RESULT,
+        CASE WHEN ITEM_RESULT = 'T' THEN '양호'
+        WHEN ITEM_RESULT = 'F' THEN '취약'
+        WHEN ITEM_RESULT = 'C' THEN '불가'
+        WHEN ITEM_RESULT = 'R' THEN '인터뷰 필요'
+        WHEN ITEM_RESULT = 'NA' THEN 'N/A'
+        ELSE '-'
+        END AS ITEM_RESULT_VIEW,
+        A.ITEM_STATUS AS ITEM_STATUS,
+        A.ITEM_STANDARD AS ITEM_STANDARD,
+        A.ITEM_COUNTERMEASURE AS ITEM_COUNTERMEASURE,
+        A.ITEM_COUNTERMEASURE_DETAIL AS ITEM_COUNTERMEASURE_DETAIL,
+        #DATE_FORMAT(STR_TO_DATE(C.ACTION_PLAN_DATE, '%Y%m%d%H%i%S'), '%Y%m%d') AS ACTION_PLAN_COMPLATE_DATE,
+        C.ACTION_PLAN_REASON, A.DIAGNOSIS_CD, DATE_FORMAT(A.CREATE_DATE,'%Y%m%d%H%i') as CREATE_DATE
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (A.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE A.DIAGNOSIS_CD is not null
+        <choose>
+            <when test="DETAIL_FLAG != null and !DETAIL_FLAG.equals('') ">
+                AND A.asset_cd in
+                <foreach item="item" index="index" collection="assetCdIn" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+                AND A.ASSET_CD = #{ASSET_CD}
+            </otherwise>
+        </choose>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_INFO != null and !SW_INFO.equals('') ">
+            and A.SW_INFO = #{SW_INFO}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and A.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="SW_USER != null and !SW_USER.equals('') ">
+            and A.SW_USER = #{SW_USER}
+        </if>
+        <if test="SW_ETC != null and !SW_ETC.equals('') ">
+            and A.SW_ETC = #{SW_ETC}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(A.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="ITEM_RESULT != null and !ITEM_RESULT.equals('') ">
+            and A.ITEM_RESULT = #{ITEM_RESULT}
+        </if>
+        <if test="DIAGNOSIS_CD != null and !DIAGNOSIS_CD.equals('') ">
+            and A.DIAGNOSIS_CD = #{DIAGNOSIS_CD}
+        </if>
+        and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        ORDER BY I.ITEM_GRP_NM, I.DIAGNOSIS_CD  asc
+    </select>
+
+    <select id="selectAssetSwAuditReportBargraphMapping" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT item_grade, CASE WHEN ITEM_GRADE = 'H' THEN '상'
+			WHEN ITEM_GRADE = 'M' THEN '중'
+			WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW, count(*) as count
+		FROM SNET_ASSET_SW_AUDIT_REPORT A
+			LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+				ON A.ASSET_CD = B.ASSET_CD
+				AND A.SW_INFO = B.SW_INFO
+				AND A.SW_NM = B.SW_NM
+				AND A.SW_TYPE = B.SW_TYPE
+				AND A.SW_DIR = B.SW_DIR
+				AND A.SW_USER = B.SW_USER
+				AND A.SW_ETC = B.SW_ETC
+				AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+			LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+				ON (A.ASSET_CD = C.ASSET_CD
+				AND A.SW_INFO = C.SW_INFO
+				AND A.SW_NM = C.SW_NM
+				AND A.SW_TYPE = C.SW_TYPE
+				AND A.SW_DIR = C.SW_DIR
+				AND A.SW_USER = C.SW_USER
+				AND A.SW_ETC = C.SW_ETC
+				AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+				AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+		WHERE A.ASSET_CD = #{ASSET_CD}
+		AND A.SW_TYPE = #{SW_TYPE}
+		AND A.AUDIT_DAY = #{AUDIT_DAY}
+		group by item_grade
+		order by (
+				 case item_grade
+						 when 'H' then 1
+						when 'M' then 2
+					  when 'L' then 3
+					else 4
+					end)
+	</select>
+
+    <select id="getDetailResultList" parameterType="java.util.HashMap" resultType="ResultDtoList">
+        SELECT replace(SUBSTRING_INDEX(IFNULL(I.ITEM_GRP_NM, E.ITEM_GRP_NM), '.', -1),' ','') as grpname, E.ITEM_GRADE as name, E.DIAGNOSIS_CD as item_code, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (E.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and E.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="ITEM_GRP_NM != null and !ITEM_GRP_NM.equals('') ">
+            and replace(SUBSTRING_INDEX(IFNULL(I.ITEM_GRP_NM, E.ITEM_GRP_NM), '.', -1),' ','') = #{ITEM_GRP_NM}
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and E.AUDIT_DAY = #{createDate}
+        </if>
+        <choose>
+            <when test="NA_FLAG != null and !NA_FLAG.equals('') ">
+                and E.ITEM_RESULT not in ('NA')
+            </when>
+            <otherwise>
+                <if test="C_FLAG != null and !C_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'C'
+                </if>
+                <if test="F_FLAG != null and !F_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'F'
+                </if>
+                <if test="NA_Y_FLAG != null and !NA_Y_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'NA'
+                </if>
+                <if test="T_FLAG != null and !T_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'T'
+                </if>
+                <if test="R_FLAG != null and !R_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'R'
+                </if>
+            </otherwise>
+        </choose>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        group by E.ITEM_GRADE
+        order by grpname asc
+    </select>
+
+    <select id="getDetailResultListItemGrpOrigin" parameterType="java.util.HashMap" resultType="ResultDtoList">
+        SELECT replace(E.ITEM_GRP_NM,' ','') as grpname, E.ITEM_GRADE as name, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and E.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="ITEM_GRP_NM != null and !ITEM_GRP_NM.equals('') ">
+            and replace(E.ITEM_GRP_NM,' ','') = #{ITEM_GRP_NM}
+        </if>
+        <if test="createDate != null and !createDate.equals('') ">
+            and E.AUDIT_DAY = #{createDate}
+        </if>
+        <choose>
+            <when test="NA_FLAG != null and !NA_FLAG.equals('') ">
+                and E.ITEM_RESULT not in ('NA')
+            </when>
+            <otherwise>
+                <if test="C_FLAG != null and !C_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'C'
+                </if>
+                <if test="F_FLAG != null and !F_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'F'
+                </if>
+                <if test="NA_Y_FLAG != null and !NA_Y_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'NA'
+                </if>
+                <if test="T_FLAG != null and !T_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'T'
+                </if>
+                <if test="R_FLAG != null and !R_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'R'
+                </if>
+            </otherwise>
+        </choose>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        group by E.ITEM_GRADE
+    </select>
+
+    <select id="getDetailResultList2" parameterType="java.util.HashMap" resultType="ResultDtoList">
+        SELECT replace(substr(E.ITEM_GRP_NM, 4),' ','') as grpname, E.ITEM_GRADE as name, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="ITEM_GRP_NM != null and !ITEM_GRP_NM.equals('') ">
+            and replace(substr(E.ITEM_GRP_NM, 4),' ','') = #{ITEM_GRP_NM}
+        </if>
+        <choose>
+            <when test="NA_FLAG != null and !NA_FLAG.equals('') ">
+                and E.ITEM_RESULT not in ('NA')
+            </when>
+            <otherwise>
+                <if test="C_FLAG != null and !C_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'C'
+                </if>
+                <if test="F_FLAG != null and !F_FLAG.equals('') ">
+                    and E.ITEM_RESULT = 'F'
+                </if>
+            </otherwise>
+        </choose>
+        and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        group by E.ITEM_GRADE
+    </select>
+
+    <select id="getDetailItemResultList" parameterType="java.util.HashMap" resultType="ResultDtoList">
+        SELECT replace(substr(E.ITEM_NM, 6),' ','') as GRPNAME, E.DIAGNOSIS_CD as ITEM_CODE, E.ITEM_GRADE as NAME, count(*) as count
+        from SNET_ASSET_SW_AUDIT_REPORT E
+        where E.ASSET_CD = #{ASSET_CD}
+        and E.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and E.SW_NM = #{SW_NM}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and E.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <!--		<if test="ITEM_NM != null and !ITEM_NM.equals('') ">-->
+        <!--			and replace(substr(E.ITEM_NM, 6),' ','') = #{ITEM_NM}-->
+        <!--		</if>-->
+        <if test="T_FLAG != null and !T_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'T'
+        </if>
+        <if test="F_FLAG != null and !F_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'F'
+        </if>
+        <if test="C_FLAG != null and !C_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'C'
+        </if>
+        <if test="R_FLAG != null and !R_FLAG.equals('') ">
+            and E.ITEM_RESULT = 'R'
+        </if>
+        <if test="DIAGNOSIS_CD != null and !DIAGNOSIS_CD.equals('') ">
+            and E.DIAGNOSIS_CD = #{DIAGNOSIS_CD}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(E.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and E.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        group by E.ITEM_NM, E.ITEM_RESULT
+    </select>
+
+
+    <select id="getCheckAnalysisStandardListByFiletype1" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'Linux' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'OS'
+			AND SW_NM = 'Linux'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype1Linux" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'Linux' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'OS'
+			AND SW_NM in ('AIX', 'Devian' , 'FreeBSD' , 'HP-UX' , 'Linux' , 'Solaris')
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype2" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'Windows' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'OS'
+			AND SW_NM = 'Windows'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype3" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'DB' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'DB'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype4" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'WEB' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'WEB'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype5" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'WAS' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'WAS'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype6" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'NW' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'NW'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <!--	<select id="getCheckAnalysisStandardListByFiletype7" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">-->
+    <select id="getCheckAnalysisStandardListByFiletype7" resultType="SnetAssetSwAuditReport">
+		SELECT 'URL' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE = 'URL'
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+    <select id="getCheckAnalysisStandardListByFiletype8" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+		SELECT 'ETC' as SW_TYPE, ITEM_GRP_NM, AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM
+		, ITEM_GRP_NM
+		, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM
+		) AS CNT_ITEM_GRP
+		, ITEM_NM
+		, ITEM_GRADE
+		, CASE WHEN ITEM_GRADE = 'H' THEN '상' WHEN ITEM_GRADE = 'M' THEN '중' WHEN ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW
+		, '****' AS ITEM_STANDARD
+		, '****' AS ITEM_COUNTERMEASURE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD = (
+			SELECT AUDIT_FILE_CD
+			FROM SNET_CONFIG_AUDIT_FILE A
+			LEFT OUTER
+			JOIN SNET_CONFIG_DIAG_TYPE B ON A.FILE_TYPE = B.FILE_TYPE
+			WHERE 1=1 AND SW_NM IS NOT NULL
+			AND SW_TYPE not in ('OS','DB','WEB','WAS','NW','URL')
+			AND A.FILE_TYPE = #{FILE_TYPE}
+			LIMIT 1
+		)
+		ORDER BY DIAGNOSIS_TYPE asc, DIAGNOSIS_CD asc
+	</select>
+
+    <select id="selectAssetSwReportGroupbyAuditday" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT max(A.audit_day) as audit_day
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE 1=1
+        AND A.ASSET_CD = #{ASSET_CD}
+        and A.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        and A.audit_day between #{startAuditDay} and #{endAuditDay}
+    </select>
+
+    <select id="selectAssetSwReportGroupbyMinAuditday" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT min(A.audit_day) as audit_day
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE 1=1
+        AND A.ASSET_CD = #{ASSET_CD}
+        and A.SW_TYPE = #{SW_TYPE}
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+    </select>
+
+    <select id="selectAssetSwAuditReportNewGet" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT 	COUNT(A.ASSET_CD) as count, A.ASSET_CD, A.HOST_NM, A.SW_NM, A.SW_TYPE, A.SW_INFO, A.SW_DIR, A.SW_USER, A.SW_ETC, A.IP_ADDRESS, A.AUDIT_DAY, A.DIAGNOSIS_CD,
+        IFNULL(I.ITEM_GRP_NM, A.ITEM_GRP_NM) AS ITEM_GRP_NM,
+        A.ITEM_NM,
+        A.ITEM_NM AS ITEM_NM_DESC,
+        A.ITEM_GRADE,
+        CASE WHEN A.ITEM_GRADE = 'H' THEN '상'
+        WHEN A.ITEM_GRADE = 'M' THEN '중'
+        WHEN A.ITEM_GRADE = 'L' THEN '하' END AS ITEM_GRADE_VIEW,
+        ITEM_RESULT,
+        CASE WHEN ITEM_RESULT = 'T' THEN '양호'
+        WHEN ITEM_RESULT = 'F' THEN '취약'
+        WHEN ITEM_RESULT = 'C' THEN '불가'
+        WHEN ITEM_RESULT = 'R' THEN '인터뷰 필요'
+        WHEN ITEM_RESULT = 'NA' THEN 'N/A' END AS ITEM_RESULT_VIEW,A.ITEM_STATUS, A.ITEM_STANDARD,
+        A.ITEM_COUNTERMEASURE, A.ITEM_COUNTERMEASURE_DETAIL,
+        DATE_FORMAT(STR_TO_DATE(C.ACTION_PLAN_DATE, '%Y%m%d%H%i%S'), '%Y%m%d') AS ACTION_PLAN_COMPLATE_DATE,
+        C.ACTION_PLAN_REASON, DATE_FORMAT(A.CREATE_DATE,'%Y%m%d%H%i') as CREATE_DATE
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_CONFIG_AUDIT_ITEM I ON (A.DIAGNOSIS_CD = I.DIAGNOSIS_CD)
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE 1=1
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            and A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_INFO != null and !SW_INFO.equals('') ">
+            and A.SW_INFO = #{SW_INFO}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and A.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="SW_USER != null and !SW_USER.equals('') ">
+            and A.SW_USER = #{SW_USER}
+        </if>
+        <if test="SW_ETC != null and !SW_ETC.equals('') ">
+            and A.SW_ETC = #{SW_ETC}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="CREATE_DATE != null and !CREATE_DATE.equals('') ">
+            AND DATE_FORMAT(A.CREATE_DATE,'%Y%m%d%H%i')= #{CREATE_DATE}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        order by A.CREATE_DATE desc
+    </select>
+
+    <select id="selectAssetSwAuditReportNewGetMinAuditDay" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT 	min(A.AUDIT_DAY) as AUDIT_DAY
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE 1=1
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            and A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_INFO != null and !SW_INFO.equals('') ">
+            and A.SW_INFO = #{SW_INFO}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and A.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="SW_USER != null and !SW_USER.equals('') ">
+            and A.SW_USER = #{SW_USER}
+        </if>
+        <if test="SW_ETC != null and !SW_ETC.equals('') ">
+            and A.SW_ETC = #{SW_ETC}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        <if test="FILE_TYPE != null and !FILE_TYPE.equals('') ">
+            AND CASE WHEN A.DIAGNOSIS_TYPE IS NULL THEN
+                      <choose>
+                        <when test="FILE_TYPE == 1">
+                           A.DIAGNOSIS_CD LIKE 'C%'
+                        </when>
+                        <when test="FILE_TYPE == 2">
+                           A.DIAGNOSIS_CD LIKE 'M%'
+                        </when>
+                     </choose>
+                    ELSE A.DIAGNOSIS_TYPE = #{FILE_TYPE}
+                 END
+        </if>
+        LIMIT 1
+    </select>
+
+    <select id="selectAssetSwAuditReportNewGetMaxAuditDay" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditReport">
+        SELECT 	max(A.AUDIT_DAY) as AUDIT_DAY
+        FROM SNET_ASSET_SW_AUDIT_REPORT A
+        LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_COK B
+        ON A.ASSET_CD = B.ASSET_CD
+        AND A.SW_INFO = B.SW_INFO
+        AND A.SW_NM = B.SW_NM
+        AND A.SW_TYPE = B.SW_TYPE
+        AND A.SW_DIR = B.SW_DIR
+        AND A.SW_USER = B.SW_USER
+        AND A.SW_ETC = B.SW_ETC
+        AND A.DIAGNOSIS_CD = B.DIAGNOSIS_CD
+        LEFT OUTER JOIN  SNET_ASSET_SW_AUDIT_ACTION_PLAN C
+        ON (A.ASSET_CD = C.ASSET_CD
+        AND A.SW_INFO = C.SW_INFO
+        AND A.SW_NM = C.SW_NM
+        AND A.SW_TYPE = C.SW_TYPE
+        AND A.SW_DIR = C.SW_DIR
+        AND A.SW_USER = C.SW_USER
+        AND A.SW_ETC = C.SW_ETC
+        AND A.DIAGNOSIS_CD = C.DIAGNOSIS_CD
+        AND C.ACTION_PLAN_STATUS IN ('0' , '1', '2'))
+        WHERE 1=1
+        <if test="ASSET_CD != null and !ASSET_CD.equals('') ">
+            and A.ASSET_CD = #{ASSET_CD}
+        </if>
+        <if test="SW_TYPE != null and !SW_TYPE.equals('') ">
+            and A.SW_TYPE = #{SW_TYPE}
+        </if>
+        <if test="SW_NM != null and !SW_NM.equals('') ">
+            and A.SW_NM = #{SW_NM}
+        </if>
+        <if test="SW_INFO != null and !SW_INFO.equals('') ">
+            and A.SW_INFO = #{SW_INFO}
+        </if>
+        <if test="SW_DIR != null and !SW_DIR.equals('') ">
+            and A.SW_DIR = #{SW_DIR}
+        </if>
+        <if test="SW_USER != null and !SW_USER.equals('') ">
+            and A.SW_USER = #{SW_USER}
+        </if>
+        <if test="SW_ETC != null and !SW_ETC.equals('') ">
+            and A.SW_ETC = #{SW_ETC}
+        </if>
+        <if test="AUDIT_DAY != null and !AUDIT_DAY.equals('') ">
+            and A.AUDIT_DAY = #{AUDIT_DAY}
+        </if>
+        <if test="startAuditDay != null and !startAuditDay.equals('') ">
+            and A.audit_day between #{startAuditDay} and #{endAuditDay}
+        </if>
+        <if test="FILE_TYPE != null and !FILE_TYPE.equals('') ">
+            AND CASE WHEN A.DIAGNOSIS_TYPE IS NULL THEN
+                      <choose>
+                        <when test="FILE_TYPE == 1">
+                           A.DIAGNOSIS_CD LIKE 'C%'
+                        </when>
+                        <when test="FILE_TYPE == 2">
+                           A.DIAGNOSIS_CD LIKE 'M%'
+                        </when>
+                     </choose>
+                    ELSE A.DIAGNOSIS_TYPE = #{FILE_TYPE}
+                 END
+            </if>
+        LIMIT 1
+    </select>
+
+    <select id="getCheckSwnmAnalysisStandardGet" parameterType="java.util.HashMap" resultType="CheckAnalysis">
+		select A.*
+		from SNET_CONFIG_AUDIT_ITEM A
+		where 1=1
+		and A.SW_NM = #{SW_NM}
+		LIMIT 1
+	</select>
+
+    <!-- -> to do test -->
+    <!-- 진단기준을 보고서 생성시 요청값으로 받으므로 REPORT 테이블 조회할 때, 진단기준을 사용해서 보고서 생성할 때 사용하면 됨 -->
+    <select id="getCheckSwnmAnalysisStandard" parameterType="java.util.HashMap" resultType="CheckAnalysis">
+		SELECT AUDIT_FILE_CD, DIAGNOSIS_CD, DIAGNOSIS_TYPE, SW_NM, ITEM_GRP_NM, (
+			SELECT COUNT(ITEM_GRP_NM)
+			FROM SNET_CONFIG_AUDIT_ITEM
+			WHERE AUDIT_FILE_CD = A.AUDIT_FILE_CD AND ITEM_GRP_NM = A.ITEM_GRP_NM) AS CNT_ITEM_GRP,
+			ITEM_NM, ITEM_GRADE
+		FROM SNET_CONFIG_AUDIT_ITEM A
+		WHERE AUDIT_FILE_CD in (select AUDIT_FILE_CD from SNET_CONFIG_AUDIT_FILE where  1=1
+			 AND SW_NM IS NOT NULL
+			 AND FILE_TYPE = #{FILE_TYPE} and SW_TYPE = #{SW_TYPE})
+		group by sw_nm
+		order by cnt_item_grp desc
+	</select>
+
+    <select id="selectConfigAuditItem" parameterType="java.util.HashMap" resultType="SnetConfigAuditItem">
+	SELECT
+		ITEM_STANDARD, ITEM_COUNTERMEASURE
+	FROM
+		SNET_CONFIG_AUDIT_ITEM
+	WHERE
+		DIAGNOSIS_CD = #{DIAGNOSIS_CD}
+	LIMIT 1
+	</select>
+
+</mapper>

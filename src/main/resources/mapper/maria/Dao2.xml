@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.Dao2">
+
+<select id="selectWifiFirmwareList" useCache="false" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigWifiFirmwareEntity">
+SELECT   
+        company_id AS companyId
+      , firmware_ver AS firmwareVer
+      , company_nm AS companyNm
+      , use_yn AS useYn
+      , create_date AS createDate
+      , update_date AS updateDate
+ FROM 
+      SNET_CONFIG_WIFI_FIRMWARE
+ where 1=1
+   and firmware_ver is not null
+   and firmware_ver != ''      
+</select>
+
+
+<select id="selectCountOfAssetMaster" useCache="false" resultType="string">
+SELECT asset_cd
+  from SNET_ASSET_MASTER
+ where host_nm = #{hostNm}
+   and ip_address = #{ipAddress}
+ limit 1   
+</select>
+
+
+
+<select id="selectUserInfo" useCache="false" resultType="com.mobigen.snet.supportagent.entity.UserInfo">
+select user_id as userId
+     , user_nm as userNm
+     , branch_id as branchId
+     , branch_nm as branchNm
+     , team_id as teamId
+     , team_nm as teamNm
+     , user_ms as userMs
+     , user_mail as userMail
+     , user_auth as userAuth
+  from SNET_CONFIG_USER_VIEW
+ where 1=1
+   and user_id = #{userId}
+ limit 1
+</select>
+
+
+<update id="deleteAllConfigFemtoAsset">
+delete from SNET_CONFIG_FEMTO_ASSET
+</update>
+
+
+<update id="insertIntoFemtoFirmware">
+insert into SNET_CONFIG_FEMTO_FIRMWARE
+       (manufacturer, softwareversion, use_yn  )
+SELECT distinct MANUFACTURER, SOFTWAREVERSION , 'Y'
+  FROM SNET_CONFIG_FEMTO_ASSET
+ WHERE MANUFACTURER IS NOT NULL 
+   and concat(MANUFACTURER, "-", SOFTWAREVERSION) 
+		 not in (select concat(MANUFACTURER, "-", SOFTWAREVERSION)
+		           from SNET_CONFIG_FEMTO_FIRMWARE
+		         )
+</update>
+
+
+<update id="updateUseYnInFemtoFirmware">
+update SNET_CONFIG_FEMTO_FIRMWARE
+   set use_yn = 'Y'
+ where concat(MANUFACTURER, "-", SOFTWAREVERSION)
+       in (select concat(MANUFACTURER, "-", SOFTWAREVERSION)  from SNET_CONFIG_FEMTO_ASSET)
+</update>
+
+
+
+<update id="updateUseYnInFemtoFirmware2">
+update SNET_CONFIG_FEMTO_FIRMWARE
+   set use_yn = 'N'
+ where concat(MANUFACTURER, "-", SOFTWAREVERSION)
+       not in (select concat(MANUFACTURER, "-", SOFTWAREVERSION)  from SNET_CONFIG_FEMTO_ASSET)
+</update>
+
+
+<update id="deleteAllConfigFemtoEnb">
+delete from SNET_CONFIG_FEMTO_ENB
+</update>
+
+
+<select id="selectFemtoFirmwareList" useCache="false" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetConfigFemtoFirmwareEntity">
+SELECT
+         manufacturer   
+       , softwareversion   
+       , use_yn   
+       , create_date   
+       , update_date   
+   FROM
+        SNET_CONFIG_FEMTO_FIRMWARE a
+  WHERE
+        1=1
+    and manufacturer is not null
+    and manufacturer != ''
+    and softwareversion is not null
+    and softwareversion != ''
+    
+    
+    
+</select>
+
+</mapper>

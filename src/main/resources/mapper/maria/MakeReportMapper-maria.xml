@@ -1,0 +1,2158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.MakeReportMapper">
+	<delete id="deleteReportBranch">
+		DELETE FROM	SNET_REPORT_BRANCH
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportBranchSwType">
+		DELETE FROM	SNET_REPORT_BRANCH_SW_TYPE
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportHostIp">
+		DELETE FROM	SNET_REPORT_HOST_IP
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportHostIpSwType">
+		DELETE FROM	SNET_REPORT_HOST_IP_SW_TYPE
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportSwNm">
+		DELETE FROM	SNET_REPORT_SW_NM
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportSwType">
+		DELETE FROM	SNET_REPORT_SW_TYPE
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+        AND DEL_FLAG != DATE_FORMAT(NOW(), '%H')
+	</delete>
+	
+	<delete id="deleteReportSwWeak">
+		DELETE FROM	SNET_REPORT_SW_WEAK
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+        AND DEL_FLAG != DATE_FORMAT(NOW(), '%H')
+	</delete>
+
+	<delete id="deleteReportBranchSwWeak">
+		DELETE FROM	SNET_REPORT_BRANCH_SW_WEAK
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportTeam">
+		DELETE FROM	SNET_REPORT_TEAM
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportTeamSwType">
+		DELETE FROM	SNET_REPORT_TEAM_SW_TYPE
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<delete id="deleteReportBranchAgent">
+		DELETE FROM	SNET_REPORT_BRANCH_AGENT
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+
+	<delete id="deleteReportBranchAgentStatus">
+		DELETE FROM	SNET_REPORT_BRANCH_AGENT_STATUS
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+	
+	<insert id="insertReportBranch"> 
+		INSERT INTO SNET_REPORT_BRANCH
+		(
+		   CDATE         
+		   , BRANCH_ID     
+		   , BRANCH_NM     
+		   , AUDIT_RATE    
+		   , AD_RESULT_OK  
+		   , AD_RESULT_NOK 
+		   , AD_RESULT_NA  
+		   , AD_RESULT_PASS
+		   , AD_RESULT_REQ
+		   , AD_WEIGHT_TOTAL
+		   , AD_WEIGHT_OK   
+		   , AD_WEIGHT_NOK  
+		   , AD_WEIGHT_PASS 
+		   , AD_WEIGHT_NA
+		   , AD_WEIGHT_REQ
+		   , ASSET_CNT 
+		   , ASSET_SW_CNT 
+		)
+		(SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , '0' AS BRANCH_ID
+		   , '전체' AS BRANCH_NM		   
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE			   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+	   	   , (  
+				SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND C.ASSET_CD  = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			 ) AS ASSET_CNT
+			 ,
+			 (
+				SELECT COUNT(*) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND C.ASSET_CD = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			 ) AS ASSET_SW_CNT		   
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+			, SNET_ASSET_SW_AUDIT_DAY B
+			, SNET_ASSET_MASTER SAM
+		WHERE SAM.BRANCH_ID != ''
+			AND A.ASSET_CD 	= B.ASSET_CD
+			AND A.AUDIT_DAY = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 	= B.SW_NM
+			AND A.SW_DIR 	= B.SW_DIR
+      AND A.SW_USER 	= B.SW_USER
+      AND A.SW_ETC 	= B.SW_ETC
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			AND SAM.ASSET_CD = A.ASSET_CD)
+      UNION ALL
+      (SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , SAM.BRANCH_ID
+		   , 
+		   (
+		     SELECT BRANCH_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE BRANCH_ID = SAM.BRANCH_ID
+			 AND BRANCH_NM = SAM.BRANCH_NM
+			 GROUP BY BRANCH_ID, BRANCH_NM
+		   ) AS BRANCH_NM		   
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE			   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+	   	   , (  
+				SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND C.ASSET_CD  = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND F.BRANCH_ID = SAM.BRANCH_ID
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			 ) AS ASSET_CNT
+			 ,
+			 (
+				SELECT COUNT(*) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND C.ASSET_CD = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND F.BRANCH_ID = SAM.BRANCH_ID
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			 ) AS ASSET_SW_CNT		   
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+			, SNET_ASSET_SW_AUDIT_DAY B
+			, SNET_ASSET_MASTER SAM
+		WHERE SAM.BRANCH_ID != ''
+			AND A.ASSET_CD 	= B.ASSET_CD
+			AND A.AUDIT_DAY = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 	= B.SW_NM
+			AND A.SW_DIR 	= B.SW_DIR
+            AND A.SW_USER 	= B.SW_USER
+            AND A.SW_ETC 	= B.SW_ETC
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			AND SAM.ASSET_CD = A.ASSET_CD
+		GROUP BY SAM.BRANCH_ID
+	)
+	</insert>
+
+	<select id="selectReportBranch" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT 
+		BRANCH_ID AS branchId
+		FROM SNET_REPORT_BRANCH
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+	
+	<update id="updateReportBranchCnt" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE 	SNET_REPORT_BRANCH SET
+		ASSET_CNT = (
+			SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND C.ASSET_CD  = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				AND F.BRANCH_ID =#{branchId}
+		)
+		, ASSET_SW_CNT = 
+		(
+			SELECT COUNT(*) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND C.ASSET_CD = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				AND F.BRANCH_ID = #{branchId}
+		)
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND BRANCH_ID = #{branchId}	
+	</update>
+		
+	<insert id="insertReportBranchSwType">
+		INSERT INTO SNET_REPORT_BRANCH_SW_TYPE
+		(
+		   CDATE         
+		   , BRANCH_ID     
+		   , BRANCH_NM
+		   , SW_TYPE   
+		   , AUDIT_RATE 
+		   , AD_RESULT_OK  
+		   , AD_RESULT_NOK 
+		   , AD_RESULT_NA  
+		   , AD_RESULT_PASS
+		   , AD_RESULT_REQ
+		   , AD_WEIGHT_TOTAL
+		   , AD_WEIGHT_OK   
+		   , AD_WEIGHT_NOK  
+		   , AD_WEIGHT_PASS 
+		   , AD_WEIGHT_NA 
+		   , AD_WEIGHT_REQ
+		   , ASSET_CNT
+		   , ASSET_SW_CNT
+		)
+		SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , SAM.BRANCH_ID
+		   , 
+		   (
+		     SELECT BRANCH_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE BRANCH_ID = SAM.BRANCH_ID
+			 AND BRANCH_NM = SAM.BRANCH_NM
+			 GROUP BY BRANCH_ID, BRANCH_NM
+		   ) AS BRANCH_NM
+		   , A.SW_TYPE
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE		   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA 
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ 
+	   	   , (  
+				SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD = D.ASSET_CD
+				AND C.ASSET_CD = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				AND C.SW_TYPE = A.SW_TYPE
+				AND F.BRANCH_ID = SAM.BRANCH_ID
+			 ) AS ASSET_CNT
+			 ,
+			 (
+				SELECT COUNT(*) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD = D.ASSET_CD
+				AND C.ASSET_CD = F.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE   = D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				AND C.SW_TYPE = A.SW_TYPE
+				AND F.BRANCH_ID = SAM.BRANCH_ID
+			 ) AS ASSET_SW_CNT	
+	   
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+			, SNET_ASSET_SW_AUDIT_DAY B
+			, SNET_ASSET_MASTER SAM
+		WHERE SAM.BRANCH_ID != ''
+			AND A.ASSET_CD 	= B.ASSET_CD
+			AND A.AUDIT_DAY  = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 		= B.SW_NM
+			AND A.SW_DIR = B.SW_DIR
+            AND A.SW_USER = B.SW_USER
+            AND A.SW_ETC = B.SW_ETC
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			AND SAM.ASSET_CD = A.ASSET_CD
+		GROUP BY SAM.BRANCH_ID, A.SW_TYPE
+	</insert>
+	<select id="selectReportBranchSwType" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT 
+			BRANCH_ID as branchId
+			, SW_TYPE as swType
+		FROM SNET_REPORT_BRANCH_SW_TYPE
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+	
+	<update id="updateReportBranchSwType" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE 	SNET_REPORT_BRANCH_SW_TYPE SET
+		ASSET_CNT = (
+			SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+			  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+			  , SNET_ASSET_SW_AUDIT_DAY D
+			  , SNET_ASSET_MASTER F
+			 WHERE 1=1
+			AND C.ASSET_CD 	= D.ASSET_CD
+			AND C.ASSET_CD  = F.ASSET_CD
+			AND C.AUDIT_DAY = D.AUDIT_DAY
+			AND C.SW_TYPE 	= D.SW_TYPE
+			AND C.SW_NM 	= D.SW_NM
+			AND C.SW_DIR 	= D.SW_DIR
+			AND C.SW_USER 	= D.SW_USER
+			AND C.SW_ETC 	= D.SW_ETC			
+			AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			AND F.BRANCH_ID = #{branchId}
+			AND C.SW_TYPE   = #{swType}
+		)
+		, ASSET_SW_CNT = 
+		(
+		
+			SELECT COUNT(*) AS CNT
+			  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+			  , SNET_ASSET_SW_AUDIT_DAY D
+			  , SNET_ASSET_MASTER F
+			 WHERE 1=1
+			AND C.ASSET_CD 	= D.ASSET_CD
+			AND C.ASSET_CD  = F.ASSET_CD
+			AND C.AUDIT_DAY = D.AUDIT_DAY
+			AND C.SW_TYPE   = D.SW_TYPE
+			AND C.SW_NM 	= D.SW_NM
+			AND C.SW_DIR 	= D.SW_DIR
+			AND C.SW_USER 	= D.SW_USER
+			AND C.SW_ETC 	= D.SW_ETC			
+			AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+			AND F.BRANCH_ID = #{branchId}
+			AND C.SW_TYPE   = #{swType}
+		)
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND BRANCH_ID = #{branchId}
+			AND SW_TYPE   = #{swType}			
+	
+	</update>
+		
+	<insert id="insertReportHostIp">
+		INSERT INTO SNET_REPORT_HOST_IP
+		(
+			CDATE         
+			, BRANCH_ID     
+			, BRANCH_NM
+			, TEAM_ID
+			, TEAM_NM
+			, USER_ID
+			, USER_NM
+			, HOST_NM
+			, IP_ADDRESS
+			, AUDIT_RATE 
+			, AD_RESULT_OK  
+			, AD_RESULT_NOK 
+			, AD_RESULT_NA  
+			, AD_RESULT_PASS
+			, AD_RESULT_REQ
+			, AD_WEIGHT_TOTAL
+			, AD_WEIGHT_OK   
+			, AD_WEIGHT_NOK  
+			, AD_WEIGHT_PASS 
+			, AD_WEIGHT_NA
+			, AD_WEIGHT_REQ
+			, ASSET_CNT 
+			, ASSET_SW_CNT
+		)
+		SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , SAM.BRANCH_ID
+		   , 
+		   (
+			 SELECT BRANCH_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE BRANCH_ID = SAM.BRANCH_ID
+			 AND BRANCH_NM = SAM.BRANCH_NM
+			 GROUP BY BRANCH_ID, BRANCH_NM
+		   ) AS BRANCH_NM		   
+		   , SAM.TEAM_ID
+		   ,
+		   (
+			 SELECT TEAM_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE TEAM_ID = SAM.TEAM_ID
+		   ) AS TEAM_NM	           
+		   , SAU.USER_ID 
+		   , SAU.USER_NM 
+		   , SAM.HOST_NM 
+		   , SAM.IP_ADDRESS
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE		  
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+		   ,
+			 (  
+				SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND F.ASSET_CD  = C.ASSET_CD
+				AND C.AUDIT_DAY = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				AND F.BRANCH_ID = SAM.BRANCH_ID
+				AND F.TEAM_ID = SAM.TEAM_ID
+				AND F.HOST_NM = SAM.HOST_NM
+				AND F.IP_ADDRESS = SAM.IP_ADDRESS  
+			 ) AS ASSET_CNT
+			 ,
+			 (
+				SELECT COUNT(*) AS CNT
+				  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				  , SNET_ASSET_SW_AUDIT_DAY D
+				  , SNET_ASSET_MASTER F
+				 WHERE 1=1
+				AND C.ASSET_CD 	= D.ASSET_CD
+				AND F.ASSET_CD   =  C.ASSET_CD
+				AND C.AUDIT_DAY  = D.AUDIT_DAY
+				AND C.SW_TYPE 	= D.SW_TYPE
+				AND C.SW_NM 	= D.SW_NM
+				AND C.SW_DIR 	= D.SW_DIR
+				AND C.SW_USER 	= D.SW_USER
+				AND C.SW_ETC 	= D.SW_ETC				
+				AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				AND F.BRANCH_ID = SAM.BRANCH_ID
+				AND F.TEAM_ID = SAM.TEAM_ID
+				AND F.HOST_NM = SAM.HOST_NM
+				AND F.IP_ADDRESS = SAM.IP_ADDRESS  
+			 ) AS ASSET_SW_CNT
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+			, SNET_ASSET_SW_AUDIT_DAY B
+			, SNET_ASSET_USER SAU
+			, SNET_ASSET_MASTER SAM
+		WHERE SAM.BRANCH_ID != ''
+			AND A.ASSET_CD 	= B.ASSET_CD
+			AND A.ASSET_CD  = SAM.ASSET_CD
+			AND A.ASSET_CD  = SAU.ASSET_CD
+			AND A.AUDIT_DAY = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 	= B.SW_NM
+			AND A.SW_DIR 	= B.SW_DIR
+			AND A.SW_USER 	= B.SW_USER
+			AND A.SW_ETC 	= B.SW_ETC			
+			AND SAU.USER_TYPE='OP'
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+		GROUP BY 
+			SAM.BRANCH_ID
+			, SAM.TEAM_ID
+			, SAM.HOST_NM
+			, SAU.USER_ID 
+			, SAU.USER_NM 
+			, SAM.IP_ADDRESS
+	</insert>
+	<select id="selectReportHostIp" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT 
+			BRANCH_ID as branchId
+			, TEAM_ID as teamId
+			, HOST_NM as hostNm
+			, IP_ADDRESS as ipAddress
+		FROM SNET_REPORT_HOST_IP
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+	
+	<update id="updateReportHostIp" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE SNET_REPORT_HOST_IP SET
+			        ASSET_CNT = (  
+						SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+						  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+						  , SNET_ASSET_SW_AUDIT_DAY D
+						 WHERE 1=1
+						AND C.ASSET_CD 	= D.ASSET_CD
+						AND C.AUDIT_DAY = D.AUDIT_DAY
+						AND C.SW_TYPE 	= D.SW_TYPE
+						AND C.SW_NM 	= D.SW_NM
+						AND C.SW_DIR 	= D.SW_DIR
+						AND C.SW_USER 	= D.SW_USER
+						AND C.SW_ETC 	= D.SW_ETC						
+						AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+						AND F.BRANCH_ID = #{branchId}
+						AND C.TEAM_ID = #{teamId}
+						AND C.HOST_NM = #{hostNm}
+						AND C.IP_ADDRESS = #{ipAddress}    
+			         )  
+					 ,
+					ASSET_SW_CNT = (
+						SELECT COUNT(*) AS CNT
+						  FROM SNET_ASSET_SW_AUDIT_HISTORY C
+						  , SNET_ASSET_SW_AUDIT_DAY D
+						 WHERE 1=1
+						AND C.ASSET_CD 	= D.ASSET_CD
+						AND C.AUDIT_DAY = D.AUDIT_DAY
+						AND C.SW_TYPE 	= D.SW_TYPE
+						AND C.SW_NM 	= D.SW_NM
+						AND C.SW_DIR 	= D.SW_DIR
+						AND C.SW_USER 	= D.SW_USER
+						AND C.SW_ETC 	= D.SW_ETC						
+						AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+						AND F.BRANCH_ID = #{branchId}
+						AND C.TEAM_ID = #{teamId}
+						AND C.HOST_NM = #{hostNm}
+						AND C.IP_ADDRESS = #{ipAddress}  
+					 ) 
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND BRANCH_ID = #{branchId}
+			AND TEAM_ID = #{teamId}
+			AND HOST_NM = #{hostNm}
+			AND IP_ADDRESS = #{ipAddress}	
+	
+	</update>
+		
+	<insert id="insertReportHostIpSwType">
+		INSERT INTO SNET_REPORT_HOST_IP_SW_TYPE
+		(
+			CDATE         
+			, BRANCH_ID     
+			, BRANCH_NM
+			, TEAM_ID
+			, TEAM_NM
+			, USER_ID
+			, USER_NM
+			, HOST_NM
+			, IP_ADDRESS
+			, SW_TYPE
+			, AUDIT_RATE 
+			, AD_RESULT_OK  
+			, AD_RESULT_NOK 
+			, AD_RESULT_NA  
+			, AD_RESULT_PASS
+			, AD_RESULT_REQ
+			, AD_WEIGHT_TOTAL
+			, AD_WEIGHT_OK   
+			, AD_WEIGHT_NOK  
+			, AD_WEIGHT_PASS 
+			, AD_WEIGHT_NA 
+			, AD_WEIGHT_REQ
+		)
+		SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , SAM.BRANCH_ID
+		   , 
+		   (
+			 SELECT BRANCH_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE BRANCH_ID = SAM.BRANCH_ID
+			 AND BRANCH_NM = SAM.BRANCH_NM
+			 GROUP BY BRANCH_ID, BRANCH_NM
+		   ) AS BRANCH_NM		   
+		   , SAM.TEAM_ID
+		   ,
+		   (
+			 SELECT TEAM_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE TEAM_ID = SAM.TEAM_ID
+		   ) AS TEAM_NM	
+		   , SAU.USER_ID 
+		   , SAU.USER_NM 
+		   , SAM.HOST_NM 
+		   , SAM.IP_ADDRESS
+		   , A.SW_TYPE
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE		   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA  
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+		, SNET_ASSET_SW_AUDIT_DAY B
+		, SNET_ASSET_USER SAU
+		, SNET_ASSET_MASTER SAM
+		WHERE SAM.BRANCH_ID != ''
+			AND A.ASSET_CD 	 = B.ASSET_CD
+			AND A.ASSET_CD   = SAM.ASSET_CD
+			AND A.ASSET_CD   = SAU.ASSET_CD
+			AND A.AUDIT_DAY  = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 	= B.SW_NM
+			AND A.SW_DIR 	= B.SW_DIR
+			AND A.SW_USER 	= B.SW_USER
+			AND A.SW_ETC 	= B.SW_ETC			
+			AND SAU.USER_TYPE = 'OP'
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+		GROUP BY 
+			SAM.BRANCH_ID
+			, SAM.TEAM_ID
+			, SAM.HOST_NM
+			, SAU.USER_ID 
+			, SAU.USER_NM 
+			, SAM.IP_ADDRESS
+			, A.SW_TYPE
+	</insert>
+	
+	<insert id="insertReportSwNm">
+		INSERT INTO SNET_REPORT_SW_NM
+		(
+			CDATE         
+			, SW_TYPE
+			, SW_NM
+			, AUDIT_RATE 
+			, AD_RESULT_OK  
+			, AD_RESULT_NOK 
+			, AD_RESULT_NA  
+			, AD_RESULT_PASS
+			, AD_RESULT_REQ
+			, AD_WEIGHT_TOTAL
+			, AD_WEIGHT_OK   
+			, AD_WEIGHT_NOK  
+			, AD_WEIGHT_PASS 
+			, AD_WEIGHT_NA
+			, AD_WEIGHT_REQ
+			, ASSET_CNT
+			, ASSET_SW_CNT 
+		)
+		SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , A.SW_TYPE
+		   , A.SW_NM
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE		   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+		   ,
+		   (
+				SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				, SNET_ASSET_SW_AUDIT_DAY D
+				, SNET_ASSET_MASTER F	
+				   WHERE    
+							C.ASSET_CD 	= D.ASSET_CD
+						AND F.ASSET_CD 	= D.ASSET_CD
+						AND C.SW_TYPE 	= D.SW_TYPE
+						AND C.SW_NM 		= D.SW_NM
+						AND C.AUDIT_DAY 	= D.AUDIT_DAY
+						AND C.SW_DIR 	= D.SW_DIR
+						AND C.SW_USER 	= D.SW_USER
+						AND C.SW_ETC 	= D.SW_ETC
+						AND C.SW_TYPE	= A.SW_TYPE		
+						AND LOWER(C.SW_NM) 	= LOWER(A.SW_NM)
+		   ) AS ASSET_CNT
+		   ,
+		   (
+				SELECT COUNT(*) AS CNT
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C
+				, SNET_ASSET_SW_AUDIT_DAY D		
+				, SNET_ASSET_MASTER F	
+				   WHERE    
+							C.ASSET_CD 	= D.ASSET_CD
+						AND F.ASSET_CD 	= D.ASSET_CD
+						AND C.SW_TYPE 	= D.SW_TYPE
+						AND C.SW_NM 		= D.SW_NM
+						AND C.AUDIT_DAY 	= D.AUDIT_DAY
+						AND C.SW_DIR 	= D.SW_DIR
+						AND C.SW_USER 	= D.SW_USER
+						AND C.SW_ETC 	= D.SW_ETC	
+						AND C.SW_TYPE	= A.SW_TYPE
+						AND LOWER(C.SW_NM) 	= LOWER(A.SW_NM)					
+		   ) AS ASSET_SW_CNT
+		FROM SNET_ASSET_SW_AUDIT_HISTORY A
+		, SNET_ASSET_SW_AUDIT_DAY B
+		, SNET_ASSET_MASTER SAM
+		WHERE 
+			A.ASSET_CD 	= B.ASSET_CD
+			AND A.ASSET_CD  = SAM.ASSET_CD
+			AND A.AUDIT_DAY = B.AUDIT_DAY
+			AND A.SW_TYPE 	= B.SW_TYPE
+			AND A.SW_NM 	= B.SW_NM
+			AND A.SW_DIR 	= B.SW_DIR
+			AND A.SW_USER 	= B.SW_USER
+			AND A.SW_ETC 	= B.SW_ETC
+			AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+		GROUP BY 
+			A.SW_TYPE
+			, A.SW_NM
+	</insert>
+
+	<select id="selectReportSwNm" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT
+			SW_TYPE as swType
+			, SW_NM as swNm
+		FROM SNET_REPORT_SW_NM
+		WHERE 
+		CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+	
+	<update id="updateReportSwNm" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE 	SNET_REPORT_SW_NM SET
+		ASSET_CNT = (
+			SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+			FROM SNET_ASSET_SW_AUDIT_HISTORY C
+			, SNET_ASSET_SW_AUDIT_DAY D
+			, SNET_ASSET_MASTER F	
+			   WHERE    
+						C.ASSET_CD 	= D.ASSET_CD
+					AND F.ASSET_CD 	= D.ASSET_CD
+					AND C.SW_TYPE 	= D.SW_TYPE
+					AND C.SW_NM 		= D.SW_NM
+					AND C.AUDIT_DAY 	= D.AUDIT_DAY
+					AND C.SW_DIR 	= D.SW_DIR
+					AND C.SW_USER 	= D.SW_USER
+					AND C.SW_ETC 	= D.SW_ETC
+					AND C.SW_TYPE	= #{swType}	
+					AND LOWER(C.SW_NM) 	= LOWER(#{swNm})
+		)
+		, ASSET_SW_CNT = 
+		(
+		
+			SELECT COUNT(*) AS CNT
+			FROM SNET_ASSET_SW_AUDIT_HISTORY C
+			, SNET_ASSET_SW_AUDIT_DAY D
+			, SNET_ASSET_MASTER F	
+			   WHERE    
+						C.ASSET_CD 	= D.ASSET_CD
+					AND F.ASSET_CD 	= D.ASSET_CD
+					AND C.SW_TYPE 	= D.SW_TYPE
+					AND C.SW_NM 		= D.SW_NM
+					AND C.AUDIT_DAY 	= D.AUDIT_DAY
+					AND C.SW_DIR 	= D.SW_DIR
+					AND C.SW_USER 	= D.SW_USER
+					AND C.SW_ETC 	= D.SW_ETC
+					AND C.SW_TYPE	= #{swType}	
+					AND LOWER(C.SW_NM) 	= LOWER(#{swNm})
+		)
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND SW_TYPE = #{swType}
+			AND SW_NM   = #{swNm}
+	</update>
+		
+	<insert id="insertReportSwType">
+        INSERT INTO SNET_REPORT_SW_TYPE
+        (
+            CDATE
+            , SW_TYPE
+            , BRANCH_NM
+            , AUDIT_RATE
+            , AD_RESULT_OK
+            , AD_RESULT_NOK
+            , AD_RESULT_NA
+            , AD_RESULT_PASS
+            , AD_RESULT_REQ
+            , AD_WEIGHT_TOTAL
+            , AD_WEIGHT_OK
+            , AD_WEIGHT_NOK
+            , AD_WEIGHT_PASS
+            , AD_WEIGHT_NA
+            , AD_WEIGHT_REQ
+            , ASSET_CNT
+            , ASSET_SW_CNT
+            , DEL_FLAG
+        )
+            (
+                SELECT
+                      DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+                    , A.SW_TYPE
+                    , '전체' AS BRANCH_NM
+                    , ROUND(
+                              CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+                              WHEN 0 THEN 0
+                              WHEN null THEN 0
+                              ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+                              END, 2) AS AUDIT_RATE
+                    , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK
+                    , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+                    , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+                    , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+                    , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+                    , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+                    , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+                    , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK
+                    , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+                    , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+                    , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+                    ,
+                      (
+                          SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+                          FROM SNET_ASSET_SW_AUDIT_HISTORY C
+                              , SNET_ASSET_SW_AUDIT_DAY D
+                              , SNET_ASSET_MASTER F
+                          WHERE
+                              C.ASSET_CD 	= D.ASSET_CD
+                              AND F.ASSET_CD 	= D.ASSET_CD
+                              AND C.SW_TYPE 	= D.SW_TYPE
+                              AND C.SW_NM 		= D.SW_NM
+                              AND C.AUDIT_DAY 	= D.AUDIT_DAY
+                              AND C.SW_DIR 	= D.SW_DIR
+                              AND C.SW_USER 	= D.SW_USER
+                              AND C.SW_ETC 	= D.SW_ETC
+                              AND LOWER(C.SW_TYPE) 	= LOWER(A.SW_TYPE)
+                      ) AS ASSET_CNT
+                    ,
+                      (
+                          SELECT COUNT(*) AS CNT
+                          FROM SNET_ASSET_SW_AUDIT_HISTORY C
+                              , SNET_ASSET_SW_AUDIT_DAY D
+                              , SNET_ASSET_MASTER F
+                          WHERE
+                              C.ASSET_CD 	= D.ASSET_CD
+                              AND F.ASSET_CD 	= D.ASSET_CD
+                              AND C.SW_TYPE 	= D.SW_TYPE
+                              AND C.SW_NM 		= D.SW_NM
+                              AND C.AUDIT_DAY 	= D.AUDIT_DAY
+                              AND C.SW_DIR 	= D.SW_DIR
+                              AND C.SW_USER 	= D.SW_USER
+                              AND C.SW_ETC 	= D.SW_ETC
+                              AND LOWER(C.SW_TYPE) 	= LOWER(A.SW_TYPE)
+                      ) AS ASSET_SW_CNT
+                    , DATE_FORMAT(NOW(), '%H') as DEL_FLAG
+                FROM SNET_ASSET_SW_AUDIT_HISTORY A
+                    , SNET_ASSET_SW_AUDIT_DAY B
+                    , SNET_ASSET_MASTER SAM
+                WHERE
+                    A.ASSET_CD 	= B.ASSET_CD
+                    AND A.ASSET_CD  = SAM.ASSET_CD
+                    AND A.AUDIT_DAY = B.AUDIT_DAY
+                    AND A.SW_TYPE 	= B.SW_TYPE
+                    AND A.SW_NM 	= B.SW_NM
+                    AND A.SW_DIR 	= B.SW_DIR
+                    AND A.SW_USER 	= B.SW_USER
+                    AND A.SW_ETC 	= B.SW_ETC
+                    AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+                GROUP BY A.SW_TYPE
+            )
+            UNION ALL
+            (SELECT
+                   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+                 , A.SW_TYPE
+                 , (
+                       SELECT BRANCH_NM
+                       FROM SNET_CONFIG_TEAM_VIEW
+                       WHERE BRANCH_ID = SAM.BRANCH_ID
+                       AND BRANCH_NM = SAM.BRANCH_NM
+                       GROUP BY BRANCH_ID, BRANCH_NM
+                   ) AS BRANCH_NM
+                 , ROUND(
+                           CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+                           WHEN 0 THEN 0
+                           WHEN null THEN 0
+                           ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+                           END, 2) AS AUDIT_RATE
+                 , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK
+                 , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+                 , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+                 , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+                 , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+                 , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+                 , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+                 , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK
+                 , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+                 , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+                 , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+                 ,
+                   (
+                       SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+                       FROM SNET_ASSET_SW_AUDIT_HISTORY C
+                           , SNET_ASSET_SW_AUDIT_DAY D
+                           , SNET_ASSET_MASTER F
+                       WHERE
+                           C.ASSET_CD 	= D.ASSET_CD
+                           AND F.ASSET_CD 	= D.ASSET_CD
+                           AND C.SW_TYPE 	= D.SW_TYPE
+                           AND C.SW_NM 		= D.SW_NM
+                           AND C.AUDIT_DAY 	= D.AUDIT_DAY
+                           AND C.SW_DIR 	= D.SW_DIR
+                           AND C.SW_INFO 	= D.SW_INFO
+                           AND C.SW_USER 	= D.SW_USER
+                           AND C.SW_ETC 	= D.SW_ETC
+                           AND F.BRANCH_ID = SAM.BRANCH_ID
+                           AND LOWER(C.SW_TYPE) 	= LOWER(A.SW_TYPE)
+                   ) AS ASSET_CNT
+                 ,
+                   (
+                       SELECT COUNT(*) AS CNT
+                       FROM SNET_ASSET_SW_AUDIT_HISTORY C
+                           , SNET_ASSET_SW_AUDIT_DAY D
+                           , SNET_ASSET_MASTER F
+                       WHERE
+                           C.ASSET_CD 	= D.ASSET_CD
+                           AND F.ASSET_CD 	= D.ASSET_CD
+                           AND C.SW_TYPE 	= D.SW_TYPE
+                           AND C.SW_NM 		= D.SW_NM
+                           AND C.AUDIT_DAY 	= D.AUDIT_DAY
+                           AND C.SW_DIR 	= D.SW_DIR
+                           AND C.SW_INFO 	= D.SW_INFO
+                           AND C.SW_USER 	= D.SW_USER
+                           AND C.SW_ETC 	= D.SW_ETC
+                           AND F.BRANCH_ID = SAM.BRANCH_ID
+                           AND LOWER(C.SW_TYPE) 	= LOWER(A.SW_TYPE)
+                   ) AS ASSET_SW_CNT
+                 , DATE_FORMAT(NOW(), '%H') as DEL_FLAG
+             FROM SNET_ASSET_SW_AUDIT_HISTORY A
+                 , SNET_ASSET_SW_AUDIT_DAY B
+                 , SNET_ASSET_MASTER SAM
+             WHERE
+                 A.ASSET_CD 	= B.ASSET_CD
+                 AND A.ASSET_CD  = SAM.ASSET_CD
+                 AND A.AUDIT_DAY = B.AUDIT_DAY
+                 AND A.SW_TYPE 	= B.SW_TYPE
+                 AND A.SW_NM 	= B.SW_NM
+                 AND A.SW_DIR 	= B.SW_DIR
+                 AND A.SW_INFO 	= B.SW_INFO
+                 AND A.SW_USER 	= B.SW_USER
+                 AND A.SW_ETC 	= B.SW_ETC
+                 AND A.SW_TYPE IN ('OS', 'DB','WEB', 'WAS', 'URL', 'NW', 'SE', 'SC', 'HV', 'Pentest')
+             GROUP BY A.SW_TYPE, SAM.BRANCH_ID)
+	</insert>
+
+	<select id="selectReportSwType" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT 
+			SW_TYPE AS swType
+		FROM SNET_REPORT_SW_TYPE
+		WHERE 
+		CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+	
+	<update id="updateReportSwType" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE 	SNET_REPORT_SW_TYPE SET
+		ASSET_CNT = (
+			SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+			FROM SNET_ASSET_SW_AUDIT_HISTORY C
+			, SNET_ASSET_SW_AUDIT_DAY D
+			, SNET_ASSET_MASTER F	
+			   WHERE    
+						C.ASSET_CD 	= D.ASSET_CD
+					AND F.ASSET_CD 	= D.ASSET_CD
+					AND C.SW_TYPE 	= D.SW_TYPE
+					AND C.SW_NM 	= D.SW_NM
+					AND C.AUDIT_DAY = D.AUDIT_DAY
+					AND C.SW_DIR 	= D.SW_DIR
+					AND C.SW_USER 	= D.SW_USER
+					AND C.SW_ETC 	= D.SW_ETC
+					AND LOWER(C.SW_TYPE) 	= LOWER(#{swType})	
+		)
+		, ASSET_SW_CNT = 
+		(
+		
+			SELECT COUNT(*) AS CNT
+			FROM SNET_ASSET_SW_AUDIT_HISTORY C
+			, SNET_ASSET_SW_AUDIT_DAY D
+			, SNET_ASSET_MASTER F	
+			   WHERE    
+						C.ASSET_CD 	= D.ASSET_CD
+					AND F.ASSET_CD 	= D.ASSET_CD
+					AND C.SW_TYPE 	= D.SW_TYPE
+					AND C.SW_NM 	= D.SW_NM
+					AND C.AUDIT_DAY = D.AUDIT_DAY
+					AND C.SW_DIR 	= D.SW_DIR
+					AND C.SW_USER 	= D.SW_USER
+					AND C.SW_ETC 	= D.SW_ETC
+					AND LOWER(C.SW_TYPE) 	= LOWER(#{swType})	
+		)
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND SW_TYPE = #{swType}	
+	</update>
+		
+	<insert id="insertReportSwWeak">
+        INSERT INTO SNET_REPORT_SW_WEAK
+        (
+            CDATE,
+            BRANCH_NM,
+            SW_TYPE,
+            SW_NM,
+            DIAGNOSIS_CD,
+            ITEM_GRP_NM,
+            ITEM_NM,
+            ITEM_GRADE,
+            WEAK_CNT,
+            DEL_FLAG
+        )
+            (
+                SELECT   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE,
+                         '전체' as BRANCH_NM,
+                    A.SW_TYPE,
+                    A.SW_NM,
+                    A.DIAGNOSIS_CD,
+                    A.ITEM_GRP_NM,
+                    A.ITEM_NM,
+                    A.ITEM_GRADE,
+                         COUNT(*) AS WEAK_CNT
+                    , DATE_FORMAT(NOW(), '%H') as DEL_FLAG
+                FROM SNET_ASSET_SW_AUDIT_REPORT A
+                    , SNET_ASSET_SW_AUDIT_DAY B
+                    , SNET_ASSET_MASTER SAM
+                WHERE   A.ASSET_CD = B.ASSET_CD
+                        AND SAM.ASSET_CD = A.ASSET_CD
+                        AND A.SW_TYPE 	 = B.SW_TYPE
+                        AND A.SW_NM 	 = B.SW_NM
+                        AND A.SW_DIR 	= B.SW_DIR
+                        AND A.SW_USER 	= B.SW_USER
+                        AND A.SW_ETC 	= B.SW_ETC
+                        AND A.AUDIT_DAY = B.AUDIT_DAY
+                        AND A.ITEM_RESULT = 'F'
+                        AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+                GROUP BY A.SW_TYPE,
+                    A.SW_NM,
+                    A.DIAGNOSIS_CD,
+                    A.ITEM_GRP_NM,
+                    A.ITEM_NM,
+                    A.ITEM_GRADE
+            )
+            UNION ALL
+            (SELECT   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE,
+                 (
+                     SELECT BRANCH_NM
+                     FROM SNET_CONFIG_TEAM_VIEW
+                     WHERE BRANCH_ID = SAM.BRANCH_ID
+                     GROUP BY BRANCH_ID, BRANCH_NM
+                 ) AS BRANCH_NM,
+                 A.SW_TYPE,
+                 A.SW_NM,
+                 A.DIAGNOSIS_CD,
+                 A.ITEM_GRP_NM,
+                 A.ITEM_NM,
+                 A.ITEM_GRADE,
+                      COUNT(*) AS WEAK_CNT
+                 , DATE_FORMAT(NOW(), '%H') as DEL_FLAG
+             FROM SNET_ASSET_SW_AUDIT_REPORT A
+                 , SNET_ASSET_SW_AUDIT_DAY B
+                 , SNET_ASSET_MASTER SAM
+             WHERE   A.ASSET_CD = B.ASSET_CD
+                     AND SAM.ASSET_CD = A.ASSET_CD
+                     AND A.SW_TYPE 	 = B.SW_TYPE
+                     AND A.SW_NM 	 = B.SW_NM
+                     AND A.SW_DIR 	= B.SW_DIR
+                     AND A.SW_USER 	= B.SW_USER
+                     AND A.SW_ETC 	= B.SW_ETC
+                     AND A.AUDIT_DAY = B.AUDIT_DAY
+                     AND A.ITEM_RESULT = 'F'
+                     AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+             GROUP BY A.SW_TYPE,
+                 A.SW_NM,
+                 A.DIAGNOSIS_CD,
+                 A.ITEM_GRP_NM,
+                 A.ITEM_NM,
+                 A.ITEM_GRADE,
+                 SAM.BRANCH_NM)
+	</insert>
+	
+	<insert id="insertReportBranchSwWeak">
+		INSERT INTO SNET_REPORT_BRANCH_SW_WEAK
+		(
+			CDATE,
+			BRANCH_ID,
+			BRANCH_NM,
+			SW_TYPE,
+			SW_NM,
+			DIAGNOSIS_CD,
+			ITEM_GRP_NM,
+			ITEM_NM,
+			ITEM_GRADE,
+			WEAK_CNT
+		)
+	  SELECT DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE,
+			 SAM.BRANCH_ID,
+		   (
+			 SELECT BRANCH_NM 
+			 FROM SNET_CONFIG_TEAM_VIEW
+			 WHERE BRANCH_ID = SAM.BRANCH_ID
+			 GROUP BY BRANCH_ID, BRANCH_NM
+		   ) AS BRANCH_NM,			
+			 A.SW_TYPE,
+			 A.SW_NM,
+			 A.DIAGNOSIS_CD,
+			 A.ITEM_GRP_NM,
+			 A.ITEM_NM,
+			 A.ITEM_GRADE,
+			 COUNT(*) AS WEAK_CNT
+		FROM SNET_ASSET_SW_AUDIT_REPORT A
+			 , SNET_ASSET_SW_AUDIT_DAY B
+			 , SNET_ASSET_MASTER SAM
+	   WHERE     A.ASSET_CD = B.ASSET_CD
+	   		 AND SAM.ASSET_CD = A.ASSET_CD
+			 AND A.SW_TYPE = B.SW_TYPE
+			 AND A.SW_NM = B.SW_NM
+			 AND A.SW_DIR = B.SW_DIR
+			 AND A.SW_USER = B.SW_USER
+			 AND A.SW_ETC = B.SW_ETC
+			 AND A.AUDIT_DAY = B.AUDIT_DAY
+			 AND A.ITEM_RESULT = 'F'
+			 AND A.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+	GROUP BY SAM.BRANCH_ID,
+			 A.SW_TYPE,
+			 A.SW_NM,
+			 A.DIAGNOSIS_CD,
+			 A.ITEM_GRP_NM,
+			 A.ITEM_NM,
+			 A.ITEM_GRADE
+	</insert>
+	
+	<insert id="insertReportTeam">
+		INSERT INTO SNET_REPORT_TEAM
+		(
+			CDATE         
+			, BRANCH_ID
+			, BRANCH_NM
+			, TEAM_ID
+			, TEAM_NM
+			, AUDIT_RATE 
+			, AD_RESULT_OK  
+			, AD_RESULT_NOK 
+			, AD_RESULT_NA  
+			, AD_RESULT_PASS
+			, AD_RESULT_REQ
+			, AD_WEIGHT_TOTAL
+			, AD_WEIGHT_OK   
+			, AD_WEIGHT_NOK  
+			, AD_WEIGHT_PASS 
+			, AD_WEIGHT_NA 
+			, AD_WEIGHT_REQ
+			, ASSET_CNT 
+			, ASSET_SW_CNT 
+		)
+		SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , SAM.BRANCH_ID
+		   , (SELECT BRANCH_NM FROM SNET_CONFIG_TEAM_VIEW WHERE BRANCH_ID =SAM.BRANCH_ID AND TEAM_ID =SAM.TEAM_ID) as BRANCH_NM
+		   , SAM.TEAM_ID
+		   , (SELECT TEAM_NM FROM SNET_CONFIG_TEAM_VIEW WHERE BRANCH_ID =SAM.BRANCH_ID AND TEAM_ID =SAM.TEAM_ID) as TEAM_NM
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE		   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+		   , (
+				SELECT COUNT(DISTINCT F.ASSET_CD) AS CNT
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+					 SNET_ASSET_SW_AUDIT_DAY   D,
+					 SNET_ASSET_MASTER         F
+			   WHERE     C.ASSET_CD = D.ASSET_CD
+					 AND F.ASSET_CD = D.ASSET_CD
+					 AND C.SW_TYPE = D.SW_TYPE
+					 AND C.SW_NM = D.SW_NM
+					 AND C.AUDIT_DAY = D.AUDIT_DAY
+					 AND C.SW_DIR = D.SW_DIR
+					 AND C.SW_USER = D.SW_USER
+					 AND C.SW_ETC = D.SW_ETC
+					 AND F.BRANCH_ID = SAM.BRANCH_ID
+					 AND F.TEAM_ID = SAM.TEAM_ID				 
+
+		   ) AS ASSET_CNT
+		   , 
+		   (
+			 SELECT 
+				COUNT(*) AS CNT
+            FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+                 SNET_ASSET_SW_AUDIT_DAY   D,
+                 SNET_ASSET_MASTER         F
+           WHERE     C.ASSET_CD = D.ASSET_CD
+                 AND F.ASSET_CD = D.ASSET_CD
+                 AND C.SW_TYPE = D.SW_TYPE
+                 AND C.SW_NM = D.SW_NM
+                 AND C.AUDIT_DAY = D.AUDIT_DAY
+                 AND C.SW_DIR = D.SW_DIR
+                 AND C.SW_USER = D.SW_USER
+                 AND C.SW_ETC = D.SW_ETC
+				 AND F.BRANCH_ID = SAM.BRANCH_ID
+			 	 AND F.TEAM_ID = SAM.TEAM_ID
+		   ) AS ASSET_SW_CNT
+    FROM SNET_ASSET_SW_AUDIT_HISTORY A,
+         SNET_ASSET_SW_AUDIT_DAY   B,
+         SNET_ASSET_MASTER         SAM
+   WHERE     A.ASSET_CD = B.ASSET_CD
+         AND A.ASSET_CD = SAM.ASSET_CD
+         AND A.AUDIT_DAY = B.AUDIT_DAY
+         AND A.SW_TYPE = B.SW_TYPE
+         AND A.SW_NM = B.SW_NM
+         AND A.SW_DIR = B.SW_DIR
+         AND A.SW_USER = B.SW_USER
+         AND A.SW_ETC = B.SW_ETC
+         AND A.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+		 AND SAM.BRANCH_ID != ''
+		 AND SAM.TEAM_ID != ''
+	GROUP BY 
+		SAM.BRANCH_ID
+		, SAM.TEAM_ID
+	</insert>
+	
+	<select id="selectReportTeam" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT
+			BRANCH_ID as branchId
+			, TEAM_ID as teamId
+		FROM SNET_REPORT_TEAM
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+
+	<update id="updateReportTeam" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE SNET_REPORT_TEAM SET
+		ASSET_CNT = (
+			SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+			FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+					 SNET_ASSET_SW_AUDIT_DAY   D,
+					 SNET_ASSET_MASTER         F
+			WHERE     C.ASSET_CD = D.ASSET_CD
+				 AND F.ASSET_CD = D.ASSET_CD
+				 AND C.SW_TYPE = D.SW_TYPE
+				 AND C.SW_NM = D.SW_NM
+				 AND C.AUDIT_DAY = D.AUDIT_DAY
+				 AND C.SW_DIR = D.SW_DIR
+				 AND C.SW_USER = D.SW_USER
+				 AND C.SW_ETC = D.SW_ETC
+				 AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				 AND F.BRANCH_ID = #{branchId}
+				 AND C.TEAM_ID 	= #{teamId}
+		)
+		, ASSET_SW_CNT = 
+		(
+			SELECT 
+				COUNT(TEAM_ID) AS CNT
+			FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+				 SNET_ASSET_SW_AUDIT_DAY   D,
+				 SNET_ASSET_MASTER         F
+		    WHERE     C.ASSET_CD = D.ASSET_CD
+				 AND F.ASSET_CD = D.ASSET_CD
+				 AND C.SW_TYPE = D.SW_TYPE
+				 AND C.SW_NM = D.SW_NM
+				 AND C.AUDIT_DAY = D.AUDIT_DAY
+				 AND C.SW_DIR = D.SW_DIR
+				 AND C.SW_USER = D.SW_USER
+				 AND C.SW_ETC = D.SW_ETC
+				 AND C.SW_TYPE IN ('OS', 'DB' ,'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+				 AND F.BRANCH_ID = #{branchId}
+				 AND C.TEAM_ID 	= #{teamId}
+		)
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND BRANCH_ID	= #{branchId}
+			AND TEAM_ID		= #{teamId}	
+	</update>
+		
+	<insert id="insertReportTeamSwType">
+		INSERT INTO SNET_REPORT_TEAM_SW_TYPE
+		(
+			CDATE         
+			, BRANCH_ID
+			, BRANCH_NM
+			, TEAM_ID
+			, TEAM_NM
+			, SW_TYPE
+			, AUDIT_RATE 
+			, AD_RESULT_OK  
+			, AD_RESULT_NOK 
+			, AD_RESULT_NA  
+			, AD_RESULT_PASS
+			, AD_RESULT_REQ
+			, AD_WEIGHT_TOTAL
+			, AD_WEIGHT_OK   
+			, AD_WEIGHT_NOK  
+			, AD_WEIGHT_PASS 
+			, AD_WEIGHT_NA
+			, AD_WEIGHT_REQ
+			, ASSET_CNT
+			, ASSET_SW_CNT
+		)
+		SELECT
+		   DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+		   , SAM.BRANCH_ID
+		   , (SELECT BRANCH_NM FROM SNET_CONFIG_TEAM_VIEW WHERE BRANCH_ID =SAM.BRANCH_ID AND TEAM_ID =SAM.TEAM_ID) as BRANCH_NM
+		   , SAM.TEAM_ID
+		   , (SELECT TEAM_NM FROM SNET_CONFIG_TEAM_VIEW WHERE BRANCH_ID =SAM.BRANCH_ID AND TEAM_ID =SAM.TEAM_ID) as TEAM_NM
+		   , A.SW_TYPE
+		   , ROUND(
+			   CASE (SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+		         WHEN 0 THEN 0
+		         WHEN null THEN 0
+			 	 ELSE SUM(A.AD_WEIGHT_OK)/(SUM(A.AD_WEIGHT_TOTAL)-SUM(A.AD_WEIGHT_PASS)-SUM(A.AD_WEIGHT_NA))*100
+			   END, 2) AS AUDIT_RATE		   
+		   , SUM(A.AD_RESULT_OK) AS AD_RESULT_OK     
+		   , SUM(A.AD_RESULT_NOK) AS AD_RESULT_NOK
+		   , SUM(A.AD_RESULT_NA) AS AD_RESULT_NA
+		   , SUM(A.AD_RESULT_PASS) AS AD_RESULT_PASS
+		   , SUM(A.AD_RESULT_REQ) AS AD_RESULT_REQ
+		   , SUM(A.AD_WEIGHT_TOTAL) AS AD_WEIGHT_TOTAL
+		   , SUM(A.AD_WEIGHT_OK) AS AD_WEIGHT_OK
+		   , SUM(A.AD_WEIGHT_NOK) AS AD_WEIGHT_NOK 
+		   , SUM(A.AD_WEIGHT_PASS) AS AD_WEIGHT_PASS
+		   , SUM(A.AD_WEIGHT_NA) AS AD_WEIGHT_NA
+		   , SUM(A.AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+		   ,
+		   (
+				SELECT COUNT(DISTINCT C.ASSET_CD) AS CNT
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+					 SNET_ASSET_SW_AUDIT_DAY   D,
+					 SNET_ASSET_MASTER         F
+			   WHERE     C.ASSET_CD = D.ASSET_CD
+					 AND F.ASSET_CD = D.ASSET_CD
+					 AND C.SW_TYPE = D.SW_TYPE
+					 AND C.SW_NM = D.SW_NM
+					 AND C.AUDIT_DAY = D.AUDIT_DAY
+					 AND C.SW_DIR = D.SW_DIR
+					 AND C.SW_USER = D.SW_USER
+					 AND C.SW_ETC = D.SW_ETC
+					 AND C.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+					 AND F.BRANCH_ID = SAM.BRANCH_ID
+					 AND F.TEAM_ID = SAM.TEAM_ID	
+					 AND C.SW_TYPE	= A.SW_TYPE
+		   ) AS ASSET_CNT
+		   ,
+		   (
+				SELECT COUNT(*) AS CNT 
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+					 SNET_ASSET_SW_AUDIT_DAY   D,
+					 SNET_ASSET_MASTER         F
+			   WHERE     C.ASSET_CD = D.ASSET_CD
+					 AND F.ASSET_CD = D.ASSET_CD
+					 AND C.SW_TYPE = D.SW_TYPE
+					 AND C.SW_NM = D.SW_NM
+					 AND C.AUDIT_DAY = D.AUDIT_DAY
+					 AND C.SW_DIR = D.SW_DIR
+					 AND C.SW_USER = D.SW_USER
+					 AND C.SW_ETC = D.SW_ETC
+					 AND C.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+					 AND F.BRANCH_ID = SAM.BRANCH_ID
+					 AND F.TEAM_ID = SAM.TEAM_ID	
+					 AND C.SW_TYPE	= A.SW_TYPE	
+		   ) AS ASSET_SW_CNT     
+    FROM SNET_ASSET_SW_AUDIT_HISTORY A,
+         SNET_ASSET_SW_AUDIT_DAY   B,
+         SNET_ASSET_MASTER         SAM
+   WHERE     A.ASSET_CD = B.ASSET_CD
+         AND A.ASSET_CD = SAM.ASSET_CD
+         AND A.AUDIT_DAY = B.AUDIT_DAY
+         AND A.SW_TYPE = B.SW_TYPE
+         AND A.SW_NM = B.SW_NM
+         AND A.SW_DIR = B.SW_DIR
+         AND A.SW_USER = B.SW_USER
+         AND A.SW_ETC = B.SW_ETC
+         AND A.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+		 AND SAM.BRANCH_ID !=''
+		 AND SAM.TEAM_ID !=''
+		GROUP BY 
+			SAM.BRANCH_ID
+			, SAM.TEAM_ID
+			, A.SW_TYPE		
+	</insert>
+
+	<select id="selectReportTeamSwType" resultType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		SELECT
+			BRANCH_ID as branchId
+			, TEAM_ID as teamId
+			, SW_TYPE as swType
+		FROM SNET_REPORT_TEAM_SW_TYPE
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</select>
+
+	<update id="updateReportTeamSwType" parameterType="com.mobigen.snet.supportagent.entity.MakeReportEntity">
+		UPDATE SNET_REPORT_TEAM_SW_TYPE SET
+		ASSET_CNT = (
+			SELECT COUNT(DISTINCT F.ASSET_CD) AS CNT
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+					 SNET_ASSET_SW_AUDIT_DAY   D,
+					 SNET_ASSET_MASTER         F
+			   WHERE     C.ASSET_CD = D.ASSET_CD
+					 AND F.ASSET_CD = D.ASSET_CD
+					 AND C.SW_TYPE = D.SW_TYPE
+					 AND C.SW_NM = D.SW_NM
+					 AND C.AUDIT_DAY = D.AUDIT_DAY
+					 AND C.SW_DIR = D.SW_DIR
+					 AND C.SW_USER = D.SW_USER
+					 AND C.SW_ETC = D.SW_ETC
+					 AND C.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+					 AND F.BRANCH_ID = #{branchId}
+					 AND C.TEAM_ID	= #{teamId}
+					 AND C.SW_TYPE	= #{swType}	
+		)
+		, ASSET_SW_CNT = 
+		(
+			SELECT COUNT(*) AS CNT 
+				FROM SNET_ASSET_SW_AUDIT_HISTORY C,
+					 SNET_ASSET_SW_AUDIT_DAY   D,
+					 SNET_ASSET_MASTER         F
+			   WHERE     C.ASSET_CD = D.ASSET_CD
+					 AND F.ASSET_CD = D.ASSET_CD
+					 AND C.SW_TYPE = D.SW_TYPE
+					 AND C.SW_NM = D.SW_NM
+					 AND C.AUDIT_DAY = D.AUDIT_DAY
+					 AND C.SW_DIR = D.SW_DIR
+					 AND C.SW_USER = D.SW_USER
+					 AND C.SW_ETC = D.SW_ETC
+					 AND C.SW_TYPE IN ('OS', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+					 AND F.BRANCH_ID = #{branchId}
+					 AND C.TEAM_ID	= #{teamId}
+					 AND C.SW_TYPE	= #{swType}		
+		)
+		WHERE 
+			CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+			AND BRANCH_ID = #{branchId}
+			AND TEAM_ID	= #{teamId}
+			AND SW_TYPE	= #{swType}
+	</update>
+	
+	<!-- Agent Status Report -->
+	<delete id="deleteAgentReport">
+		DELETE FROM SNET_REPORT_AGENT
+		WHERE CDATE = DATE_FORMAT(NOW(), '%Y%m%d')
+	</delete>
+
+	<!--'sg_supprotmanager 프로젝트 - 스케줄러'-->
+	<insert id="makeAgentReport">
+		INSERT INTO SNET_REPORT_AGENT
+		(
+			CDATE
+			, SW_NM
+			, AGENT_DAE
+			, AGENT_JUN
+			, AGENT_RES
+			, EQUIP_CNT
+			, CREATE_DATE
+		) 
+		SELECT 
+		 	DATE_FORMAT(NOW(), '%Y%m%d')
+			, OS_DATA.SW_NM
+			, ifnull(ALL_DATA.DAE, 0) AS DAE
+			, ifnull(ALL_DATA.JUN, 0) AS JUN
+			, ifnull(ALL_DATA.RES, 0) AS RES
+			, ifnull(OS_DATA.CNT, 0) AS EQUIP_CNT
+			, now()
+		 FROM 
+		 (
+			SELECT AD.SW_NM, COUNT(*) AS CNT
+				FROM (  SELECT ASSET_CD, SW_NM, COUNT(*) AS CNT
+						  FROM SNET_ASSET_SW_AUDIT_DAY
+						 WHERE SW_TYPE = 'OS'
+					  GROUP BY ASSET_CD, SW_NM) AD
+			GROUP BY AD.SW_NM
+		 ) OS_DATA
+		 LEFT OUTER JOIN
+		 (
+			SELECT
+				A.SW_NM
+				, 
+				(
+					SELECT COUNT(SCM.ASSET_CD) AS CNT
+					 FROM SNET_CONNECT_MASTER SCM,
+						  SNET_AGENT_MASTER   AM,
+						  SNET_ASSET_MASTER   ASSM
+					 WHERE     ASSM.ASSET_CD = SCM.ASSET_CD
+						   AND ASSM.AGENT_CD = AM.AGENT_CD
+						   AND SCM.CONNECT_IP_ADDRESS IS NOT NULL
+						   AND AM.AGENT_REGI_FLAG = 2
+						   AND AM.AGENT_TYPE = 1
+						   AND LOWER(SCM.SW_NM) = LOWER(A.SW_NM)
+				) AS JUN	
+				,
+				(
+					SELECT COUNT(SCM.ASSET_CD) AS CNT
+							
+					 FROM SNET_CONNECT_MASTER SCM,
+						  SNET_AGENT_MASTER   AM,
+						  SNET_ASSET_MASTER   ASSM
+					 WHERE     ASSM.ASSET_CD = SCM.ASSET_CD
+						   AND ASSM.AGENT_CD = AM.AGENT_CD
+						   AND SCM.CONNECT_IP_ADDRESS IS NOT NULL
+						   AND AM.AGENT_REGI_FLAG = 2
+						   AND AM.AGENT_TYPE = 2
+						   AND LOWER(SCM.SW_NM) = LOWER(A.SW_NM)
+				) AS DAE
+				, COUNT(B.ASSET_CD) AS RES
+				FROM
+					(
+						SELECT SCM.ASSET_CD,
+								SCM.SW_NM,
+								AM.AGENT_TYPE
+						 FROM SNET_CONNECT_MASTER SCM,
+							  SNET_AGENT_MASTER   AM,
+							  SNET_ASSET_MASTER   ASSM
+						 WHERE     ASSM.ASSET_CD = SCM.ASSET_CD
+							   AND ASSM.AGENT_CD = AM.AGENT_CD
+							   AND SCM.CONNECT_IP_ADDRESS IS NOT NULL
+							   AND AM.AGENT_REGI_FLAG = 2
+							   AND AM.AGENT_TYPE =2
+					) A
+                    LEFT OUTER JOIN 
+					(
+						SELECT DISTINCT ASSET_CD, AGENT_STATUS
+						FROM SNET_AGENT_STATUS_HISTORY
+						WHERE AGENT_STATUS = 1
+						AND AGENT_STATUS_DATE >= CONCAT(DATE_FORMAT(NOW(), '%Y%m%d'), "000000")
+					) B
+				ON (A.ASSET_CD = B.ASSET_CD)
+				GROUP BY A.SW_NM	
+		) ALL_DATA
+		ON( LOWER(OS_DATA.SW_NM) = ALL_DATA.SW_NM)
+	</insert>	
+	
+	<insert id="insertReportBranchAgent"> 
+		INSERT INTO SNET_REPORT_BRANCH_AGENT
+		(
+		   CDATE         
+		   , BRANCH_ID     
+		   , BRANCH_NM
+		   , TEAM_ID     
+		   , TEAM_NM  
+		   , ASSET_CNT
+		   , AGENT_RATE		   
+		   , JAGENT_CNT
+		   , DAGENT_CNT
+		   , SAGENT_CNT
+		   , NAGENT_CNT
+		   , OK_RES_CNT
+		   , RES_RATE
+		   , CREATE_DATE
+		)
+		(
+		SELECT  
+				DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+				, Z.BRANCH_ID
+				, Z.BRANCH_NM
+				, Z.TEAM_ID
+				, Z.TEAM_NM
+				, Z.ASSET_CNT
+				, Z.AGENT_RATE
+				, Z.JAGENT_CNT
+				, Z.DAGENT_CNT
+				, Z.SAGENT_CNT
+				, Z.NAGENT_CNT
+				, Z.OK_RES_CNT
+				, Z.RES_RATE
+				, now()
+			FROM (
+				SELECT  A.BRANCH_ID
+					, A.TEAM_ID
+					, A.BRANCH_NM
+					, A.TEAM_NM
+					, CONCAT(BRANCH_ID, '\n', BRANCH_NM, '\n', TEAM_ID,'\n', TEAM_NM) AS BRANCH_TEAM
+					, ASSET_CNT
+					, IFNULL(ASSET_CNT-NAGENT_CNT, 0) AS OK_ASSET_CNT 
+					, AGENT_RATE
+					, AGENT_RATE AS AGENT_RATE_PARAM
+					, JAGENT_CNT
+					, DAGENT_CNT
+					, SAGENT_CNT
+					, NAGENT_CNT
+					, OK_RES_CNT
+					, RES_RATE
+					, RES_RATE AS RES_RATE_PARAM
+				FROM (
+					SELECT AAA.BRANCH_ID,
+						AAA.TEAM_ID,
+						(SELECT DISTINCT BRANCH_NM FROM SNET_CONFIG_TEAM_VIEW WHERE BRANCH_ID = AAA.BRANCH_ID AND BRANCH_NM = AAA.BRANCH_NM) AS BRANCH_NM ,
+						(SELECT DISTINCT TEAM_NM FROM SNET_CONFIG_TEAM_VIEW WHERE TEAM_ID = AAA.TEAM_ID) AS TEAM_NM , 
+						AAA.ASSET_CNT,
+						IFNULL(ROUND(( (AAA.J_AGENT_CNT + AAA.D_AGENT_CNT + AAA.S_AGENT_CNT) / (AAA.ASSET_CNT - AAA.N_AGENT_CNT) * 100 ), 1), 0) AS AGENT_RATE,
+						IFNULL(AAA.J_AGENT_CNT, 0) AS JAGENT_CNT,
+						IFNULL(AAA.D_AGENT_CNT, 0) AS DAGENT_CNT,
+						IFNULL(AAA.S_AGENT_CNT, 0) AS SAGENT_CNT,
+						IFNULL(AAA.N_AGENT_CNT, 0) AS NAGENT_CNT,
+						IFNULL(BBB.OK_RES_CNT, 0) AS OK_RES_CNT,
+						CASE
+							WHEN AAA.D_AGENT_CNT = 0 THEN 0
+							ELSE ROUND((IFNULL(BBB.OK_RES_CNT, 0) / AAA.D_AGENT_CNT * 100), 1)
+						END AS	RES_RATE
+					FROM (
+						SELECT AA.BRANCH_ID,
+							AA.TEAM_ID, 
+							AA.BRANCH_NM,
+							AA.TEAM_NM,
+							AA.ASSET_CNT,
+							IFNULL(BB.J_AGENT_CNT, 0) AS J_AGENT_CNT,
+							IFNULL(BB.D_AGENT_CNT, 0) AS D_AGENT_CNT,
+							IFNULL(BB.S_AGENT_CNT, 0) AS S_AGENT_CNT,
+							IFNULL(BB.N_AGENT_CNT, 0) AS N_AGENT_CNT
+						FROM ( 
+							SELECT A.BRANCH_ID
+								, A.TEAM_ID
+								, A.BRANCH_NM
+								, A.TEAM_NM
+								, COUNT(A.TEAM_NM) AS ASSET_CNT
+							FROM SNET_ASSET_MASTER A
+							WHERE A.BRANCH_ID IS NOT NULL
+								AND A.TEAM_ID IS NOT NULL
+							GROUP BY A.BRANCH_ID, A.TEAM_ID
+							) AA
+					      	LEFT OUTER JOIN (
+						      		SELECT BRANCH_NM, TEAM_NM,
+						      		    BRANCH_ID, TEAM_ID,
+						      			MAX(J_AGENT_CNT) AS J_AGENT_CNT, 
+						      			MAX(D_AGENT_CNT) AS D_AGENT_CNT, 
+						      			MAX(S_AGENT_CNT) AS S_AGENT_CNT, 
+						      			MAX(N_AGENT_CNT) AS N_AGENT_CNT
+						      		FROM (
+				    					SELECT A.BRANCH_NM,
+				    						A.TEAM_NM,
+				    						A.BRANCH_ID, 
+				    						A.TEAM_ID,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 1 THEN 1 ELSE 0 END) AS J_AGENT_CNT,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 2 THEN 1 ELSE 0 END) AS D_AGENT_CNT,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 3 THEN 1 ELSE 0 END) AS S_AGENT_CNT,
+						    				0 AS N_AGENT_CNT
+				    					FROM SNET_ASSET_MASTER A
+				    						, SNET_AGENT_MASTER B
+				    					WHERE A.AGENT_CD = B.AGENT_CD
+											AND DATE_FORMAT(A.UPDATE_DATE, '%Y%m%d') >= '20161201'
+				    					GROUP BY A.BRANCH_ID, A.TEAM_ID
+				    					UNION ALL
+				    					SELECT A.BRANCH_NM,
+				    						A.TEAM_NM,
+				    						A.BRANCH_ID, 
+				    						A.TEAM_ID,
+				    						0 AS J_AGENT_CNT,
+				    						0 AS D_AGENT_CNT,
+				    						0 AS S_AGENT_CNT,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 4 THEN 1 ELSE 0 END) AS N_AGENT_CNT
+				    					FROM SNET_ASSET_MASTER A
+				    						, SNET_AGENT_MASTER B
+				    					WHERE A.AGENT_CD = B.AGENT_CD
+				    					GROUP BY A.BRANCH_ID, A.TEAM_ID
+			    					) C
+			    					GROUP BY BRANCH_ID, TEAM_ID
+			    				)BB
+								ON (AA.BRANCH_ID = BB.BRANCH_ID
+									AND AA.TEAM_ID = BB.TEAM_ID)
+						) AAA
+					    LEFT OUTER JOIN
+							( SELECT BRANCH_NM, TEAM_NM, BRANCH_ID, TEAM_ID, COUNT(TEAM_NM) AS OK_RES_CNT
+								FROM SNET_ASSET_MASTER
+								WHERE AGENT_CD IN (SELECT AA.AGENT_CD
+													FROM SNET_AGENT_MASTER AA
+						              					INNER JOIN
+															(SELECT A.AGENT_CD
+															FROM SNET_AGENT_STATUS_HISTORY A
+						                						INNER JOIN
+																	(SELECT AGENT_CD,
+																		MAX(AGENT_STATUS_DATE) AS AGENT_STATUS_DATE
+																	FROM SNET_AGENT_STATUS_HISTORY
+																	WHERE AGENT_STATUS = 1
+																	GROUP BY AGENT_CD
+																	) B
+																	ON A.AGENT_CD = B.AGENT_CD
+																		AND A.AGENT_STATUS_DATE = B.AGENT_STATUS_DATE
+															) BB
+															ON AA.AGENT_CD = BB.AGENT_CD
+					              					WHERE AA.AGENT_TYPE = 2
+													)
+								GROUP BY BRANCH_ID, TEAM_ID
+							) BBB
+							ON AAA.BRANCH_ID = BBB.BRANCH_ID
+								AND AAA.TEAM_ID = BBB.TEAM_ID
+					) A
+				WHERE 1=1
+					AND A.BRANCH_NM IS NOT NULL
+				ORDER BY OK_ASSET_CNT DESC, ASSET_CNT DESC, AGENT_RATE DESC, BRANCH_ID, TEAM_ID
+			) Z	
+		)
+	</insert>
+	
+	<insert id="insertReportBranchAgentStatus"> 
+		INSERT INTO SNET_REPORT_BRANCH_AGENT_STATUS
+		(
+		   CDATE         
+		   , BRANCH_ID     
+		   , BRANCH_NM
+		   , TEAM_ID     
+		   , TEAM_NM  
+		   , ASSET_CNT
+		   , AGENT_RATE		   
+		   , JAGENT_CNT
+		   , DAGENT_CNT
+		   , SAGENT_CNT
+		   , NAGENT_CNT
+		   , OK_RES_CNT
+		   , RES_RATE
+		   , CREATE_DATE
+		)
+		(
+		SELECT  
+				DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE
+				, Z.BRANCH_ID
+				, Z.BRANCH_NM
+				, Z.TEAM_ID
+				, Z.TEAM_NM
+				, Z.ASSET_CNT
+				, Z.AGENT_RATE
+				, Z.JAGENT_CNT
+				, Z.DAGENT_CNT
+				, Z.SAGENT_CNT
+				, Z.NAGENT_CNT
+				, Z.OK_RES_CNT
+				, Z.RES_RATE
+				, now()
+			FROM (
+				SELECT  A.BRANCH_ID
+					, A.TEAM_ID
+					, A.BRANCH_NM
+					, A.TEAM_NM
+					, CONCAT(BRANCH_ID, '\n', BRANCH_NM, '\n', TEAM_ID,'\n', TEAM_NM) AS BRANCH_TEAM
+					, ASSET_CNT
+					, IFNULL(ASSET_CNT-NAGENT_CNT, 0) AS OK_ASSET_CNT 
+					, AGENT_RATE
+					, AGENT_RATE AS AGENT_RATE_PARAM
+					, JAGENT_CNT
+					, DAGENT_CNT
+					, SAGENT_CNT
+					, NAGENT_CNT
+					, OK_RES_CNT
+					, RES_RATE
+					, RES_RATE AS RES_RATE_PARAM
+				FROM (
+					SELECT AAA.BRANCH_ID,
+						AAA.TEAM_ID,
+						(SELECT DISTINCT BRANCH_NM FROM SNET_CONFIG_TEAM_VIEW WHERE BRANCH_ID = AAA.BRANCH_ID AND BRANCH_NM = AAA.BRANCH_NM) AS BRANCH_NM ,
+						(SELECT DISTINCT TEAM_NM FROM SNET_CONFIG_TEAM_VIEW WHERE TEAM_ID = AAA.TEAM_ID) AS TEAM_NM , 
+						AAA.ASSET_CNT,
+						IFNULL(ROUND(( (AAA.J_AGENT_CNT + AAA.D_AGENT_CNT + AAA.S_AGENT_CNT) / (AAA.ASSET_CNT - AAA.N_AGENT_CNT) * 100 ), 1), 0) AS AGENT_RATE,
+						IFNULL(AAA.J_AGENT_CNT, 0) AS JAGENT_CNT,
+						IFNULL(AAA.D_AGENT_CNT, 0) AS DAGENT_CNT,
+						IFNULL(AAA.S_AGENT_CNT, 0) AS SAGENT_CNT,
+						IFNULL(AAA.N_AGENT_CNT, 0) AS NAGENT_CNT,
+						IFNULL(BBB.OK_RES_CNT, 0) AS OK_RES_CNT,
+						CASE
+							WHEN AAA.D_AGENT_CNT = 0 THEN 0
+							ELSE ROUND((IFNULL(BBB.OK_RES_CNT, 0) / AAA.D_AGENT_CNT * 100), 1)
+						END AS	RES_RATE
+					FROM (
+						SELECT AA.BRANCH_ID,
+							AA.TEAM_ID, 
+							AA.BRANCH_NM,
+							AA.TEAM_NM,
+							AA.ASSET_CNT,
+							IFNULL(BB.J_AGENT_CNT, 0) AS J_AGENT_CNT,
+							IFNULL(BB.D_AGENT_CNT, 0) AS D_AGENT_CNT,
+							IFNULL(BB.S_AGENT_CNT, 0) AS S_AGENT_CNT,
+							IFNULL(BB.N_AGENT_CNT, 0) AS N_AGENT_CNT
+						FROM ( 
+							SELECT A.BRANCH_ID
+								, A.TEAM_ID
+								, A.BRANCH_NM
+								, A.TEAM_NM
+								, COUNT(A.TEAM_NM) AS ASSET_CNT
+							FROM SNET_ASSET_MASTER A
+							WHERE A.BRANCH_ID IS NOT NULL
+								AND A.TEAM_ID IS NOT NULL
+							GROUP BY A.BRANCH_ID, A.TEAM_ID
+							) AA
+					      	LEFT OUTER JOIN (
+						      		SELECT BRANCH_NM, TEAM_NM,
+						      			BRANCH_ID, TEAM_ID,
+						      			MAX(J_AGENT_CNT) AS J_AGENT_CNT, 
+						      			MAX(D_AGENT_CNT) AS D_AGENT_CNT, 
+						      			MAX(S_AGENT_CNT) AS S_AGENT_CNT, 
+						      			MAX(N_AGENT_CNT) AS N_AGENT_CNT
+						      		FROM (
+				    					SELECT A.BRANCH_NM,
+				    						A.TEAM_NM,
+				    						A.BRANCH_ID,
+				    						A.TEAM_ID,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 1 THEN 1 ELSE 0 END) AS J_AGENT_CNT,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 2 THEN 1 ELSE 0 END) AS D_AGENT_CNT,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 3 THEN 1 ELSE 0 END) AS S_AGENT_CNT,
+						    				0 AS N_AGENT_CNT
+				    					FROM SNET_ASSET_MASTER A
+				    						, SNET_AGENT_MASTER B
+				    					WHERE A.AGENT_CD = B.AGENT_CD				    					
+				    					GROUP BY A.BRANCH_ID, A.TEAM_ID
+				    					UNION ALL
+				    					SELECT A.BRANCH_NM,
+				    						A.TEAM_NM,
+				    						A.BRANCH_ID, 
+				    						A.TEAM_ID,
+				    						0 AS J_AGENT_CNT,
+				    						0 AS D_AGENT_CNT,
+				    						0 AS S_AGENT_CNT,
+						    				SUM(CASE WHEN B.AGENT_TYPE = 4 THEN 1 ELSE 0 END) AS N_AGENT_CNT
+				    					FROM SNET_ASSET_MASTER A
+				    						, SNET_AGENT_MASTER B
+				    					WHERE A.AGENT_CD = B.AGENT_CD
+				    					GROUP BY A.BRANCH_ID, A.TEAM_ID
+			    					) C
+			    					GROUP BY BRANCH_ID, TEAM_ID
+			    				)BB
+								ON (AA.BRANCH_ID = BB.BRANCH_ID
+									AND AA.TEAM_ID = BB.TEAM_ID)
+						) AAA
+					    LEFT OUTER JOIN
+							( SELECT BRANCH_NM, TEAM_NM, BRANCH_ID, TEAM_ID, COUNT(TEAM_NM) AS OK_RES_CNT
+								FROM SNET_ASSET_MASTER
+								WHERE AGENT_CD IN (SELECT AA.AGENT_CD
+													FROM SNET_AGENT_MASTER AA
+						              					INNER JOIN
+															(SELECT A.AGENT_CD
+															FROM SNET_AGENT_STATUS_HISTORY A
+						                						INNER JOIN
+																	(SELECT AGENT_CD,
+																		MAX(AGENT_STATUS_DATE) AS AGENT_STATUS_DATE
+																	FROM SNET_AGENT_STATUS_HISTORY
+																	WHERE AGENT_STATUS = 1
+																	GROUP BY AGENT_CD
+																	) B
+																	ON A.AGENT_CD = B.AGENT_CD
+																		AND A.AGENT_STATUS_DATE = B.AGENT_STATUS_DATE
+															) BB
+															ON AA.AGENT_CD = BB.AGENT_CD
+					              					WHERE AA.AGENT_TYPE = 2
+													)
+								GROUP BY BRANCH_ID, TEAM_ID
+							) BBB
+							ON AAA.BRANCH_ID = BBB.BRANCH_ID
+								AND AAA.TEAM_ID = BBB.TEAM_ID
+					) A
+				WHERE 1=1
+					AND A.BRANCH_NM IS NOT NULL
+					AND A.DAGENT_CNT	>= 1
+				ORDER BY DAGENT_CNT DESC, RES_RATE DESC, BRANCH_NM, TEAM_NM 
+			) Z	
+		)
+	</insert>
+
+	<insert id="insertBranchWeeklyReport">
+        INSERT INTO SNET_REPORT_BRANCH_ASSET_RESULT (
+         CDATE,
+         BRANCH_ID,
+         BRANCH_NM,
+         SW_TYPE,
+         SW_NM,
+         ASSET_CNT,
+         AUDIT_DAY_CNT,
+         AD_RESULT_OK,
+         AD_RESULT_NOK,
+         AD_RESULT_NA,
+         AD_RESULT_PASS,
+         AD_RESULT_REQ,
+         DATE_RANGE
+        )
+        SELECT
+            DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE,
+            F.BRANCH_ID,
+            (SELECT
+                    BRANCH_NM
+                FROM
+                    SNET_CONFIG_TEAM_VIEW T
+                WHERE
+                    F.BRANCH_ID = T.BRANCH_ID
+                LIMIT 1) AS BRANCH_NM,
+            F.SW_TYPE,
+            F.SW_NM,
+            COUNT(1) AS CNT,
+            SUM(CASE
+                WHEN DATEDIFF(NOW(), F.AUDIT_DAY) <![CDATA[ <= ]]> 7 THEN 1
+                ELSE 0
+            END) AS AUDIT_DAY,
+            SUM(F.AD_RESULT_OK) AS AD_RESULT_OK,
+            SUM(F.AD_RESULT_NOK) AS AD_RESULT_NOK,
+            SUM(F.AD_RESULT_NA) AS AD_RESULT_NA,
+            SUM(F.AD_RESULT_PASS) AS AD_RESULT_PASS,
+            SUM(F.AD_RESULT_REQ) AS AD_RESULT_REQ,
+            'W'
+        FROM
+            (SELECT
+                A.BRANCH_ID,
+                    B.SW_TYPE,
+                    B.SW_NM,
+                    B.CREATE_DATE,
+                    B.AUDIT_DAY,
+                    SUM(CASE
+                        WHEN
+                            DATEDIFF(NOW(), B.AUDIT_DAY) <![CDATA[ <= ]]> 7
+                                AND D.ITEM_RESULT = 'T'
+                        THEN
+                            1
+                        ELSE 0
+                    END) AS AD_RESULT_OK,
+                    SUM(CASE
+                        WHEN
+                            DATEDIFF(NOW(), B.AUDIT_DAY) <![CDATA[ <= ]]> 7
+                                AND D.ITEM_RESULT = 'F'
+                        THEN
+                            1
+                        ELSE 0
+                    END) AS AD_RESULT_NOK,
+                    SUM(CASE
+                        WHEN
+                            DATEDIFF(NOW(), B.AUDIT_DAY) <![CDATA[ <= ]]> 7
+                                AND D.ITEM_RESULT = 'NA'
+                        THEN
+                            1
+                        ELSE 0
+                    END) AS AD_RESULT_NA,
+                    SUM(CASE
+                        WHEN
+                            DATEDIFF(NOW(), B.AUDIT_DAY) <![CDATA[ <= ]]> 7
+                                AND D.ITEM_RESULT = 'C'
+                        THEN
+                            1
+                        ELSE 0
+                    END) AS AD_RESULT_PASS,
+                    SUM(CASE
+                        WHEN
+                            DATEDIFF(NOW(), B.AUDIT_DAY) <![CDATA[ <= ]]> 7
+                                AND D.ITEM_RESULT = 'R'
+                        THEN
+                            1
+                        ELSE 0
+                    END) AS AD_RESULT_REQ
+            FROM
+                SNET_ASSET_MASTER A
+            INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+            LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_REPORT D ON (B.ASSET_CD = D.ASSET_CD
+                AND B.SW_TYPE = D.SW_TYPE
+                AND B.SW_NM = D.SW_NM
+                AND B.SW_INFO = D.SW_INFO
+                AND B.SW_DIR = D.SW_DIR
+                AND B.SW_USER = D.SW_USER
+                AND B.SW_ETC = D.SW_ETC
+                AND B.AUDIT_DAY = D.AUDIT_DAY)
+            WHERE
+                1 = 1
+                    AND B.SW_TYPE IN ('OS' , 'Cloud', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+            GROUP BY A.ASSET_CD , B.SW_TYPE , B.SW_NM , B.SW_INFO , B.SW_DIR , B.SW_USER , B.SW_ETC) F
+        GROUP BY F.BRANCH_ID , F.SW_TYPE , F.SW_NM
+        ORDER BY BRANCH_ID , SW_TYPE ASC
+	</insert>
+
+	<insert id="insertBranchMonthlyReport">
+        INSERT INTO SNET_REPORT_BRANCH_ASSET_RESULT (
+         CDATE,
+         BRANCH_ID,
+         BRANCH_NM,
+         SW_TYPE,
+         SW_NM,
+         ASSET_CNT,
+         AUDIT_DAY_CNT,
+         AD_RESULT_OK,
+         AD_RESULT_NOK,
+         AD_RESULT_NA,
+         AD_RESULT_PASS,
+         AD_RESULT_REQ,
+         DATE_RANGE
+        )
+        SELECT
+            DATE_FORMAT(NOW(), '%Y%m%d') AS CDATE,
+            F.BRANCH_ID,
+            (SELECT
+                    BRANCH_NM
+                FROM
+                    SNET_CONFIG_TEAM_VIEW T
+                WHERE
+                    F.BRANCH_ID = T.BRANCH_ID
+                LIMIT 1) AS BRANCH_NM,
+            F.SW_TYPE,
+            F.SW_NM,
+            COUNT(1) AS CNT,
+            SUM(CASE
+                WHEN F.audit_day <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL - 1 MONTH) AND NOW() THEN 1
+                ELSE 0
+            END) AS AUDIT_DAY,
+            SUM(F.AD_RESULT_OK) AS AD_RESULT_OK,
+            SUM(F.AD_RESULT_NOK) AS AD_RESULT_NOK,
+            SUM(F.AD_RESULT_NA) AS AD_RESULT_NA,
+            SUM(F.AD_RESULT_PASS) AS AD_RESULT_PASS,
+            SUM(F.AD_RESULT_REQ) AS AD_RESULT_REQ,
+            'M'
+        FROM
+            (SELECT
+                A.BRANCH_ID,
+                    B.SW_TYPE,
+                    B.SW_NM,
+                    B.CREATE_DATE,
+                    B.AUDIT_DAY,
+                    SUM(CASE
+                        WHEN B.AUDIT_DAY <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL - 1 MONTH) AND D.ITEM_RESULT = 'T' THEN 1
+                        ELSE 0
+                    END) AS AD_RESULT_OK,
+                    SUM(CASE
+                        WHEN B.AUDIT_DAY <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL - 1 MONTH) AND D.ITEM_RESULT = 'F' THEN 1
+                        ELSE 0
+                    END) AS AD_RESULT_NOK,
+                    SUM(CASE
+                        WHEN B.AUDIT_DAY <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL - 1 MONTH) AND D.ITEM_RESULT = 'NA' THEN 1
+                        ELSE 0
+                    END) AS AD_RESULT_NA,
+                    SUM(CASE
+                        WHEN B.AUDIT_DAY <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL - 1 MONTH) AND D.ITEM_RESULT = 'C' THEN 1
+                        ELSE 0
+                    END) AS AD_RESULT_PASS,
+                    SUM(CASE
+                        WHEN B.AUDIT_DAY <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL - 1 MONTH) AND D.ITEM_RESULT = 'R' THEN 1
+                        ELSE 0
+                    END) AS AD_RESULT_REQ
+            FROM
+                SNET_ASSET_MASTER A
+            INNER JOIN SNET_ASSET_SW_AUDIT_DAY B ON (A.ASSET_CD = B.ASSET_CD)
+            LEFT OUTER JOIN SNET_ASSET_SW_AUDIT_REPORT D ON (B.ASSET_CD = D.ASSET_CD
+                AND B.SW_TYPE = D.SW_TYPE
+                AND B.SW_NM = D.SW_NM
+                AND B.SW_INFO = D.SW_INFO
+                AND B.SW_DIR = D.SW_DIR
+                AND B.SW_USER = D.SW_USER
+                AND B.SW_ETC = D.SW_ETC
+                AND B.AUDIT_DAY = D.AUDIT_DAY)
+            WHERE
+                1 = 1
+                    AND B.SW_TYPE IN ('OS' , 'Cloud', 'DB', 'WEB', 'WAS', 'URL', 'NW', 'SE', 'Pentest')
+            GROUP BY A.ASSET_CD , B.SW_TYPE , B.SW_NM , B.SW_INFO , B.SW_DIR , B.SW_USER , B.SW_ETC) F
+        GROUP BY F.BRANCH_ID , F.SW_TYPE , F.SW_NM
+        ORDER BY BRANCH_ID , SW_TYPE ASC
+	</insert>
+
+	<delete id="deleteBranchReport">
+		DELETE FROM	SNET_REPORT_BRANCH_ASSET_RESULT
+		WHERE CDATE <![CDATA[ < ]]> DATE_ADD(NOW(), INTERVAL -13 MONTH)
+	</delete>
+</mapper>

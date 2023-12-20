@@ -1,0 +1,12 @@
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mobigen.snet.supportagent.dao.was.SnetNewDiagnosisMainMapper">
+	<!-- 4단계 메일 CODE 생성 -->
+	<select id="makeMailCd" resultType="String">
+		/*SELECT 'MC' || TO_CHAR ( SYSDATE , 'YYYYMMDDHH24MISS' ) FROM DUAL*/
+		SELECT CONCAT('MC',DATE_FORMAT ( SYSDATE() , '%Y%m%d%H%i%s' ) ) FROM DUAL
+	</select>
+</mapper>

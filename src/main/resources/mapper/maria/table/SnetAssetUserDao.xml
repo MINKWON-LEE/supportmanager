@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetAssetUserDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetUserEntity">
+ INSERT INTO SNET_ASSET_USER
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='assetCd != null '>
+      , asset_cd
+   </if>
+   <if test='userId != null '>
+      , user_id
+   </if>
+   <if test='userType != null '>
+      , user_type
+   </if>
+   <if test='teamId != null '>
+      , team_id
+   </if>
+   <if test='teamNm != null '>
+      , team_nm
+   </if>
+   <if test='userNm != null '>
+      , user_nm
+   </if>
+   <if test='userMs != null '>
+      , user_ms
+   </if>
+   <if test='userMail != null '>
+      , user_mail
+   </if>
+   <if test='createDate != null '>
+      , create_date
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='assetCd != null '>
+   	  ,    #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userId != null '>
+   	  ,    #{userId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userType != null '>
+   	  ,    #{userType, javaType=String, jdbcType=CHAR} 
+   </if>
+   <if test='teamId != null '>
+   	  ,    #{teamId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamNm != null '>
+   	  ,    #{teamNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userNm != null '>
+   	  ,    #{userNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userMs != null '>
+   	  ,    #{userMs, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userMail != null '>
+   	  ,    #{userMail, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='createDate != null '>
+   	  ,    #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetUserEntity">
+   UPDATE 
+         SNET_ASSET_USER
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='teamId != null '>
+      , team_id =   #{teamId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='teamNm != null '>
+      , team_nm =   #{teamNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userNm != null '>
+      , user_nm =   #{userNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userMs != null '>
+      , user_ms =   #{userMs, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userMail != null '>
+      , user_mail =   #{userMail, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='createDate != null '>
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+    </if>  
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND user_id =   #{userId, javaType=String, jdbcType=VARCHAR} 
+   AND user_type =   #{userType, javaType=String, jdbcType=CHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetUserEntity">
+   UPDATE 
+         SNET_ASSET_USER
+      SET 
+ <trim  prefixOverrides="," >
+      , team_id =   #{teamId, javaType=String, jdbcType=VARCHAR} 
+      , team_nm =   #{teamNm, javaType=String, jdbcType=VARCHAR} 
+      , user_nm =   #{userNm, javaType=String, jdbcType=VARCHAR} 
+      , user_ms =   #{userMs, javaType=String, jdbcType=VARCHAR} 
+      , user_mail =   #{userMail, javaType=String, jdbcType=VARCHAR} 
+      , create_date =   #{createDate, javaType=java.sql.Timestamp, jdbcType=TIMESTAMP} 
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND user_id =   #{userId, javaType=String, jdbcType=VARCHAR} 
+   AND user_type =   #{userType, javaType=String, jdbcType=CHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_ASSET_USER
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND user_id =   #{userId, javaType=String, jdbcType=VARCHAR} 
+   AND user_type =   #{userType, javaType=String, jdbcType=CHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetUserEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , asset_cd AS assetCd
+      , user_id AS userId
+      , user_type AS userType
+      , team_id AS teamId
+      , team_nm AS teamNm
+      , user_nm AS userNm
+      , user_ms AS userMs
+      , user_mail AS userMail
+      , create_date AS createDate
+  </trim>
+ FROM 
+      SNET_ASSET_USER
+WHERE
+      asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+  AND user_id =   #{userId, javaType=String, jdbcType=VARCHAR} 
+  AND user_type =   #{userType, javaType=String, jdbcType=CHAR} 
+</select>
+
+</mapper>

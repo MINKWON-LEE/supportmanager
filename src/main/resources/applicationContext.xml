@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/task 
+	   http://www.springframework.org/schema/task/spring-task.xsd
+	   http://www.springframework.org/schema/tx 
+	   http://www.springframework.org/schema/tx/spring-tx.xsd
+	   http://www.springframework.org/schema/aop 
+	   http://www.springframework.org/schema/aop/spring-aop.xsd
+	   http://mybatis.org/schema/mybatis-spring 
+	   http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <bean id="environmentVariablesConfiguration" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+        <property name="algorithm" value="PBEWITHMD5ANDDES" />
+        <property name="password" value="igloosec" />
+    </bean>
+
+    <bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+        <property name="config" ref="environmentVariablesConfiguration" />
+    </bean>
+
+    <!-- DataSource -->
+    <bean id="propertyConfigurer"
+          class="org.jasypt.spring3.properties.EncryptablePropertyPlaceholderConfigurer">
+        <constructor-arg ref="configurationEncryptor" />
+        <property name="locations">
+            <list>
+                <!--<value>classpath:supportAgent.properties</value>-->
+                <value>file:/usr/local/snetManager/conf/support.context.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+
+    </bean>
+
+    <!-- 	<context:property-placeholder location="classpath:supportAgent.properties" /> -->
+    <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+			<list>
+				<value>classpath:supportAgent.properties</value>
+				<value>file:/usr/local/snetManager/conf/support.context.properties</value>
+			</list>
+		</property> 
+	</bean>-->
+	<!-- SupportManager (SupportAgent) -->
+	<context:component-scan base-package="com.mobigen.snet.supportagent" />
+
+	<!-- Was -->
+	<context:component-scan base-package="com.sktelecom.mf" />
+
+	<!-- Manager -->
+	<context:component-scan base-package="com.igloosec.smartguard.next.agentmanager" />
+
+	<context:annotation-config />
+
+	<task:annotation-driven scheduler="commonScheduler" mode="aspectj" />
+	<task:scheduler id="commonScheduler" pool-size="10" />
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.passwd}" />
+		<property name="defaultAutoCommit" value="${jdbc.defaultautocommit}" />
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		<property name="maxWait" value="${jdbc.maxWait}" />
+		<property name="testOnBorrow" value="${jdbc.testOnBorrow}" />
+		<property name="testWhileIdle" value="${jdbc.testWhileIdle}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}" />
+		<property name="validationQuery" value="${jdbc.validationQuery}" />
+		<property name="poolPreparedStatements" value="${jdbc.poolPreparedStatements}" />
+	</bean>
+
+	<!-- SqlSessionFactory -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/mapper/SqlMapConfig.xml" />
+		<property name="typeAliasesPackage" value="com.mobigen.snet" />
+	</bean>
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg index="0" ref="sqlSession" />
+<!-- 		<constructor-arg index="1" value="BATCH" /> -->
+	</bean>
+	
+	<mybatis:scan base-package="com.mobigen.snet.supportagent.dao" />
+	
+	<!-- Transaction -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- Thread Pool
+		- asyc-timeout 이 default 100 (0.1 sec) 인데, 테스트할때 asyc-timeout 이 처리시간보다 짧으면 예외가 발생함
+	-->
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="20" />
+		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
+
+	<!-- Performance -->
+	<bean id="performanceMonitor" class="com.mobigen.snet.supportagent.common.PerfInterceptor" />
+
+
+	<aop:config>
+		<aop:pointcut id="allServiceMethods"
+			expression="execution(* com.mobigen.snet.supportagent.service.*.*(..))" />
+		<aop:advisor pointcut-ref="allServiceMethods" advice-ref="performanceMonitor"
+			order="2" />
+	</aop:config>
+
+</beans>

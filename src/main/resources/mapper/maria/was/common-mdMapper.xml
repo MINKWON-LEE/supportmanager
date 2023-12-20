@@ -1,0 +1,61 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mobigen.snet.supportagent.dao.was.AuditCommonMapper">
+	<select id="selectDepartmentAll" resultType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+	   SELECT * 
+	       FROM AUDIT_INF_DEPT_INFO_RCV
+	       ORDER BY DEPTNM ASC 
+	</select>
+	
+	<select id="selectDepartmentApplyFilter" resultType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+       SELECT * 
+           FROM AUDIT_INF_DEPT_INFO_RCV
+           WHERE (LENGTH(LEVELCD) > 0 AND LEVELCD IS NOT NULL) 
+           AND INDEPT IN (SELECT DISTINCT(TEAM_ID) FROM SNET_ASSET_MASTER)
+           ORDER BY DEPTNM ASC 
+    </select>
+    
+    <select id="selectPersonInfoAll" resultType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+        SELECT USER_ID AS EMPNO, TEAM_ID AS INDEPT, TEAM_NM AS DEPTNM, BRANCH_ID AS HIGHPARTDEPT, BRANCH_NM AS HIGHPARTDEPTNM
+            FROM SNET_CONFIG_USER_VIEW
+    </select>
+    
+    <!-- 부서정보 업데이트용 Hook Start -->
+    <update id="updateDepartmentAboutSnetAssetMaster" parameterType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+        UPDATE SNET_ASSET_MASTER A
+            SET BRANCH_ID = #{HIGHPARTDEPT},
+                BRANCH_NM = #{HIGHPARTDEPTNM},
+                TEAM_ID = #{INDEPT},
+                TEAM_NM = #{DEPTNM}
+            WHERE (SELECT USER_ID FROM SNET_ASSET_USER WHERE ASSET_CD = A.ASSET_CD AND USER_TYPE='OP') = #{EMPNO}
+    </update>
+    <update id="updateDepartmentAboutSnetAssetUser" parameterType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+        UPDATE SNET_ASSET_USER 
+            SET TEAM_ID = #{INDEPT},
+                TEAM_NM = #{DEPTNM}
+			<if test="USER_NM != null and USER_NM != ''">
+                ,USER_NM = #{USER_NM}
+			</if>
+			<if test="USER_MS != null and USER_MS != ''">
+                ,USER_MS = #{USER_MS}
+			</if>
+			<if test="USER_MAIL != null and USER_MAIL != ''">
+                ,USER_MAIL =#{USER_MAIL}
+			</if>
+            WHERE USER_ID = #{EMPNO}
+    </update>
+    <update id="updateDepartmentAboutSnetConfigUserAuth" parameterType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+        UPDATE SNET_CONFIG_USER_AUTH 
+            SET TEAM_ID = #{INDEPT},
+                TEAM_NM = #{DEPTNM}
+            WHERE USER_ID = #{EMPNO}
+    </update>
+    <update id="updateDepartmentAboutSnetConfigUserAuthCheck" parameterType="com.mobigen.snet.supportagent.models.was.DepartmentTreeModel">
+        UPDATE SNET_CONFIG_USER_AUTH_CHECK 
+            SET TEAM_ID = #{INDEPT},
+                TEAM_NM = #{DEPTNM}
+            WHERE USER_ID = #{EMPNO}
+    </update>
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.AssetExceptMapper">
+
+    <!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+
+    <select id="getAssetExceptReqCnt" parameterType="java.util.HashMap" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        SNET_ASSET_SW_AUDIT_EXCEPT A,
+        SNET_ASSET_SW_AUDIT_DAY    B
+        WHERE
+        A.ASSET_CD      = B.ASSET_CD
+        AND     A.SW_TYPE       = B.SW_TYPE
+        AND     A.SW_NM         = B.SW_NM
+        AND     A.SW_INFO       = B.SW_INFO
+        AND     A.SW_DIR        = B.SW_DIR
+        AND     A.SW_USER       = B.SW_USER
+        AND     A.SW_ETC        = B.SW_ETC
+        and A.asset_cd in
+        <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="createDate != null and !createDate.equals('') ">
+            and B.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+    <select id="getAssetExceptOkCnt" parameterType="java.util.HashMap" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        SNET_ASSET_SW_AUDIT_EXCEPT A,
+        SNET_ASSET_SW_AUDIT_DAY    B
+        WHERE
+        A.ASSET_CD      = B.ASSET_CD
+        AND     A.SW_TYPE       = B.SW_TYPE
+        AND     A.SW_NM         = B.SW_NM
+        AND     A.SW_INFO       = B.SW_INFO
+        AND     A.SW_DIR        = B.SW_DIR
+        AND     A.SW_USER       = B.SW_USER
+        AND     A.SW_ETC        = B.SW_ETC
+        AND A.ADMIN_OK_FLAG = 1
+        and A.asset_cd in
+        <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="createDate != null and !createDate.equals('') ">
+            and B.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+    <select id="getAssetExceptNokCnt" parameterType="java.util.HashMap" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        SNET_ASSET_SW_AUDIT_EXCEPT A,
+        SNET_ASSET_SW_AUDIT_DAY    B
+        WHERE
+        A.ASSET_CD      = B.ASSET_CD
+        AND     A.SW_TYPE       = B.SW_TYPE
+        AND     A.SW_NM         = B.SW_NM
+        AND     A.SW_INFO       = B.SW_INFO
+        AND     A.SW_DIR        = B.SW_DIR
+        AND     A.SW_USER       = B.SW_USER
+        AND     A.SW_ETC        = B.SW_ETC
+        AND A.ADMIN_OK_FLAG != 1
+        and A.asset_cd in
+        <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="createDate != null and !createDate.equals('') ">
+            and B.AUDIT_DAY = #{createDate}
+        </if>
+    </select>
+
+    <select id="getDiagnosisexclusionByImportanceStatus" parameterType="java.util.HashMap" resultType="SnetAssetSwAuditExcept">
+        SELECT distinct C.ITEM_RESULT, C.ITEM_GRADE, C.audit_day, B.audit_day as cok_audit_day, C.asset_cd, C.sw_type, C.sw_nm
+        , A.ADMIN_OK_FLAG, DATE_FORMAT(A.ADMIN_OK_DATE,'%Y%m%d') as ADMIN_OK_DATE, A.ADMIN_USER_ID
+        , A.EXCEPT_REQ_USER_ID, A.EXCEPT_REQ_DATE, A.EXCEPT_ACTION_DATE
+        FROM
+        SNET_ASSET_SW_AUDIT_EXCEPT A,
+        SNET_ASSET_SW_AUDIT_DAY B,
+        SNET_ASSET_SW_AUDIT_REPORT C
+        WHERE
+        A.ASSET_CD = B.ASSET_CD
+        AND     A.SW_TYPE  = B.SW_TYPE
+        AND     A.SW_NM    = B.SW_NM
+        AND     A.SW_INFO  = B.SW_INFO
+        AND     B.ASSET_CD = C.ASSET_CD
+        AND     B.SW_TYPE      = C.SW_TYPE
+        AND     B.SW_NM        = C.SW_NM
+        AND     B.SW_INFO      = C.SW_INFO
+        AND     B.SW_DIR       = C.SW_DIR
+        AND     B.SW_USER      = C.SW_USER
+        AND     B.SW_ETC       = C.SW_ETC
+        AND 	 B.AUDIT_DAY		= C.AUDIT_DAY
+        AND     A.ADMIN_OK_FLAG = 1
+        and A.asset_cd in
+        <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

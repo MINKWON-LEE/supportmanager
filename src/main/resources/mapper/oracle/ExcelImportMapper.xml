@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.ExcelImportMapper">
+
+	<update id="updateUploadFileStart" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_UPLOAD
+		 SET JOB_SDATE = SYSDATE, 
+		  JOB_FLAG = #{JOB_FLAG}
+		 WHERE FILE_ID = #{FILE_ID}
+	</update>
+	
+	<update id="updateUploadFileEnd" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_UPLOAD
+		 SET JOB_EDATE = SYSDATE,
+		  JOB_FLAG = #{JOB_FLAG}
+		 WHERE FILE_ID = #{FILE_ID}
+	</update>	
+	
+	<update id="updateZipFileStart" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_ZIPFILE
+		 SET JOB_SDATE = SYSDATE, 
+		  JOB_FLAG = #{JOB_FLAG}
+		 WHERE FILE_ID = #{FILE_ID}
+	</update>
+	
+	<update id="updateZipFileEnd" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_ZIPFILE
+		 SET JOB_EDATE = SYSDATE,
+		  JOB_FLAG = #{JOB_FLAG}
+		 WHERE FILE_ID = #{FILE_ID}
+	</update>	
+	
+	<select id="selectSwZipFileList" resultType="java.util.HashMap">
+		SELECT FILE_ID
+	  	  FROM SNET_ASSET_SW_AUDIT_ZIPFILE 
+	  	  WHERE P_FILE_ID = #{FILE_ID}
+	</select>
+
+	<select id="selectUploadFileList" resultType="java.util.HashMap">
+		SELECT FILE_ID, AD_FILE_TYPE, AD_FILE_NM, AD_FILE_NM_ORG, USER_ID, REQ_DATE, JOB_SDATE, JOB_EDATE, JOB_FLAG, FILE_UPLOAD_FOLDER
+	  	  FROM SNET_ASSET_SW_AUDIT_UPLOAD 
+	  	  WHERE (JOB_FLAG = 0)
+		    OR (JOB_FLAG = 1 AND ROUND((SYSDATE - JOB_EDATE) * 24 * 60, 0) <![CDATA[>]]> 30)
+	</select>	
+	
+	<select id="selectZipFileList" resultType="java.util.HashMap">
+
+		SELECT FILE_ID, AD_FILE_NM, USER_ID, REQ_DATE, JOB_SDATE, JOB_EDATE, JOB_FLAG, P_FILE_ID
+	  	  FROM SNET_ASSET_SW_AUDIT_ZIPFILE 
+	  	  WHERE (JOB_FLAG = 0)
+		    OR (JOB_FLAG = 1 AND ROUND((SYSDATE - JOB_EDATE) * 24 * 60, 0) <![CDATA[>]]> 30)
+	</select>		
+
+ 	<select id="selectAuditAssetIp" resultType="java.util.HashMap">
+        SELECT
+            ASSET_CD,
+            IP_ADDRESS
+        FROM
+            AUDIT_ASSET_IP
+		WHERE IP_ADDRESS = '192.0.1.100'            
+	</select>
+	
+	<select id="selectAssetCd" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT ASSET_CD, AUDIT_DAY
+		  FROM SNET_ASSET_MASTER
+		  WHERE IP_ADDRESS = #{IpAddress}
+		    AND HOST_NM = #{HostNm}         
+	</select>
+		
+	<update id="updateAssetExcelResult" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_EXCEL_RESULT
+		 SET JOB_FLAG = 2,
+		  AUDIT_RATE = #{AUDIT_RATE}
+		 WHERE FILE_ID = #{FILE_ID}
+		  AND HOST_NM = #{HOST_NM}
+		  AND IP_ADDRESS = #{IP_ADDRESS}
+		  AND SW_TYPE = #{SW_TYPE}
+		  AND SW_NM = #{SW_NM}
+		  AND SW_INFO = #{SW_INFO}
+		  AND AUDIT_DAY = #{AUDIT_DAY} 
+	</update>
+	
+	<select id="selectAssetExcelResultByFile"  resultType="java.util.HashMap" parameterType="java.util.HashMap"> 
+		  SELECT FILE_ID, HOST_NM, IP_ADDRESS, AUDIT_DAY AS AUDIT_DAY, NVL(ROUND(SUM(AUDIT_RATE)/ COUNT(*), 2), 0) AS AUDIT_RATE
+			FROM  SNET_ASSET_EXCEL_RESULT
+			WHERE FILE_ID = #{FileId}
+			GROUP BY FILE_ID, HOST_NM, IP_ADDRESS, AUDIT_DAY
+	</select>
+	
+	<update id="updateAssetExcelResultByFile"  parameterType="java.util.HashMap"> 
+		  UPDATE SNET_ASSET_MASTER
+		    SET AUDIT_RATE = #{AUDIT_RATE},
+		      AUDIT_DAY = #{AUDIT_DAY},
+		      UPDATE_DATE = SYSDATE
+		  WHERE HOST_NM = #{HOST_NM}
+		    AND IP_ADDRESS = #{IP_ADDRESS}
+	</update>
+	
+	<select id="selectAssetExcelResult" resultType="java.util.HashMap" parameterType="java.util.HashMap">     
+		SELECT '${FileId}' AS FILE_ID, HOST_NM, IP_ADDRESS, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY,
+				ROUND((AD_WEIGHT_OK / (AD_WEIGHT_TOTAL-AD_WEIGHT_PASS-AD_WEIGHT_NA))* 100, 2) AS AUDIT_RATE, '2' AS JOB_FLAG
+		FROM SNET_ASSET_SW_AUDIT_HISTORY 
+		WHERE  ASSET_CD = #{AssetCd}
+		  AND HOST_NM = #{HostNm}
+		  AND IP_ADDRESS = #{IpAddress}
+		  AND SW_TYPE = #{SwType}
+		  AND SW_NM = #{SwNm}
+		  AND SW_INFO = #{SwInfo}
+		  AND AUDIT_DAY = #{AuditDay} 
+	</select>
+	
+	<insert id="insertAssetExcelResult" parameterType="java.util.HashMap">        
+		INSERT INTO SNET_ASSET_EXCEL_RESULT(FILE_ID, HOST_NM, IP_ADDRESS, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, JOB_FLAG)
+		values(#{FileId}, #{HostNm}, #{IpAddress}, #{SwType}, #{SwNm}, #{SwInfo}, #{AuditDay}, 3)
+	</insert>
+
+	<insert id="insertAssetCdToMaster" parameterType="java.util.HashMap">
+        INSERT INTO SNET_ASSET_MASTER(ASSET_CD, IP_ADDRESS, HOST_NM)
+		 VALUES(#{AssetCd}, #{IpAddress}, #{HostNm})         
+	</insert>
+	
+	<update id="updateAssetCdToMaster" parameterType="java.util.HashMap">
+        UPDATE SNET_ASSET_MASTER
+         SET AUDIT_DAY = #{AuditDay},
+          	AUDIT_RATE = #{AuditRate},
+          	UPDATE_DATE = SYSDATE
+         WHERE ASSET_CD = #{AssetCd}
+           AND IP_ADDRESS = #{IpAddress}
+           AND HOST_NM = #{HostNm}         
+	</update>
+	
+	<insert id="insertAssetCdToIp" parameterType="java.util.HashMap">
+        INSERT INTO SNET_ASSET_IP(ASSET_CD, IP_ADDRESS)
+		 VALUES(#{AssetCd}, #{IpAddress})         
+	</insert>
+	
+	<insert id="insertAuditSwReport" parameterType="java.util.HashMap">
+        INSERT INTO SNET_ASSET_SW_AUDIT_REPORT(ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS, ITEM_GRP_NM, DIAGNOSIS_CD, ITEM_NM, ITEM_STATUS, ITEM_GRADE, ITEM_RESULT, ITEM_COUNTERMEASURE_DETAIL, ITEM_COK_REASON)
+		 VALUES(#{AssetCd}, #{SwType}, #{SwNm}, #{SwInfo}, #{AuditDay}, #{HostNm}, #{IpAddress}, #{ItemGrpNm}, #{ItemDiagosisCd}, #{ItemNm}, #{ItemStatus}, #{ItemGrade}, #{ItemResult}, #{ItemCounterMeasureDetail}, #{ItemCokReason})         
+	</insert>
+	
+	<insert id="insertZipFileInfo" parameterType="java.util.HashMap">
+        INSERT INTO SNET_ASSET_SW_AUDIT_ZIPFILE(P_FILE_ID, FILE_ID, AD_FILE_NM, USER_ID, REQ_DATE, JOB_SDATE, JOB_EDATE, JOB_FLAG)
+		 VALUES(#{PFileId}, #{FileId}, #{AdFileNm}, #{UserId}, SYSDATE, SYSDATE, SYSDATE, 0)         
+	</insert>
+	
+	<delete id="deleteAssetSwReport" parameterType="java.util.HashMap">
+		DELETE FROM SNET_ASSET_SW_AUDIT_REPORT
+		WHERE ASSET_CD = #{AssetCd}
+		  AND SW_TYPE = #{SwType}
+		  AND SW_NM = #{SwNm}
+		  AND SW_INFO = #{SwInfo}
+		  AND AUDIT_DAY = #{AuditDay}
+		  AND HOST_NM = #{HostNm}
+		  AND IP_ADDRESS = #{IpAddress}
+	</delete>
+	
+	<delete id="deleteAssetSwHistory" parameterType="java.util.HashMap">
+		DELETE FROM SNET_ASSET_SW_AUDIT_HISTORY
+		WHERE ASSET_CD = #{AssetCd}
+		  AND SW_TYPE = #{SwType}
+		  AND SW_NM = #{SwNm}
+		  AND SW_INFO = #{SwInfo}
+		  AND AUDIT_DAY = #{AuditDay}
+		  AND HOST_NM = #{HostNm}
+		  AND IP_ADDRESS = #{IpAddress}
+	</delete>
+	
+	<delete id="deleteAssetSwDay" parameterType="java.util.HashMap">
+		DELETE FROM SNET_ASSET_SW_AUDIT_DAY
+		WHERE ASSET_CD = #{AssetCd}
+		  AND SW_TYPE = #{SwType}
+		  AND SW_NM = #{SwNm}
+		  AND SW_INFO = #{SwInfo}
+		  AND AUDIT_DAY = #{AuditDay}
+		  AND USER_REGI = 1
+	</delete>
+	
+	<delete id="deleteAssetExcelResult" parameterType="java.util.HashMap">
+		DELETE FROM SNET_ASSET_EXCEL_RESULT
+		WHERE FILE_ID = #{FILE_ID} 
+	</delete>	
+	
+	<delete id="deleteSwZipFileList" parameterType="java.util.HashMap">
+		DELETE FROM SNET_ASSET_SW_AUDIT_ZIPFILE
+		WHERE P_FILE_ID = #{FILE_ID}
+	</delete>
+	
+	<select id="selectAuditSwDay" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT AUDIT_DAY, ASSET_CD, SW_TYPE, SW_NM, SW_INFO
+		  FROM SNET_ASSET_SW_AUDIT_DAY
+		WHERE ASSET_CD = #{AssetCd}
+		 AND SW_TYPE = #{SwType}
+		 AND SW_NM = #{SwNm}
+		 AND SW_INFO = #{SwInfo}
+	</select>
+	
+	<insert id="insertAuditSwDay" parameterType="java.util.HashMap">
+		 INSERT INTO SNET_ASSET_SW_AUDIT_DAY(ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, USER_REGI)
+		 VALUES(#{AssetCd}, #{SwType}, #{SwNm}, #{SwInfo}, #{AuditDay}, 1)         
+	</insert>
+	
+	<update id="updateAuditSwDay" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_SW_AUDIT_DAY
+		   SET AUDIT_DAY = #{AuditDay},
+		   	   LAST_CHG_DATE = TO_CHAR(SYSDATE, 'YYYYMMDD')
+		  WHERE ASSET_CD = #{AssetCd}
+		 	AND SW_TYPE = #{SwType}
+		 	AND SW_NM = #{SwNm}
+		 	AND SW_INFO = #{SwInfo}
+	</update>
+	
+	<insert id="insertAuditSwHistory" parameterType="java.util.HashMap">	
+			INSERT INTO SNET_ASSET_SW_AUDIT_HISTORY(ASSET_CD, AUDIT_DAY, HOST_NM, IP_ADDRESS, SW_TYPE,  SW_NM,  SW_INFO, AUDIT_RATE,
+				AD_RESULT_OK,  AD_RESULT_NOK,  AD_RESULT_NA, AD_RESULT_PASS , AD_RESULT_REQ, AD_WEIGHT_TOTAL ,   
+			 	AD_WEIGHT_OK,  AD_WEIGHT_NOK, AD_WEIGHT_NA, AD_WEIGHT_PASS, AD_WEIGHT_REQ, BRANCH_ID, BRANCH_NM, TEAM_ID, TEAM_NM) 
+			
+			SELECT KK.ASSET_CD, KK.AUDIT_DAY, KK.HOST_NM, KK.IP_ADDRESS, KK.SW_TYPE,  KK.SW_NM,  KK.SW_INFO, KK.AUDIT_RATE, 
+			 	KK.AD_RESULT_OK, KK. AD_RESULT_NOK,  KK.AD_RESULT_NA, KK.AD_RESULT_PASS ,  KK.AD_RESULT_REQ,  KK.AD_WEIGHT_TOTAL ,   
+			 	KK.AD_WEIGHT_OK,  KK.AD_WEIGHT_NOK, KK.AD_WEIGHT_NA, KK.AD_WEIGHT_PASS, KK.AD_WEIGHT_REQ,
+				PP.BRANCH_ID, PP.BRANCH_NM, PP.TEAM_ID, PP.TEAM_NM
+			  FROM (
+			 
+				SELECT ASSET_CD, AUDIT_DAY, HOST_NM, IP_ADDRESS, SW_TYPE,  SW_NM,  SW_INFO, 
+					 CASE WHEN AD_WEIGHT_OK = 0 THEN 0
+	                  ELSE
+	                  ROUND (
+	                     (AD_WEIGHT_OK
+	                      / (  AD_WEIGHT_TOTAL
+	                         - AD_WEIGHT_PASS
+	                         - AD_WEIGHT_NA))
+	                     * 100,
+	                     2) END 
+	                     AS AUDIT_RATE,
+					 AD_RESULT_OK,  AD_RESULT_NOK,  AD_RESULT_NA, AD_RESULT_PASS ,  AD_RESULT_REQ,  AD_WEIGHT_TOTAL ,   
+					 AD_WEIGHT_OK,  AD_WEIGHT_NOK, AD_WEIGHT_NA, AD_WEIGHT_PASS, AD_WEIGHT_REQ      
+			 	FROM (
+				 	SELECT ASSET_CD,
+                          SW_TYPE,
+                          SW_NM,
+                          SW_INFO,
+                          AUDIT_DAY,
+                          HOST_NM,
+                          IP_ADDRESS,
+                          NVL (AD_RESULT_OK, 0) AS AD_RESULT_OK,
+                          NVL (AD_RESULT_NOK, 0) AS AD_RESULT_NOK,
+                          NVL (AD_RESULT_NA, 0) AS AD_RESULT_NA,
+                          NVL (AD_RESULT_PASS, 0) AS AD_RESULT_PASS,
+                          NVL (AD_RESULT_REQ, 0) AS AD_RESULT_REQ,
+                          NVL (AD_WEIGHT_OK, 0) AS AD_WEIGHT_OK,
+                          NVL (AD_WEIGHT_NOK, 0) AS AD_WEIGHT_NOK,
+                          NVL (AD_WEIGHT_NA, 0) AS AD_WEIGHT_NA,
+                          NVL (AD_WEIGHT_PASS, 0) AS AD_WEIGHT_PASS,
+                          NVL (AD_WEIGHT_REQ, 0) AS AD_WEIGHT_REQ,
+                          (  NVL (AD_WEIGHT_OK, 0)
+                           + NVL (AD_WEIGHT_NOK, 0)
+                           + NVL (AD_WEIGHT_NA, 0)
+                           + NVL (AD_WEIGHT_PASS, 0)
+                           + NVL (AD_WEIGHT_REQ, 0))
+                             AS AD_WEIGHT_TOTAL
+				    
+					FROM (     
+				         SELECT ASSET_CD,
+                                    SW_TYPE,
+                                    SW_NM,
+                                    SW_INFO,
+                                    AUDIT_DAY,
+                                    HOST_NM,
+                                    IP_ADDRESS,
+                                    SUM (AD_RESULT_OK) AS AD_RESULT_OK,
+                                    SUM (AD_WEIGHT_OK) AS AD_WEIGHT_OK,
+                                    SUM (AD_RESULT_NOK) AS AD_RESULT_NOK,
+                                    SUM (AD_WEIGHT_NOK) AS AD_WEIGHT_NOK,
+                                    SUM (AD_RESULT_NA) AS AD_RESULT_NA,
+                                    SUM (AD_WEIGHT_NA) AS AD_WEIGHT_NA,
+                                    SUM (AD_RESULT_PASS) AS AD_RESULT_PASS,
+                                    SUM (AD_WEIGHT_PASS) AS AD_WEIGHT_PASS,
+                                    SUM (AD_RESULT_REQ) AS AD_RESULT_REQ,
+                                    SUM (AD_WEIGHT_REQ) AS AD_WEIGHT_REQ
+
+				        FROM (
+								SELECT ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS, 
+									COUNT(*) AS AD_RESULT_OK, 
+									0 AS AD_RESULT_NOK, 
+									0 AS AD_RESULT_NA, 
+									0 AS AD_RESULT_PASS, 
+									0 AS AD_RESULT_REQ,
+									SUM(CASE WHEN ITEM_GRADE = 'H' THEN 3                      
+										WHEN ITEM_GRADE = 'M' THEN 2
+										WHEN ITEM_GRADE = 'L' THEN 1                                  
+									END) AS AD_WEIGHT_OK ,
+								   0 AS AD_WEIGHT_NOK,
+								   0 AS AD_WEIGHT_NA,
+								   0 AS AD_WEIGHT_PASS,
+								   0 AS AD_WEIGHT_REQ
+								  FROM SNET_ASSET_SW_AUDIT_REPORT
+								  WHERE ITEM_RESULT = 'T'
+									AND ASSET_CD = #{AssetCd}
+									AND SW_TYPE = #{SwType}
+									AND SW_NM = #{SwNm}
+									AND SW_INFO = #{SwInfo}
+									AND AUDIT_DAY = #{AuditDay}
+								GROUP BY ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS
+		
+								UNION ALL
+							      
+								SELECT ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS, 
+									0 AS AD_RESULT_OK, 
+									COUNT(*) AS AD_RESULT_NOK, 
+									0 AS AD_RESULT_NA, 
+									0 AS AD_RESULT_PASS, 
+									0 AS AD_RESULT_REQ,
+									0 AS AD_WEIGHT_OK,
+									SUM(CASE WHEN ITEM_GRADE = 'H' THEN 3                      
+										WHEN ITEM_GRADE = 'M' THEN 2
+										WHEN ITEM_GRADE = 'L' THEN 1                                  
+									 END) AS AD_WEIGHT_NOK,
+									  0 AS AD_WEIGHT_NA,
+									   0 AS AD_WEIGHT_PASS,
+									   0 AS AD_WEIGHT_REQ
+								  FROM SNET_ASSET_SW_AUDIT_REPORT
+								  WHERE ITEM_RESULT = 'F'
+									AND ASSET_CD = #{AssetCd}
+									AND SW_TYPE = #{SwType}
+									AND SW_NM = #{SwNm}
+									AND SW_INFO = #{SwInfo}
+									AND AUDIT_DAY = #{AuditDay}
+								GROUP BY ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS
+		
+								UNION ALL
+							     
+								SELECT ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS,  
+									0 AS AD_RESULT_OK, 
+									0 AD_RESULT_NOK, 
+									COUNT(*) AS AD_RESULT_NA, 
+									0 AS AD_RESULT_PASS, 
+									0 AS AD_RESULT_REQ,
+									0 AS AD_WEIGHT_OK,
+									0 AS AD_WEIGHT_NOK,
+									SUM(CASE WHEN ITEM_GRADE = 'H' THEN 3                      
+									   WHEN ITEM_GRADE = 'M' THEN 2
+									   WHEN ITEM_GRADE = 'L' THEN 1                                  
+									END) AS AD_WEIGHT_NA,
+									   0 AS AD_WEIGHT_PASS,
+									   0 AS AD_WEIGHT_REQ
+								  FROM SNET_ASSET_SW_AUDIT_REPORT
+								  WHERE ITEM_RESULT = 'NA'
+									AND ASSET_CD = #{AssetCd}
+									AND SW_TYPE = #{SwType}
+									AND SW_NM = #{SwNm}
+									AND SW_INFO = #{SwInfo}
+									AND AUDIT_DAY = #{AuditDay}
+								GROUP BY ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS
+		
+								UNION ALL				       
+											
+								SELECT ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS, 
+									0 AS AD_RESULT_OK, 
+									0 AD_RESULT_NOK, 
+									0 AS AD_RESULT_NA,  
+									COUNT(*) AS AD_RESULT_PASS, 
+									0 AS AD_RESULT_REQ,
+									0 AS AD_WEIGHT_OK,
+									0 AS AD_WEIGHT_NOK,
+									0 AS AD_WEIGHT_NA,
+								SUM(CASE WHEN ITEM_GRADE = 'H' THEN 3                      
+								   WHEN ITEM_GRADE = 'M' THEN 2
+								   WHEN ITEM_GRADE = 'L' THEN 1                                  
+								END) AS AD_WEIGHT_PASS,
+									0 AS AD_WEIGHT_REQ
+								  FROM SNET_ASSET_SW_AUDIT_REPORT
+								  WHERE ITEM_RESULT = 'C'
+									AND ASSET_CD = #{AssetCd}
+									AND SW_TYPE = #{SwType}
+									AND SW_NM = #{SwNm}
+									AND SW_INFO = #{SwInfo}
+									AND AUDIT_DAY = #{AuditDay}
+								GROUP BY ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS
+		
+								UNION ALL
+							  
+							    SELECT ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS, 
+								0 AS AD_RESULT_OK, 
+								0 AD_RESULT_NOK, 
+								0 AS AD_RESULT_NA, 
+								0 AS AD_RESULT_PASS, 
+								COUNT(*) AS AD_RESULT_REQ,
+								0 AS AD_WEIGHT_OK,
+								0 AS AD_WEIGHT_NOK,
+								0 AS AD_WEIGHT_NA,
+								0 AS AD_WEIGHT_PASS,
+							    SUM(CASE WHEN ITEM_GRADE = 'H' THEN 3                      
+								   WHEN ITEM_GRADE = 'M' THEN 2
+								   WHEN ITEM_GRADE = 'L' THEN 1                                  
+								END) AS AD_WEIGHT_REQ
+							      FROM SNET_ASSET_SW_AUDIT_REPORT
+							      WHERE ITEM_RESULT = 'R'
+								AND ASSET_CD = #{AssetCd}
+								AND SW_TYPE = #{SwType}
+								AND SW_NM = #{SwNm}
+								AND SW_INFO = #{SwInfo}
+								AND AUDIT_DAY = #{AuditDay}
+							    GROUP BY ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS
+						)
+						GROUP BY ASSET_CD, SW_TYPE, SW_NM, SW_INFO, AUDIT_DAY, HOST_NM, IP_ADDRESS
+			          )       
+                   )                      
+   		   ) KK,(
+		         SELECT B.IP_ADDRESS, A.HOST_NM, A.BRANCH_ID, A.BRANCH_NM, A.TEAM_ID, A.TEAM_NM, C.USER_ID, C.USER_TYPE, C.USER_NM
+		          FROM SNET_ASSET_MASTER A, SNET_ASSET_IP B, SNET_ASSET_USER C
+		          WHERE A.ASSET_CD = B.ASSET_CD
+		            AND A.ASSET_CD = C.ASSET_CD(+)        
+		            AND A.IP_ADDRESS = B.IP_ADDRESS
+		            AND C.USER_TYPE = 'OP'  
+		          GROUP BY B.IP_ADDRESS, A.HOST_NM, A.BRANCH_ID, A.BRANCH_NM, A.TEAM_ID, A.TEAM_NM,  C.USER_ID, C.USER_TYPE, C.USER_NM
+          ) PP
+			WHERE KK.IP_ADDRESS = PP.IP_ADDRESS(+)
+			   AND KK.HOST_NM = PP.HOST_NM(+)		
+	</insert>
+	
+	<select id="selectAssetRateData" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT 	A.ASSET_CD, 
+				MAX(A.AUDIT_DAY) AS AUDIT_DAY,  
+			  	(SUM(B.AUDIT_RATE)/ COUNT(*)) AS AUDIT_RATE,
+				ROUND((SUM(B.AD_WEIGHT_OK) / (SUM(B.AD_WEIGHT_TOTAL)-SUM(B.AD_WEIGHT_PASS)-SUM(B.AD_WEIGHT_NA)))* 100, 2) AS AVG_WEIGHT_AUDIT_RATE
+		  FROM SNET_ASSET_SW_AUDIT_DAY A, SNET_ASSET_SW_AUDIT_HISTORY B
+		 WHERE A.ASSET_CD = B.ASSET_CD
+		   AND A.SW_TYPE = B.SW_TYPE
+		   AND A.SW_NM = B.SW_NM
+		   AND A.SW_INFO = B.SW_INFO
+		   AND A.AUDIT_DAY = B.AUDIT_DAY
+		   AND A.ASSET_CD = #{AssetCd}
+		   GROUP BY A.ASSET_CD
+	</select>
+	
+	<update id="updateAssetRateData" parameterType="java.util.HashMap">
+		 UPDATE SNET_ASSET_MASTER
+		 SET AUDIT_DAY = #{AUDIT_DAY},
+		  AUDIT_RATE = #{AUDIT_RATE}
+		 WHERE ASSET_CD = #{ASSET_CD}
+	</update>
+	
+	
+</mapper> 

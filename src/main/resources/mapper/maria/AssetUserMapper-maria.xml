@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.AssetUserMapper">
+
+    <!-- 'sg_supprotmanager 프로젝트 - 스케줄러' -->
+    <!--   -> to do test : branch_id null 인 경우가 있는지? -->
+    <select id="getAssetUserFirstList" parameterType="SnetAssetUser" resultType="SnetAssetUser">
+        select *
+        from (
+        select A.team_id, A.user_id, A.user_auth
+        from SNET_CONFIG_USER_AUTH A
+        left outer join SNET_ASSET_USER B
+        on (A.user_id = B.user_id)
+        <if test="userId != null and !userId.equals('') ">
+            where A.USER_ID = #{userId}
+        </if>
+        group by A.user_id
+        ) B
+    </select>
+
+    <select id="getAssetUserList" parameterType="SnetAssetUser" resultType="SnetAssetUser">
+        select D.*
+        from (
+        select C.asset_cd, A.team_id, A.user_id, B.user_auth, C.BRANCH_ID, C.audit_day, C.gov_flag
+        from SNET_ASSET_USER A
+        inner join SNET_CONFIG_USER_AUTH B on (A.user_id = B.user_id)
+        inner join SNET_ASSET_MASTER C on A.team_id = C.team_id
+        where 1=1
+        and C.asset_cd is not null
+        and C.branch_id is not null
+        <if test="userId != null and !userId.equals('') ">
+            and A.USER_ID = #{userId}
+        </if>
+        <if test="teamId != null and !teamId.equals('') ">
+            and A.TEAM_ID = #{teamId}
+        </if>
+        ) D
+        where D.user_auth is not null
+        and D.audit_day is not null
+        group by D.user_id
+    </select>
+
+    <select id="getAssetUserAllList" parameterType="java.util.HashMap" resultType="SnetAssetUser">
+        select C.asset_cd, C.team_id, C.BRANCH_ID, C.audit_day, C.gov_flag
+        from SNET_ASSET_MASTER C
+        where 1=1
+        and C.team_id in
+        <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <!--<choose>
+            <when test="ALL_FLAG != null and !ALL_FLAG.equals('') ">
+
+            </when>
+            <otherwise>
+                and C.team_id in
+                <foreach item="item" index="index" collection="assetCdInArr" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </otherwise>
+        </choose>-->
+    </select>
+
+</mapper>

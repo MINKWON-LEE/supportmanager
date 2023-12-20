@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobigen.snet.supportagent.dao.table.dao.SnetAssetSwAuditHistoryDao">
+
+<insert id="insert" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditHistoryEntity">
+ INSERT INTO SNET_ASSET_SW_AUDIT_HISTORY
+ <trim prefix="(" suffix=")"  prefixOverrides="," >
+   <if test='assetCd != null '>
+      , asset_cd
+   </if>
+   <if test='swType != null '>
+      , sw_type
+   </if>
+   <if test='swNm != null '>
+      , sw_nm
+   </if>
+   <if test='swInfo != null '>
+      , sw_info
+   </if>
+   <if test='swDir != null '>
+      , sw_dir
+   </if>
+   <if test='swUser != null '>
+      , sw_user
+   </if>
+   <if test='swEtc != null '>
+      , sw_etc
+   </if>
+   <if test='auditDay != null '>
+      , audit_day
+   </if>
+   <if test='branchId != null '>
+      , branch_id
+   </if>
+   <if test='branchNm != null '>
+      , branch_nm
+   </if>
+   <if test='teamId != null '>
+      , team_id
+   </if>
+   <if test='teamNm != null '>
+      , team_nm
+   </if>
+   <if test='hostNm != null '>
+      , host_nm
+   </if>
+   <if test='ipAddress != null '>
+      , ip_address
+   </if>
+   <if test='auditRate != null '>
+      , audit_rate
+   </if>
+   <if test='adResultOk != null '>
+      , ad_result_ok
+   </if>
+   <if test='adResultNok != null '>
+      , ad_result_nok
+   </if>
+   <if test='adResultNa != null '>
+      , ad_result_na
+   </if>
+   <if test='adResultPass != null '>
+      , ad_result_pass
+   </if>
+   <if test='adWeightTotal != null '>
+      , ad_weight_total
+   </if>
+   <if test='adWeightOk != null '>
+      , ad_weight_ok
+   </if>
+   <if test='adWeightNok != null '>
+      , ad_weight_nok
+   </if>
+   <if test='adWeightPass != null '>
+      , ad_weight_pass
+   </if>
+   <if test='adWeightNa != null '>
+      , ad_weight_na
+   </if>
+   <if test='auditFileCd != null '>
+      , audit_file_cd
+   </if>
+   <if test='adResultReq != null '>
+      , ad_result_req
+   </if>
+   <if test='adWeightReq != null '>
+      , ad_weight_req
+   </if>
+   <if test='userId != null '>
+      , user_id
+   </if>
+   <if test='userNm != null '>
+      , user_nm
+   </if>
+   <if test='servicePNm != null '>
+      , service_p_nm
+   </if>
+   <if test='serviceCNm != null '>
+      , service_c_nm
+   </if>
+ </trim>
+ <trim prefix="VALUES (" suffix=")" prefixOverrides=",">
+   <if test='assetCd != null '>
+   	  ,    #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swType != null '>
+   	  ,    #{swType, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swNm != null '>
+   	  ,    #{swNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swInfo != null '>
+   	  ,    #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swDir != null '>
+   	  ,    #{swDir, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swUser != null '>
+   	  ,    #{swUser, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='swEtc != null '>
+   	  ,    #{swEtc, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditDay != null '>
+   	  ,    #{auditDay, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='branchId != null '>
+   	  ,    #{branchId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='branchNm != null '>
+   	  ,    #{branchNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamId != null '>
+   	  ,    #{teamId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='teamNm != null '>
+   	  ,    #{teamNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='hostNm != null '>
+   	  ,    #{hostNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='ipAddress != null '>
+   	  ,    #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='auditRate != null '>
+   	  ,    #{auditRate, javaType=String, jdbcType=DECIMAL} 
+   </if>
+   <if test='adResultOk != null '>
+   	  ,    #{adResultOk, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adResultNok != null '>
+   	  ,    #{adResultNok, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adResultNa != null '>
+   	  ,    #{adResultNa, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adResultPass != null '>
+   	  ,    #{adResultPass, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adWeightTotal != null '>
+   	  ,    #{adWeightTotal, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adWeightOk != null '>
+   	  ,    #{adWeightOk, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adWeightNok != null '>
+   	  ,    #{adWeightNok, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adWeightPass != null '>
+   	  ,    #{adWeightPass, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adWeightNa != null '>
+   	  ,    #{adWeightNa, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='auditFileCd != null '>
+   	  ,    #{auditFileCd, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='adResultReq != null '>
+   	  ,    #{adResultReq, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='adWeightReq != null '>
+   	  ,    #{adWeightReq, javaType=String, jdbcType=INTEGER} 
+   </if>
+   <if test='userId != null '>
+   	  ,    #{userId, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='userNm != null '>
+   	  ,    #{userNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='servicePNm != null '>
+   	  ,    #{servicePNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+   <if test='serviceCNm != null '>
+   	  ,    #{serviceCNm, javaType=String, jdbcType=VARCHAR} 
+   </if>
+  </trim>
+</insert>
+
+
+<update id="update" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditHistoryEntity">
+   UPDATE 
+         SNET_ASSET_SW_AUDIT_HISTORY
+      SET 
+ <trim  prefixOverrides="," >
+    <if test='branchId != null '>
+      , branch_id =   #{branchId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='branchNm != null '>
+      , branch_nm =   #{branchNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='teamId != null '>
+      , team_id =   #{teamId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='teamNm != null '>
+      , team_nm =   #{teamNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='hostNm != null '>
+      , host_nm =   #{hostNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='ipAddress != null '>
+      , ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='auditRate != null '>
+      , audit_rate =   #{auditRate, javaType=String, jdbcType=DECIMAL} 
+    </if>  
+    <if test='adResultOk != null '>
+      , ad_result_ok =   #{adResultOk, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adResultNok != null '>
+      , ad_result_nok =   #{adResultNok, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adResultNa != null '>
+      , ad_result_na =   #{adResultNa, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adResultPass != null '>
+      , ad_result_pass =   #{adResultPass, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adWeightTotal != null '>
+      , ad_weight_total =   #{adWeightTotal, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adWeightOk != null '>
+      , ad_weight_ok =   #{adWeightOk, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adWeightNok != null '>
+      , ad_weight_nok =   #{adWeightNok, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adWeightPass != null '>
+      , ad_weight_pass =   #{adWeightPass, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adWeightNa != null '>
+      , ad_weight_na =   #{adWeightNa, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='auditFileCd != null '>
+      , audit_file_cd =   #{auditFileCd, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='adResultReq != null '>
+      , ad_result_req =   #{adResultReq, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='adWeightReq != null '>
+      , ad_weight_req =   #{adWeightReq, javaType=String, jdbcType=INTEGER} 
+    </if>  
+    <if test='userId != null '>
+      , user_id =   #{userId, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='userNm != null '>
+      , user_nm =   #{userNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='servicePNm != null '>
+      , service_p_nm =   #{servicePNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+    <if test='serviceCNm != null '>
+      , service_c_nm =   #{serviceCNm, javaType=String, jdbcType=VARCHAR} 
+    </if>  
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+   AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+   AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+   AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+   AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+   AND audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<update id="updateIncludingNulls" parameterType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditHistoryEntity">
+   UPDATE 
+         SNET_ASSET_SW_AUDIT_HISTORY
+      SET 
+ <trim  prefixOverrides="," >
+      , branch_id =   #{branchId, javaType=String, jdbcType=VARCHAR} 
+      , branch_nm =   #{branchNm, javaType=String, jdbcType=VARCHAR} 
+      , team_id =   #{teamId, javaType=String, jdbcType=VARCHAR} 
+      , team_nm =   #{teamNm, javaType=String, jdbcType=VARCHAR} 
+      , host_nm =   #{hostNm, javaType=String, jdbcType=VARCHAR} 
+      , ip_address =   #{ipAddress, javaType=String, jdbcType=VARCHAR} 
+      , audit_rate =   #{auditRate, javaType=String, jdbcType=DECIMAL} 
+      , ad_result_ok =   #{adResultOk, javaType=String, jdbcType=INTEGER} 
+      , ad_result_nok =   #{adResultNok, javaType=String, jdbcType=INTEGER} 
+      , ad_result_na =   #{adResultNa, javaType=String, jdbcType=INTEGER} 
+      , ad_result_pass =   #{adResultPass, javaType=String, jdbcType=INTEGER} 
+      , ad_weight_total =   #{adWeightTotal, javaType=String, jdbcType=INTEGER} 
+      , ad_weight_ok =   #{adWeightOk, javaType=String, jdbcType=INTEGER} 
+      , ad_weight_nok =   #{adWeightNok, javaType=String, jdbcType=INTEGER} 
+      , ad_weight_pass =   #{adWeightPass, javaType=String, jdbcType=INTEGER} 
+      , ad_weight_na =   #{adWeightNa, javaType=String, jdbcType=INTEGER} 
+      , audit_file_cd =   #{auditFileCd, javaType=String, jdbcType=VARCHAR} 
+      , ad_result_req =   #{adResultReq, javaType=String, jdbcType=INTEGER} 
+      , ad_weight_req =   #{adWeightReq, javaType=String, jdbcType=INTEGER} 
+      , user_id =   #{userId, javaType=String, jdbcType=VARCHAR} 
+      , user_nm =   #{userNm, javaType=String, jdbcType=VARCHAR} 
+      , service_p_nm =   #{servicePNm, javaType=String, jdbcType=VARCHAR} 
+      , service_c_nm =   #{serviceCNm, javaType=String, jdbcType=VARCHAR} 
+ </trim>
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+   AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+   AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+   AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+   AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+   AND audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+</update>
+
+
+<delete id="delete" >
+DELETE FROM 
+       SNET_ASSET_SW_AUDIT_HISTORY
+ WHERE 
+       asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+   AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+   AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+   AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+   AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+   AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+   AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+   AND audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+</delete>
+
+
+<select id="select" resultType="com.mobigen.snet.supportagent.dao.table.model.SnetAssetSwAuditHistoryEntity" useCache="false">
+SELECT   
+  <trim prefixOverrides=",">
+      , asset_cd AS assetCd
+      , sw_type AS swType
+      , sw_nm AS swNm
+      , sw_info AS swInfo
+      , sw_dir AS swDir
+      , sw_user AS swUser
+      , sw_etc AS swEtc
+      , audit_day AS auditDay
+      , branch_id AS branchId
+      , branch_nm AS branchNm
+      , team_id AS teamId
+      , team_nm AS teamNm
+      , host_nm AS hostNm
+      , ip_address AS ipAddress
+      , audit_rate AS auditRate
+      , ad_result_ok AS adResultOk
+      , ad_result_nok AS adResultNok
+      , ad_result_na AS adResultNa
+      , ad_result_pass AS adResultPass
+      , ad_weight_total AS adWeightTotal
+      , ad_weight_ok AS adWeightOk
+      , ad_weight_nok AS adWeightNok
+      , ad_weight_pass AS adWeightPass
+      , ad_weight_na AS adWeightNa
+      , audit_file_cd AS auditFileCd
+      , ad_result_req AS adResultReq
+      , ad_weight_req AS adWeightReq
+      , user_id AS userId
+      , user_nm AS userNm
+      , service_p_nm AS servicePNm
+      , service_c_nm AS serviceCNm
+  </trim>
+ FROM 
+      SNET_ASSET_SW_AUDIT_HISTORY
+WHERE
+      asset_cd =   #{assetCd, javaType=String, jdbcType=VARCHAR} 
+  AND sw_type =   #{swType, javaType=String, jdbcType=VARCHAR} 
+  AND sw_nm =   #{swNm, javaType=String, jdbcType=VARCHAR} 
+  AND sw_info =   #{swInfo, javaType=String, jdbcType=VARCHAR} 
+  AND sw_dir =   #{swDir, javaType=String, jdbcType=VARCHAR} 
+  AND sw_user =   #{swUser, javaType=String, jdbcType=VARCHAR} 
+  AND sw_etc =   #{swEtc, javaType=String, jdbcType=VARCHAR} 
+  AND audit_day =   #{auditDay, javaType=String, jdbcType=VARCHAR} 
+</select>
+
+</mapper>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobigen.snet.supportagent.dao.ResourceMonitoringMapper">
+
+	<insert id="insertProcess">
+		INSERT INTO SNET_REPORT_PROCESS
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, PR_NM
+			, PUSER
+			, PID
+			, MEM
+			, CPU
+			, STATUS
+		)VALUES(
+			TO_CHAR(SYSDATE, 'yyyymmdd')
+			, TO_CHAR(SYSDATE, 'hh24')
+			, TO_CHAR(SYSDATE, 'MI')
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{procesNm,jdbcType=VARCHAR}
+			, #{user,jdbcType=VARCHAR}
+			, #{pid,jdbcType=VARCHAR}
+			, #{mem,jdbcType=VARCHAR}
+			, #{cpu,jdbcType=VARCHAR}
+			, #{status,jdbcType=INTEGER}
+		)
+	</insert>
+	
+	<insert id="insertCpu">
+		INSERT INTO SNET_REPORT_CPU
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, CPU_RATE
+		)
+		VALUES
+		(
+			TO_CHAR(SYSDATE, 'yyyymmdd')
+			, TO_CHAR(SYSDATE, 'hh24')
+			, TO_CHAR(SYSDATE, 'MI')
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{cpu,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="insertDisk">
+		INSERT INTO SNET_REPORT_DISK
+		(
+			CDATE
+			, CHOUR
+			, CMIN		
+			, SERVER_NM
+			, FILE_SYSTEM
+			, DISK_SIZE
+			, USED
+			, AVAIL
+			, USE_RATE
+			, MOUNTED_ON
+		)
+		VALUES
+		(
+			TO_CHAR(SYSDATE, 'yyyymmdd')
+			, TO_CHAR(SYSDATE, 'hh24')
+			, TO_CHAR(SYSDATE, 'MI')		
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{fileSystem,jdbcType=VARCHAR}
+			, #{size,jdbcType=VARCHAR}
+			, #{used,jdbcType=VARCHAR}
+			, #{avail,jdbcType=VARCHAR}
+			, #{useRate,jdbcType=VARCHAR}
+			, #{mountedOn,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="insertMemory">
+		INSERT INTO SNET_REPORT_MEMORY
+		(
+			CDATE
+			, CHOUR
+			, CMIN
+			, SERVER_NM
+			, TOTAL
+			, FREE
+			, USED
+			, USE_RATE
+		)
+		VALUES
+		(
+			TO_CHAR(SYSDATE, 'yyyymmdd')
+			, TO_CHAR(SYSDATE, 'hh24')
+			, TO_CHAR(SYSDATE, 'MI')		
+			, #{serverNm,jdbcType=VARCHAR}
+			, #{total,jdbcType=VARCHAR}
+			, #{free,jdbcType=VARCHAR}
+			, #{used,jdbcType=VARCHAR}
+			, #{useRate,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<select id="selectThreshold" parameterType="com.mobigen.snet.supportagent.entity.Threshold" resultType="com.mobigen.snet.supportagent.entity.Threshold">
+		SELECT *
+		FROM SNET_CONFIG_THRESHOLD
+		<where>
+			<if test="checkTarget !=null and checkTarget != ''">
+				CHECK_TARGET = #{checkTarget}
+			</if>
+			<if test="alarmLevel !=null and alarmLevel != ''">
+				AND ALARM_LEVEL = #{alarmLevel}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectAlarmUser" parameterType="com.mobigen.snet.supportagent.entity.AlarmUser" resultType="com.mobigen.snet.supportagent.entity.AlarmUser">
+		SELECT *
+		FROM SNET_CONFIG_ALARM_USER
+		<where>
+			<if test="alarmLevel !=null and alarmLevel != ''">
+				ALARM_LEVEL = #{alarmLevel}
+			</if>
+		</where>
+	</select>
+	
+	<select id="checkProcess" parameterType="String" resultType="double">
+		SELECT NVL(TO_NUMBER(AVG(C.CPU)), 0)
+		FROM 
+		(
+			SELECT 
+			ROWNUM AS RNUM, R.*
+			FROM
+			(
+				SELECT A.*  
+				FROM SNET_REPORT_PROCESS A
+				WHERE CDATE = TO_CHAR(SYSDATE, 'YYYYMMDD') AND CHOUR = TO_CHAR(SYSDATE, 'HH24')
+				AND PR_NM = #{processNm}
+				ORDER BY CMIN DESC
+			) R
+		) C
+		WHERE C.RNUM BETWEEN 0 AND 5
+	</select>
+
+	<select id="checkCpu" parameterType="String" resultType="double">
+		SELECT NVL(TO_NUMBER (AVG (c.cpu_rate)),0) AS AVG_CPU
+		  FROM (SELECT ROWNUM AS rnum, r.*
+		          FROM (  SELECT a.*
+		                    FROM SNET_REPORT_CPU a
+		                   WHERE     cdate = TO_CHAR (SYSDATE, 'yyyymmdd')
+		                         AND chour = TO_CHAR (SYSDATE, 'hh24')
+		                         AND SERVER_NM =#{serverNm}
+		                ORDER BY cmin DESC) r) c
+		 WHERE c.rnum BETWEEN 0 AND 5
+	</select>
+
+	<select id="checkDisk" parameterType="String" resultType="com.mobigen.snet.supportagent.entity.DiskEntity">
+	<![CDATA[
+		SELECT *
+		FROM
+		(
+			SELECT FILE_SYSTEM, DISK_SIZE, USED, AVAIL, TO_CHAR(NVL(TO_NUMBER(substr(use_rate, 1, LENGTH(use_rate)-1)),0)) as useRate
+			FROM SNET_REPORT_DISK a
+			WHERE     cdate = TO_CHAR (SYSDATE, 'yyyymmdd')
+			 AND chour = TO_CHAR (SYSDATE, 'hh24')
+			 AND CMIN = TO_CHAR (SYSDATE, 'MI')
+			 AND SERVER_NM =#{serverNm}
+		)C
+		WHERE C.useRate > 90	
+	]]>
+	</select>
+
+	<select id="checkMemory" parameterType="String" resultType="double">
+		SELECT NVL(TO_NUMBER (AVG (c.USE_RATE)), 0) AS AVG_USAGE
+		  FROM (SELECT ROWNUM AS rnum, r.*
+		          FROM (  SELECT a.*
+		                    FROM SNET_REPORT_MEMORY a
+		                   WHERE     cdate = TO_CHAR (SYSDATE, 'yyyymmdd')
+		                         AND chour = TO_CHAR (SYSDATE, 'hh24')
+								 AND SERVER_NM =#{serverNm}
+		                ORDER BY cmin DESC) r) c
+		 WHERE c.rnum BETWEEN 0 AND 5	
+	</select>
+</mapper>

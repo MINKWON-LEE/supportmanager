@@ -1,0 +1,32 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mobigen.snet.supportagent.dao.was.SnetConfigMailSettingMapper">
+
+	<select id="selectSnetConfigMailSettingDetail" parameterType="hashMap" resultType="SnetConfigMailSettingModel">
+		SELECT DIAGNOSIS_PART_ID,
+		       DIAGNOSIS_PART_NM,
+		       MANAGER_ID,
+		       MANAGER_NM,
+		       MANAGER_MAIL,
+		       MANAGER_TEAM_ID,
+		       MANAGER_TEAM_NM,
+		       <![CDATA[ 
+               CONCAT(MANAGER_NM,'/',MANAGER_TEAM_NM,'<',MANAGER_MAIL,'>') AS MANAGER_MAIL_INFO,
+		       PL_ID,
+		       PL_NM,
+		       PL_MAIL,
+		       PL_TEAM_ID,
+		       PL_TEAM_NM,
+               CONCAT(PL_NM,'/',PL_TEAM_NM,'<',PL_MAIL,'>') AS PL_MAIL_INFO,
+               ]]>
+		       SEND_YN,
+		       (SELECT TEMPLATE_CD FROM SNET_SERVICE_MAIL_TEMPLATE WHERE TEMPLATE_CD = CONCAT('TC_',#{diagnosisPartId})) AS TEMPLATE_CD,
+		       (SELECT TEMPLATE_NM FROM SNET_SERVICE_MAIL_TEMPLATE WHERE TEMPLATE_CD = CONCAT('TC_',#{diagnosisPartId})) AS TEMPLATE_NM,
+	           (SELECT MAIL_TITLE FROM SNET_SERVICE_MAIL_TEMPLATE WHERE TEMPLATE_CD = CONCAT('TC_',#{diagnosisPartId})) AS MAIL_TITLE,
+	           (SELECT SEND_MSG FROM SNET_SERVICE_MAIL_TEMPLATE WHERE TEMPLATE_CD = CONCAT('TC_',#{diagnosisPartId})) AS SEND_MSG
+		  FROM SNET_CONFIG_MAIL_SETTING
+	     WHERE DIAGNOSIS_PART_ID = #{diagnosisPartId}
+	</select>
+</mapper>
